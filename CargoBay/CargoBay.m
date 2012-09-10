@@ -107,6 +107,7 @@ static NSString * CBBase64EncodedStringFromData(NSData *data) {
     _receiptVerificationClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kCargoBayReceiptVerificationBaseURLString]];
     [_receiptVerificationClient setDefaultHeader:@"Accept" value:@"application/json"];
     [_receiptVerificationClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
+    [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObject:@"text/plain"]];
         
     return self;
 }
