@@ -1,7 +1,7 @@
 # CargoBay
 **The Essential StoreKit Companion**
 
-[`StoreKit`](http://developer.apple.com/library/ios/#documentation/StoreKit/Reference/StoreKit_Collection/) is the Apple framework for [making In-App Purchases](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/StoreKitGuide/Introduction/Introduction.html). It's pretty good in its own right, but it has a few rough edges. 
+[`StoreKit`](http://developer.apple.com/library/ios/#documentation/StoreKit/Reference/StoreKit_Collection/) is the Apple framework for [making In-App Purchases](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/StoreKitGuide/Introduction/Introduction.html). It's pretty good, but it has a few rough edges. 
 
 `CargoBay` smooths out those rough parts by providing:
 
@@ -63,8 +63,7 @@ success:^(NSArray *products, NSArray *invalidIdentifiers) {
 ```objective-c
 [[CargoBay sharedManager] verifyTransaction:(SKPaymentTransaction *) success:^(NSDictionary *receipt) {
   NSLog(@"Receipt: %@", receipt);
-}
-  failure:^(NSError *error) {
+} failure:^(NSError *error) {
     NSLog(@"Error %d (%@)", [error code], [error localizedDescription]);
 }];
 ```
