@@ -251,14 +251,32 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
     [[self registeredDelegates] removeObject:delegate];
 }
 
-- (id)initWithSuccess:(void (^)(NSArray *, NSArray *))success failure:(void (^)(NSError *))failure {
+- (id)initWithSuccess:(void (^)(NSArray *, NSArray *))success
+              failure:(void (^)(NSError *))failure
+{
     self = [super init];
     if (!self) {
         return nil;
     }
     
-    _success = [success copy];
-    _failure = [failure copy];
+    __weak __typeof(&*self)weakSelf = self;
+    
+    _success = [^(NSArray *products, NSArray *invalidIdentifiers) {
+        if (success) {
+            success(products, invalidIdentifiers);
+        }
+        
+        [[self class] unregisterDelegate:weakSelf];
+    } copy];
+    
+    _failure = [^(NSError *error) {
+        if (failure) {
+            failure(error);
+        }
+        
+        [[self class] unregisterDelegate:weakSelf];
+    } copy];
+
     
     return self;
 }
@@ -270,9 +288,7 @@ didFailWithError:(NSError *)error
 {
     if (_failure) {
         _failure(error);
-    }
-    
-    [[self class] unregisterDelegate:self];
+    }    
 }
 
 #pragma mark - SKProductsRequestDelegate
@@ -282,9 +298,7 @@ didFailWithError:(NSError *)error
 {
     if (_success) {
         _success(response.products, response.invalidProductIdentifiers);
-    }
-    
-    [[self class] unregisterDelegate:self];
+    }    
 }
 
 @end
