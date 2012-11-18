@@ -67,9 +67,3 @@
                                                        failure:(void (^)(SKPaymentQueue *queue, NSError *error))failure;
 
 @end
-
-///----------------
-/// @name Constants
-///----------------
-
-extern NSString * const CargoBarErrorDomain;

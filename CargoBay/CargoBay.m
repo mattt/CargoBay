@@ -27,8 +27,6 @@
 #import "AFHTTPClient.h"
 #import "AFJSONRequestOperation.h"
 
-NSString * const CargoBarErrorDomain = @"CargoBarErrorDomain";
-
 static NSString * const kCargoBayReceiptVerificationBaseURLString = @"https://buy.itunes.apple.com/";
 
 typedef void (^CargoBayPaymentQueueProductSuccessBlock)(NSArray *products, NSArray *invalidIdentifiers);
@@ -225,8 +223,11 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
     
     NSURLRequest *request = [_receiptVerificationClient requestWithMethod:@"GET" path:@"verifyReceipt" parameters:[NSDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transaction.transactionReceipt) forKey:@"receipt-data"]];
     AFHTTPRequestOperation *operation = [_receiptVerificationClient HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSInteger status = [[responseObject valueForKey:@"status"] integerValue];
-        if (status == 0) {
+        NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
+        
+        // Status 0: The receipt is valid.
+        // Status 21006: This receipt is valid but the subscription has expired.
+        if (status == 0 || status == 21006) {
             NSDictionary *receipt = [responseObject valueForKey:@"receipt"];
             NSError *error = nil;
             
@@ -244,7 +245,7 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
             if (failure) {
                 NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[responseObject valueForKey:@"exception"] forKey:NSLocalizedFailureReasonErrorKey];
                 
-                NSError *error = [[NSError alloc] initWithDomain:CargoBarErrorDomain code:status userInfo:userInfo];
+                NSError *error = [[NSError alloc] initWithDomain:SKErrorDomain code:status userInfo:userInfo];
                 failure(error);
             }
         }
