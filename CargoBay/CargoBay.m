@@ -259,7 +259,11 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
         return nil;
     }
     
+#if __has_feature(objc_arc_weak)
+    __weak __typeof(&*self)weakSelf = self;
+#else
     __unsafe_unretained __typeof(&*self)weakSelf = self;
+#endif
     
     _success = [^(NSArray *products, NSArray *invalidIdentifiers) {
         if (success) {
