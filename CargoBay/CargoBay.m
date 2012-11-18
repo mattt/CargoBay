@@ -20,6 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#import <Security/Security.h>
+#import <Availability.h>
+
 #import "CargoBay.h"
 
 #import "AFHTTPClient.h"
@@ -61,6 +64,69 @@ static NSString * CBBase64EncodedStringFromData(NSData *data) {
     }
     
     return [[NSString alloc] initWithData:mutableData encoding:NSASCIIStringEncoding];
+}
+
+static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error) {
+    extern CFStringRef kSecTrustInfoExtendedValidationKey;
+    extern CFDictionaryRef SecTrustCopyInfo(SecTrustRef trust);
+    
+    NSCParameterAssert(trust);
+    
+    SecTrustResultType result;
+    if ((noErr == SecTrustEvaluate(trust, &result)) && (result == kSecTrustResultUnspecified)) {
+        id extendedValidation = [(__bridge_transfer NSDictionary *)SecTrustCopyInfo(trust) objectForKey:(__bridge NSString *)kSecTrustInfoExtendedValidationKey];
+        return [extendedValidation isKindOfClass:[NSValue class]] && [extendedValidation boolValue];
+    } else {
+        if (error){
+            *error = [NSError errorWithDomain:@"kSecTrustError" code:(NSInteger)result userInfo:nil];
+        }
+    }
+
+    return NO;
+}
+
+static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transaction, NSDictionary *receipt, NSError * __autoreleasing *error) {
+    NSDictionary *transactionReceipt = [NSPropertyListSerialization propertyListWithData:transaction.transactionReceipt options:NSPropertyListImmutable format:nil error:error];
+        
+    if (![[receipt objectForKey:@"bid"] isEqual:[transactionReceipt objectForKey:@"bid"]]) {
+        return NO;
+    } else if (![[receipt objectForKey:@"product_id"] isEqual:[transactionReceipt objectForKey:@"product-id"]]) {
+        return NO;
+    } else if (![[receipt objectForKey:@"quantity"] isEqual:[transactionReceipt objectForKey:@"quantity"]]) {
+        return NO;
+    } else if (![[receipt objectForKey:@"item_id"] isEqual:[transactionReceipt objectForKey:@"item-id"]]) {
+        return NO;
+    }
+
+    if ([[UIDevice currentDevice] respondsToSelector:NSSelectorFromString(@"identifierForVendor")]) {
+#ifdef __IPHONE_6_0
+        NSString *deviceIdentifier = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+        NSString *transactionUniqueVendorIdentifier = [transactionReceipt objectForKey:@"unique-vendor-identifier"];
+        NSString *receiptVendorIdentifier = [receipt objectForKey:@"unique_vendor_identifier"];
+        
+        if(receiptVendorIdentifier) {
+            if (![transactionUniqueVendorIdentifier isEqual:receiptVendorIdentifier] || ![transactionUniqueVendorIdentifier isEqual:deviceIdentifier])
+            {
+            #if !TARGET_IPHONE_SIMULATOR
+                return NO;
+            #endif
+            }
+        }
+#endif
+    } else if ([[UIDevice currentDevice] respondsToSelector:NSSelectorFromString(@"uniqueIdentifier")]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        NSString *deviceIdentifier = [[UIDevice currentDevice] uniqueIdentifier];
+#pragma clang diagnostic pop
+        NSString *transactionUniqueIdentifier = [transactionReceipt objectForKey:@"unique-identifier"];
+        NSString *receiptUniqueIdentifier = [receipt objectForKey:@"unique_identifier"];
+        if (![transactionUniqueIdentifier isEqual:receiptUniqueIdentifier] || ![transactionUniqueIdentifier isEqual:deviceIdentifier])
+        {
+            return NO;
+        }
+    }
+
+    return YES;
 }
 
 @interface CargoBayProductRequestDelegate : NSObject <SKRequestDelegate, SKProductsRequestDelegate> {
@@ -154,12 +220,22 @@ static NSString * CBBase64EncodedStringFromData(NSData *data) {
         return;
     }
     
-    [_receiptVerificationClient getPath:@"verifyReceipt" parameters:[NSDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transaction.transactionReceipt) forKey:@"receipt-data"] success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    NSURLRequest *request = [_receiptVerificationClient requestWithMethod:@"GET" path:@"verifyReceipt" parameters:[NSDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transaction.transactionReceipt) forKey:@"receipt-data"]];
+    AFHTTPRequestOperation *operation = [_receiptVerificationClient HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [[responseObject valueForKey:@"status"] integerValue];
         if (status == 0) {
-            if (success) {
-                NSDictionary *receipt = [responseObject valueForKey:@"receipt"];
-                success(receipt);
+            NSDictionary *receipt = [responseObject valueForKey:@"receipt"];
+            NSError *error = nil;
+            
+            BOOL isValid = CBValidateTransactionMatchesReceipt(transaction, receipt, &error);
+            if (isValid) {
+                if (success) {
+                    success(receipt);
+                }
+            } else {
+                if (failure) {
+                    failure(error);
+                }
             }
         } else {
             if (failure) {
@@ -174,6 +250,35 @@ static NSString * CBBase64EncodedStringFromData(NSData *data) {
             failure(error);
         }
     }];
+    
+    [operation setAuthenticationAgainstProtectionSpaceBlock:^BOOL(NSURLConnection *connection, NSURLProtectionSpace *protectionSpace) {
+        return [[protectionSpace authenticationMethod] isEqual:NSURLAuthenticationMethodServerTrust];
+    }];
+    
+    [operation setAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
+        if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+            SecTrustRef trust = [[challenge protectionSpace] serverTrust];
+            NSError *error = nil;
+            
+            BOOL didUseCredential = NO;
+            BOOL isTrusted = CBValidateTrust(trust, &error);
+            if (isTrusted) {
+                NSURLCredential *credential = [NSURLCredential credentialForTrust:trust];
+                if (credential) {
+                    [[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
+                    didUseCredential = YES;
+                }
+            }
+            
+            if (!didUseCredential) {
+                [[challenge sender] cancelAuthenticationChallenge:challenge];
+            }
+        } else {
+            [[challenge sender] performDefaultHandlingForAuthenticationChallenge:challenge];
+        }
+    }];
+    
+    [_receiptVerificationClient enqueueHTTPRequestOperation:operation];
 }
 
 - (void)setPaymentQueueUpdatedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block {

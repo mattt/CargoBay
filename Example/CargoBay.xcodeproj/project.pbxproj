@@ -10,6 +10,7 @@
 		F853B17815FD71A100D5AC59 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17715FD71A100D5AC59 /* UIKit.framework */; };
 		F853B17A15FD71A100D5AC59 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17915FD71A100D5AC59 /* Foundation.framework */; };
 		F853B17C15FD71A100D5AC59 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17B15FD71A100D5AC59 /* CoreGraphics.framework */; };
+		F87666F516595C72007CD103 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F87666F416595C72007CD103 /* Security.framework */; };
 		F8AA37E315FD71F800C21309 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F8AA37DC15FD71F800C21309 /* ViewController.xib */; };
 		F8AA37E415FD71F800C21309 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA37DE15FD71F800C21309 /* AppDelegate.m */; };
 		F8AA37E515FD71F800C21309 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA37DF15FD71F800C21309 /* main.m */; };
@@ -33,6 +34,7 @@
 		F853B17715FD71A100D5AC59 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		F853B17915FD71A100D5AC59 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		F853B17B15FD71A100D5AC59 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		F87666F416595C72007CD103 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		F8AA37D615FD71F800C21309 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		F8AA37D715FD71F800C21309 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = SOURCE_ROOT; };
 		F8AA37D815FD71F800C21309 /* Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Prefix.pch; sourceTree = SOURCE_ROOT; };
@@ -73,6 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F87666F516595C72007CD103 /* Security.framework in Frameworks */,
 				F8AA37EF15FD747D00C21309 /* StoreKit.framework in Frameworks */,
 				F853B17815FD71A100D5AC59 /* UIKit.framework in Frameworks */,
 				F853B17A15FD71A100D5AC59 /* Foundation.framework in Frameworks */,
@@ -104,6 +107,7 @@
 		F853B17615FD71A100D5AC59 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F87666F416595C72007CD103 /* Security.framework */,
 				F8AA37EE15FD747D00C21309 /* StoreKit.framework */,
 				F853B17715FD71A100D5AC59 /* UIKit.framework */,
 				F853B17915FD71A100D5AC59 /* Foundation.framework */,

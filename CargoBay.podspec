@@ -9,8 +9,9 @@ Pod::Spec.new do |s|
   s.source_files = 'CargoBay'
   s.requires_arc = true
 
+  s.ios.deployment_target = '4.3'
   s.osx.deployment_target = '10.7'
-  s.frameworks = 'StoreKit'
+  s.frameworks = 'StoreKit', 'Security'
 
   s.dependency 'AFNetworking', '>= 0.9'
 end
