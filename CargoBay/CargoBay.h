@@ -23,6 +23,10 @@
 #import <Foundation/Foundation.h>
 #import <StoreKit/StoreKit.h>
 
+#ifndef _SECURITY_SECBASE_H_
+#warning Security framework not found in project, or not included in precompiled header. Server trust validation on receipt verifications will not be available.
+#endif
+
 @class AFHTTPClient;
 
 @interface CargoBay : NSObject <SKPaymentTransactionObserver>

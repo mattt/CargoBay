@@ -20,10 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <Security/Security.h>
-#import <Availability.h>
-
 #import "CargoBay.h"
+
+#import <Availability.h>
 
 #import "AFHTTPClient.h"
 #import "AFJSONRequestOperation.h"
@@ -67,6 +66,7 @@ static NSString * CBBase64EncodedStringFromData(NSData *data) {
 }
 
 static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error) {
+#ifdef _SECURITY_SECBASE_H_
     extern CFStringRef kSecTrustInfoExtendedValidationKey;
     extern CFDictionaryRef SecTrustCopyInfo(SecTrustRef trust);
     
@@ -83,6 +83,9 @@ static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error)
     }
 
     return NO;
+#else
+    return YES;
+#endif
 }
 
 static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transaction, NSDictionary *receipt, NSError * __autoreleasing *error) {
