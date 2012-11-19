@@ -174,6 +174,7 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
     _receiptVerificationClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kCargoBayReceiptVerificationBaseURLString]];
     [_receiptVerificationClient setDefaultHeader:@"Accept" value:@"application/json"];
     [_receiptVerificationClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
+    [_receiptVerificationClient setParameterEncoding:AFJSONParameterEncoding];
     [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObject:@"text/plain"]];
         
     return self;
