@@ -250,7 +250,8 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
             }
         } else {
             if (failure) {
-                NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[responseObject valueForKey:@"exception"] forKey:NSLocalizedFailureReasonErrorKey];
+                NSString *exception = [responseObject valueForKey:@"exception"];
+                NSDictionary *userInfo = exception ? [NSDictionary dictionaryWithObject:exception forKey:NSLocalizedFailureReasonErrorKey] : nil;
                 
                 NSError *error = [[NSError alloc] initWithDomain:SKErrorDomain code:status userInfo:userInfo];
                 failure(error);
