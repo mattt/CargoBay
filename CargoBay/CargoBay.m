@@ -221,7 +221,7 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
         return;
     }
     
-    NSURLRequest *request = [_receiptVerificationClient requestWithMethod:@"GET" path:@"verifyReceipt" parameters:[NSDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transaction.transactionReceipt) forKey:@"receipt-data"]];
+    NSURLRequest *request = [_receiptVerificationClient requestWithMethod:@"POST" path:@"verifyReceipt" parameters:[NSDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transaction.transactionReceipt) forKey:@"receipt-data"]];
     AFHTTPRequestOperation *operation = [_receiptVerificationClient HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
         
