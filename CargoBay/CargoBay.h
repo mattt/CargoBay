@@ -52,6 +52,11 @@
 ///-------------------------------
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
+                 password:(NSString *)password
+                  success:(void (^)(NSDictionary *receipt))success
+                  failure:(void (^)(NSError *error))failure;
+
+- (void)verifyTransaction:(SKPaymentTransaction *)transaction
                   success:(void (^)(NSDictionary *receipt))success
                   failure:(void (^)(NSError *error))failure;
 

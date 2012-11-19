@@ -214,6 +214,7 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
 }
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
+                 password:(NSString *)password
                   success:(void (^)(NSDictionary *receipt))success
                   failure:(void (^)(NSError *error))failure
 {
@@ -221,7 +222,12 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
         return;
     }
     
-    NSURLRequest *request = [_receiptVerificationClient requestWithMethod:@"POST" path:@"verifyReceipt" parameters:[NSDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transaction.transactionReceipt) forKey:@"receipt-data"]];
+    NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transaction.transactionReceipt) forKey:@"receipt-data"];
+    if (password) {
+        [parameters setObject:password forKey:@"password"];
+    }
+    
+    NSURLRequest *request = [_receiptVerificationClient requestWithMethod:@"POST" path:@"verifyReceipt" parameters:parameters];
     AFHTTPRequestOperation *operation = [_receiptVerificationClient HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
         
@@ -283,6 +289,13 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
     }];
     
     [_receiptVerificationClient enqueueHTTPRequestOperation:operation];
+}
+
+- (void)verifyTransaction:(SKPaymentTransaction *)transaction
+                  success:(void (^)(NSDictionary *receipt))success
+                  failure:(void (^)(NSError *error))failure
+{
+    [self verifyTransaction:transaction password:nil success:success failure:failure];
 }
 
 - (void)setPaymentQueueUpdatedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block {
