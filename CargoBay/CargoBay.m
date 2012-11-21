@@ -70,14 +70,19 @@ static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error)
     
     NSCParameterAssert(trust);
     
+    BOOL trusted = NO;
     SecTrustResultType result;
     if ((noErr == SecTrustEvaluate(trust, &result)) && (result == kSecTrustResultUnspecified)) {
-        id extendedValidation = [(__bridge_transfer NSDictionary *)SecTrustCopyInfo(trust) objectForKey:(__bridge NSString *)kSecTrustInfoExtendedValidationKey];
-        return [extendedValidation isKindOfClass:[NSValue class]] && [extendedValidation boolValue];
-    } else {
-        if (error){
+        NSDictionary *trust_info = (__bridge_transfer NSDictionary *)SecTrustCopyInfo(trust);
+        id extendedValidation = [trust_info objectForKey:(__bridge NSString *)kSecTrustInfoExtendedValidationKey];
+        trusted = [extendedValidation isKindOfClass:[NSValue class]] && [extendedValidation boolValue];
+    }
+    
+    if (trust) {
+        if (!trusted && error) {
             *error = [NSError errorWithDomain:@"kSecTrustError" code:(NSInteger)result userInfo:nil];
         }
+        return trusted;
     }
 
     return NO;
