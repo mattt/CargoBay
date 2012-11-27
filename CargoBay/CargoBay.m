@@ -677,7 +677,7 @@ theOutLabel:
     NSString *theTransactionPurchaseInfo = [theReceiptDictionary objectForKey:@"purchase-info"];
     NSDictionary *thePurchaseInfoDictionary = [self dictionaryFromPlistData:CBDataFromBase64EncodedString(theTransactionPurchaseInfo)];
     
-    NSString *theTransactionID = [thePurchaseInfoDictionary objectForKey:@"transaction-id"];
+    __unused NSString *theTransactionID = [thePurchaseInfoDictionary objectForKey:@"transaction-id"];
     NSString *thePurchaseDateString = [thePurchaseInfoDictionary objectForKey:@"purchase-date"];
     NSString *theSignature = [theReceiptDictionary objectForKey:@"signature"];
     
@@ -703,17 +703,99 @@ theOutLabel:
         return NO;
     }
     
-//    // TODO: Ensure the transaction itself is legit
-//    if (![self doTransactionDetailsMatchPurchaseInfo:theTransaction withPurchaseInfo:thePurchaseInfoDictionary]) {
-//        return NO;
-//    }
-//    
+    // Ensure the transaction itself is legit
+    if (![self doTransactionDetailsMatchPurchaseInfo:theTransaction withPurchaseInfo:thePurchaseInfoDictionary]) {
+        return NO;
+    }
+    
 //    // Make a note of the fact that we've seen the transaction id already
 //    [self saveTransactionID:theTransactionID];
 //    
 //    // Save the transaction receipt's purchaseInfo in the self.transactionsReceiptStorageDictionary.
 //    [self.transactionsReceiptStorageDictionary setObject:thePurchaseInfoDictionary forKey:theTransactionID];
     
+    return YES;
+}
+
+// Make sure the transaction details actually match the purchase info
+- (BOOL)doTransactionDetailsMatchPurchaseInfo:(SKPaymentTransaction *)theTransaction withPurchaseInfo:(NSDictionary *)thePurchaseInfoDictionary {
+    if ((!theTransaction) || (!thePurchaseInfoDictionary)) {
+        return NO;
+    }
+    
+    NSInteger theFailCount = 0;
+    
+    {
+        NSString *theTransactionProductIdentifier = theTransaction.payment.productIdentifier;
+        NSString *thePurchaseInfoDictionaryProductIdentifier = thePurchaseInfoDictionary[@"product-id"];
+        if (![theTransactionProductIdentifier isEqualToString:thePurchaseInfoDictionaryProductIdentifier]) {
+            theFailCount++;
+        }
+    }
+    
+    {
+        NSInteger theTransactionQuantity = theTransaction.payment.quantity;
+        NSInteger thePurchaseInfoDictionaryQuantity = [thePurchaseInfoDictionary[@"quantity"] integerValue];
+        if (theTransactionQuantity != thePurchaseInfoDictionaryQuantity) {
+            theFailCount++;
+        }
+    }
+    
+    {
+        NSString *theTransactionTransactionIdentifier = theTransaction.transactionIdentifier;
+        NSString *thePurchaseInfoDictionaryTransactionIdentifier = thePurchaseInfoDictionary[@"transaction-id"];
+        if (![theTransactionTransactionIdentifier isEqualToString:thePurchaseInfoDictionaryTransactionIdentifier]) {
+            theFailCount++;
+        }
+    }
+    
+    // Optionally check the bid and bvr match this app's current bundle ID and bundle version.
+    {
+        NSString *thePurchaseInfoDictionaryBundleID = thePurchaseInfoDictionary[@"bid"];
+        NSString *theAppBundleID = [NSBundle mainBundle].bundleIdentifier;
+        if (![thePurchaseInfoDictionaryBundleID isEqualToString:theAppBundleID]) {
+            theFailCount++;
+        }
+    }
+    
+    {
+        NSString *thePurchaseInfoDictionaryBundleVersion = thePurchaseInfoDictionary[@"bvrs"];
+        NSString *theAppBundleVersion = [NSBundle mainBundle].infoDictionary[(__bridge NSString *)kCFBundleVersionKey];
+        if (![thePurchaseInfoDictionaryBundleVersion isEqualToString:theAppBundleVersion]) {
+            theFailCount++;
+        }
+    }
+    
+    // Optionally check the requestData.
+    {
+        // `theTransaction.payment.requestData` is reserved for future use as stated
+        // in the document (iOS 6). It is mentioned that the default value will be nil.
+        // If the value is not nil, it will be rejected by the Apple App Store.
+        // We could check for nil. But Apple might decides to populate this field
+        // in the future, which will break our code by then. So I think the wisest
+        // choice would be to avoid doing anything to this field all together for now.
+    }
+    
+    // Optionally check the dates.
+    {
+        NSDate *theTransactionTransactionDate = theTransaction.transactionDate;
+        NSString *thePurchaseInfoDictionaryPurchaseDateString = thePurchaseInfoDictionary[@"purchase-date"];
+        // Converts the string into a date
+        NSDateFormatter *theDateFormatter =  [[NSDateFormatter alloc] init];
+        theDateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
+        
+        NSDate *thePurchaseInfoDictionaryPurchaseDate = [theDateFormatter dateFromString:[thePurchaseInfoDictionaryPurchaseDateString stringByReplacingOccurrencesOfString:@"Etc/" withString:@""]];
+        
+        if (![theTransactionTransactionDate isEqualToDate:thePurchaseInfoDictionaryPurchaseDate]) {
+            theFailCount++;
+        }
+    }
+    
+    if (theFailCount != 0) {
+        return NO;
+    }
+    
+    // The transaction and its signed content seem ok.
     return YES;
 }
 
