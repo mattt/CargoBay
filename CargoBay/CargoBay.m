@@ -698,9 +698,6 @@ theOutLabel:
     
 //    // Make a note of the fact that we've seen the transaction id already
 //    [self saveTransactionID:theTransactionID];
-//    
-//    // Save the transaction receipt's purchaseInfo in the self.transactionsReceiptStorageDictionary.
-//    [self.transactionsReceiptStorageDictionary setObject:thePurchaseInfoDictionary forKey:theTransactionID];
     
     return YES;
 }
