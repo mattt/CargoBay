@@ -157,6 +157,9 @@ static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error)
 
 static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transaction, NSDictionary *receipt, NSError * __autoreleasing *error) {
     NSDictionary *transactionReceipt = [NSPropertyListSerialization propertyListWithData:transaction.transactionReceipt options:NSPropertyListImmutable format:nil error:error];
+    if (!transactionReceipt) {
+        return NO;
+    }
         
     if (![[receipt objectForKey:@"bid"] isEqual:[transactionReceipt objectForKey:@"bid"]]) {
         return NO;
