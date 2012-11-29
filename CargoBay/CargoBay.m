@@ -529,10 +529,13 @@ theOutLabel:
     if (transaction.transactionState != SKPaymentTransactionStatePurchased) {
         return;
     }
-    
-    if (![self verifyPurchase:transaction]) {
+    NSError *error = nil;
+    if (![self verifyPurchase:transaction error:&error]) {
         if (failure) {
-            failure([[NSError alloc] initWithDomain:SKErrorDomain code:-1 userInfo:nil]);
+            if (!error) {
+                error = [[NSError alloc] initWithDomain:SKErrorDomain code:-1 userInfo:nil];
+            }
+            failure(error);
         }
         return;
     }
@@ -629,42 +632,12 @@ theOutLabel:
     _paymentQueueRestoreFailureBlock = [failure copy];
 }
 
-#pragma mark - Helpers
-
-- (NSDictionary *)dictionaryFromPlistData:(NSData *)theData {
-    NSError *theError = nil;
-    NSDictionary *theDictionaryParsed = [NSPropertyListSerialization propertyListWithData:theData options:NSPropertyListImmutable format:nil error:&theError];
-    
-    if (!theDictionaryParsed) {
-        if (theError) {
-            NSLog(@"Fails to parse plist data with error\n%@", theError);
-        }
-        return nil;
-    }
-    
-    return theDictionaryParsed;
-}
-
-- (NSDictionary *)dictionaryFromJSONData:(NSData *)theData {
-    NSError *theError = nil;
-    NSDictionary *theDictionaryParsed = [NSJSONSerialization JSONObjectWithData:theData options:0 error:&theError];
-    
-    if (!theDictionaryParsed) {
-        if (theError) {
-            NSLog(@"Fails to parse plist data with error\n%@", theError);
-        }
-        return nil;
-    }
-    
-    return theDictionaryParsed;
-}
-
 #pragma mark - Receipt Verification
 
 // This method should be called once a transaction gets to the SKPaymentTransactionStatePurchased or SKPaymentTransactionStateRestored state
 // Call it with the SKPaymentTransaction.transactionReceipt
-- (BOOL)verifyPurchase:(SKPaymentTransaction *)theTransaction {
-    BOOL isOK = [self isTransactionAndItsReceiptValid:theTransaction];
+- (BOOL)verifyPurchase:(SKPaymentTransaction *)theTransaction error:(NSError * __autoreleasing *)theError {
+    BOOL isOK = [self isTransactionAndItsReceiptValid:theTransaction error:theError];
     if (isOK) {
         // The transaction looks ok, so start the verify process.
         return YES;
@@ -675,7 +648,7 @@ theOutLabel:
 }
 
 // Check the validity of the receipt.
-- (BOOL)isTransactionAndItsReceiptValid:(SKPaymentTransaction *)theTransaction {
+- (BOOL)isTransactionAndItsReceiptValid:(SKPaymentTransaction *)theTransaction error:(NSError * __autoreleasing *)theError {
     if (!((theTransaction) && (theTransaction.transactionReceipt) && (theTransaction.transactionReceipt.length > 0))) {
         // Transaction is not valid.
         return NO;
@@ -683,10 +656,15 @@ theOutLabel:
     
     // Pull the purchase-info out of the transaction receipt, decode it, and save it for later so
     // it can be cross checked with the verifyReceipt.
-    NSDictionary *theReceiptDictionary = [self dictionaryFromPlistData:theTransaction.transactionReceipt];
+    NSDictionary *theReceiptDictionary = [NSPropertyListSerialization propertyListWithData:theTransaction.transactionReceipt options:NSPropertyListImmutable format:nil error:theError];
+    if (!theReceiptDictionary) {
+        return NO;
+    }
     NSString *theTransactionPurchaseInfo = [theReceiptDictionary objectForKey:@"purchase-info"];
-    NSDictionary *thePurchaseInfoDictionary = [self dictionaryFromPlistData:CBDataFromBase64EncodedString(theTransactionPurchaseInfo)];
-    
+    NSDictionary *thePurchaseInfoDictionary = [NSPropertyListSerialization propertyListWithData:CBDataFromBase64EncodedString(theTransactionPurchaseInfo) options:NSPropertyListImmutable format:nil error:theError];
+    if (!thePurchaseInfoDictionary) {
+        return NO;
+    }
     __unused NSString *theTransactionID = [thePurchaseInfoDictionary objectForKey:@"transaction-id"];
     NSString *thePurchaseDateString = [thePurchaseInfoDictionary objectForKey:@"purchase-date"];
     NSString *theSignature = [theReceiptDictionary objectForKey:@"signature"];
