@@ -27,7 +27,8 @@
 #import "AFHTTPClient.h"
 #import "AFJSONRequestOperation.h"
 
-static NSString * const kCargoBayReceiptVerificationBaseURLString = @"https://buy.itunes.apple.com/";
+__unused static NSString * const kCargoBaySandboxReceiptVerificationBaseURLString = @"https://sandbox.itunes.apple.com/";
+static NSString * const kCargoBayProductionReceiptVerificationBaseURLString = @"https://buy.itunes.apple.com/";
 
 typedef void (^CargoBayPaymentQueueProductSuccessBlock)(NSArray *products, NSArray *invalidIdentifiers);
 typedef void (^CargoBayPaymentQueueProductFailureBlock)(NSError *error);
@@ -474,7 +475,7 @@ theOutLabel:
         return nil;
     }
     
-    _receiptVerificationClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kCargoBayReceiptVerificationBaseURLString]];
+    _receiptVerificationClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kCargoBayProductionReceiptVerificationBaseURLString]];
     [_receiptVerificationClient setDefaultHeader:@"Accept" value:@"application/json"];
     [_receiptVerificationClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
     [_receiptVerificationClient setParameterEncoding:AFJSONParameterEncoding];
