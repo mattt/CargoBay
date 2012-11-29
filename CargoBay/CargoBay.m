@@ -35,6 +35,8 @@ typedef void (^CargoBayPaymentQueueTransactionsBlock)(SKPaymentQueue *queue, NSA
 typedef void (^CargoBayPaymentQueueRestoreSuccessBlock)(SKPaymentQueue *queue);
 typedef void (^CargoBayPaymentQueueRestoreFailureBlock)(SKPaymentQueue *queue, NSError *error);
 
+#pragma mark - Serializations
+
 static NSString * CBBase64EncodedStringFromData(NSData *data) {
     NSUInteger length = [data length];
     NSMutableData *mutableData = [NSMutableData dataWithLength:((length + 2) / 3) * 4];
@@ -121,6 +123,8 @@ static NSData *CBDataFromBase64EncodedString(NSString *theBase64EncodedString) {
     
     return [NSData dataWithData:theBase64DecodedData];
 }
+
+#pragma mark - Validations
 
 static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error) {
 #ifdef _SECURITY_SECBASE_H_
@@ -426,6 +430,8 @@ theOutLabel:
     
     return isValid;
 }
+
+#pragma mark
 
 @interface CargoBayProductRequestDelegate : NSObject <SKRequestDelegate, SKProductsRequestDelegate> {
 @private
