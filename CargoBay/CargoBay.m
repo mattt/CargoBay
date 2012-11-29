@@ -675,6 +675,12 @@ theOutLabel:
     
     NSDate *thePurchaseDate = [theDateFormatter dateFromString:[thePurchaseDateString stringByReplacingOccurrencesOfString:@"Etc/" withString:@""]];
     
+    // In Apple's implementation, it stores the transaction ID together with its receipt.
+    // Apple chooses the `NSUserDefaults` for storage. I'm not sure about whether we should
+    // do the same (Any security concern?) or should we roll a delegate system and implements
+    // a default implementation that mimic Apple's one. I am more supportive of the latter.
+    // The TODOs below is written as a reminder that this portion of the code is still in review.
+    
 //    // TODO: Checks to see if the transaction ID is unique.
 //    if (![self isTransactionIDUnique:theTransactionID]) {
 //        // We've seen this transaction before.
@@ -696,7 +702,7 @@ theOutLabel:
         return NO;
     }
     
-//    // Make a note of the fact that we've seen the transaction id already
+//    // TODO: Make a note of the fact that we've seen the transaction id already
 //    [self saveTransactionID:theTransactionID];
     
     return YES;
