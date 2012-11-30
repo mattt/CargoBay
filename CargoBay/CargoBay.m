@@ -160,21 +160,27 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
     if (!transactionReceipt) {
         return NO;
     }
+    
+    NSString *transactionReceiptPurchaseInfoBase64Encoded = [transactionReceipt objectForKey:@"purchase-info"];
+    NSDictionary *purchaseInfo = [NSPropertyListSerialization propertyListWithData:CBDataFromBase64EncodedString(transactionReceiptPurchaseInfoBase64Encoded) options:NSPropertyListImmutable format:nil error:error];
+    if (!purchaseInfo) {
+        return NO;
+    }
         
-    if (![[receipt objectForKey:@"bid"] isEqual:[transactionReceipt objectForKey:@"bid"]]) {
+    if (![[receipt objectForKey:@"bid"] isEqual:[purchaseInfo objectForKey:@"bid"]]) {
         return NO;
-    } else if (![[receipt objectForKey:@"product_id"] isEqual:[transactionReceipt objectForKey:@"product-id"]]) {
+    } else if (![[receipt objectForKey:@"product_id"] isEqual:[purchaseInfo objectForKey:@"product-id"]]) {
         return NO;
-    } else if (![[receipt objectForKey:@"quantity"] isEqual:[transactionReceipt objectForKey:@"quantity"]]) {
+    } else if (![[receipt objectForKey:@"quantity"] isEqual:[purchaseInfo objectForKey:@"quantity"]]) {
         return NO;
-    } else if (![[receipt objectForKey:@"item_id"] isEqual:[transactionReceipt objectForKey:@"item-id"]]) {
+    } else if (![[receipt objectForKey:@"item_id"] isEqual:[purchaseInfo objectForKey:@"item-id"]]) {
         return NO;
     }
 
     if ([[UIDevice currentDevice] respondsToSelector:NSSelectorFromString(@"identifierForVendor")]) {
 #ifdef __IPHONE_6_0
         NSString *deviceIdentifier = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-        NSString *transactionUniqueVendorIdentifier = [transactionReceipt objectForKey:@"unique-vendor-identifier"];
+        NSString *transactionUniqueVendorIdentifier = [purchaseInfo objectForKey:@"unique-vendor-identifier"];
         NSString *receiptVendorIdentifier = [receipt objectForKey:@"unique_vendor_identifier"];
         
         if(receiptVendorIdentifier) {
@@ -191,7 +197,7 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
         NSString *deviceIdentifier = [[UIDevice currentDevice] uniqueIdentifier];
 #pragma clang diagnostic pop
-        NSString *transactionUniqueIdentifier = [transactionReceipt objectForKey:@"unique-identifier"];
+        NSString *transactionUniqueIdentifier = [purchaseInfo objectForKey:@"unique-identifier"];
         NSString *receiptUniqueIdentifier = [receipt objectForKey:@"unique_identifier"];
         if (![transactionUniqueIdentifier isEqual:receiptUniqueIdentifier] || ![transactionUniqueIdentifier isEqual:deviceIdentifier])
         {
