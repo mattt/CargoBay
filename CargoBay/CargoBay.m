@@ -160,6 +160,7 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
     if (!transactionReceipt) {
         return NO;
     }
+    // TODO: `transactionReceipt` have a key called environment that hints the environment the receipt is for. (e.g. environment = Sandbox;) Not sure the value for Production. We could setup our client base on this hint instead?
     
     NSString *transactionReceiptPurchaseInfoBase64Encoded = [transactionReceipt objectForKey:@"purchase-info"];
     NSDictionary *purchaseInfo = [NSPropertyListSerialization propertyListWithData:CBDataFromBase64EncodedString(transactionReceiptPurchaseInfoBase64Encoded) options:NSPropertyListImmutable format:nil error:error];
