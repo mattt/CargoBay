@@ -204,11 +204,14 @@ static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transactio
 
 #pragma mark - Check Receipt Signature
 
+#ifdef _SECURITY_SECBASE_H_
 #include <CommonCrypto/CommonDigest.h>
-#include <Security/Security.h>
+//#include <Security/Security.h>
 #include <AssertMacros.h>
+#endif
 
 static BOOL CBCheckReceiptSecurity(NSString *thePurchaseInfoString, NSString *theSignatureString, CFDateRef thePurchaseDate) {
+#ifdef _SECURITY_SECBASE_H_
     BOOL isValid = NO;
     SecCertificateRef theLeaf = NULL;
     SecCertificateRef theIntermediate = NULL;
@@ -433,6 +436,9 @@ theOutLabel:
     }
     
     return isValid;
+#else
+    return YES;
+#endif
 }
 
 #pragma mark
