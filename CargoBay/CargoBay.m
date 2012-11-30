@@ -27,7 +27,7 @@
 #import "AFHTTPClient.h"
 #import "AFJSONRequestOperation.h"
 
-__unused static NSString * const kCargoBaySandboxReceiptVerificationBaseURLString = @"https://sandbox.itunes.apple.com/";
+static NSString * const kCargoBaySandboxReceiptVerificationBaseURLString = @"https://sandbox.itunes.apple.com/";
 static NSString * const kCargoBayProductionReceiptVerificationBaseURLString = @"https://buy.itunes.apple.com/";
 
 typedef void (^CargoBayPaymentQueueProductSuccessBlock)(NSArray *products, NSArray *invalidIdentifiers);
@@ -484,17 +484,31 @@ theOutLabel:
     return _sharedManager;
 }
 
+- (AFHTTPClient *)sandboxReceiptVerificationClient {
+    AFHTTPClient *theHTTPClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationBaseURLString]];
+    [theHTTPClient setDefaultHeader:@"Accept" value:@"application/json"];
+    [theHTTPClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
+    [theHTTPClient setParameterEncoding:AFJSONParameterEncoding];
+    [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObject:@"text/plain"]];
+    return theHTTPClient;
+}
+
+- (AFHTTPClient *)productionReceiptVerificationClient {
+    AFHTTPClient *theHTTPClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kCargoBayProductionReceiptVerificationBaseURLString]];
+    [theHTTPClient setDefaultHeader:@"Accept" value:@"application/json"];
+    [theHTTPClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
+    [theHTTPClient setParameterEncoding:AFJSONParameterEncoding];
+    [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObject:@"text/plain"]];
+    return theHTTPClient;
+}
+
 - (id)init {
     self = [super init];
     if (!self) {
         return nil;
     }
     
-    _receiptVerificationClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kCargoBayProductionReceiptVerificationBaseURLString]];
-    [_receiptVerificationClient setDefaultHeader:@"Accept" value:@"application/json"];
-    [_receiptVerificationClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
-    [_receiptVerificationClient setParameterEncoding:AFJSONParameterEncoding];
-    [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObject:@"text/plain"]];
+    _receiptVerificationClient = [self productionReceiptVerificationClient];
         
     return self;
 }
@@ -577,6 +591,20 @@ theOutLabel:
                         failure(error);
                     }
                 }
+            } break;
+            case 21007: {   // Status 21007: This receipt is a sandbox receipt, but it was sent to the production service for verification.
+                _receiptVerificationClient = [self sandboxReceiptVerificationClient];
+                [self verifyTransaction:transaction
+                               password:password
+                                success:success
+                                failure:failure];
+            } break;
+            case 21008: {   // Status 21008: This receipt is a production receipt, but it was sent to the sandbox service for verification.
+                _receiptVerificationClient = [self productionReceiptVerificationClient];
+                [self verifyTransaction:transaction
+                               password:password
+                                success:success
+                                failure:failure];
             } break;
             default: {
                 if (failure) {
