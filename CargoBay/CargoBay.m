@@ -561,30 +561,32 @@ theOutLabel:
     AFHTTPRequestOperation *operation = [_receiptVerificationClient HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
         
-        // Status 0: The receipt is valid.
-        // Status 21006: This receipt is valid but the subscription has expired.
-        if (status == 0 || status == 21006) {
-            NSDictionary *receipt = [responseObject valueForKey:@"receipt"];
-            NSError *error = nil;
-            
-            BOOL isValid = CBValidateTransactionMatchesReceipt(transaction, receipt, &error);
-            if (isValid) {
-                if (success) {
-                    success(receipt);
+        switch (status) {
+            case 0:         // Status 0: The receipt is valid.
+            case 21006: {   // Status 21006: This receipt is valid but the subscription has expired.
+                NSDictionary *receipt = [responseObject valueForKey:@"receipt"];
+                NSError *error = nil;
+                
+                BOOL isValid = CBValidateTransactionMatchesReceipt(transaction, receipt, &error);
+                if (isValid) {
+                    if (success) {
+                        success(receipt);
+                    }
+                } else {
+                    if (failure) {
+                        failure(error);
+                    }
                 }
-            } else {
+            } break;
+            default: {
                 if (failure) {
+                    NSString *exception = [responseObject valueForKey:@"exception"];
+                    NSDictionary *userInfo = exception ? [NSDictionary dictionaryWithObject:exception forKey:NSLocalizedFailureReasonErrorKey] : nil;
+                    
+                    NSError *error = [[NSError alloc] initWithDomain:SKErrorDomain code:status userInfo:userInfo];
                     failure(error);
                 }
-            }
-        } else {
-            if (failure) {
-                NSString *exception = [responseObject valueForKey:@"exception"];
-                NSDictionary *userInfo = exception ? [NSDictionary dictionaryWithObject:exception forKey:NSLocalizedFailureReasonErrorKey] : nil;
-                
-                NSError *error = [[NSError alloc] initWithDomain:SKErrorDomain code:status userInfo:userInfo];
-                failure(error);
-            }
+            } break;
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if (failure) {
