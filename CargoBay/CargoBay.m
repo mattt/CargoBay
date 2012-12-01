@@ -467,8 +467,6 @@ theOutLabel:
 
 @implementation CargoBay {
 @private
-    AFHTTPClient *_receiptVerificationClient;
-        
     CargoBayPaymentQueueTransactionsBlock _paymentQueueTransactionsUpdated;
     CargoBayPaymentQueueTransactionsBlock _paymentQueueTransactionsRemoved;
     CargoBayPaymentQueueRestoreSuccessBlock _paymentQueueRestoreSuccessBlock;
@@ -521,8 +519,6 @@ theOutLabel:
     if (!self) {
         return nil;
     }
-    
-    _receiptVerificationClient = [self productionReceiptVerificationClient];
         
     return self;
 }
@@ -664,14 +660,30 @@ theOutLabel:
         }
     }];
     
-    [_receiptVerificationClient enqueueHTTPRequestOperation:operation];
+    [client enqueueHTTPRequestOperation:operation];
 }
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
                  password:(NSString *)password
                   success:(void (^)(NSDictionary *receipt))success
                   failure:(void (^)(NSError *error))failure {
-    AFHTTPClient *client = _receiptVerificationClient;
+    NSError *error = nil;
+    
+    if (!((transaction) && (transaction.transactionReceipt) && (transaction.transactionReceipt.length > 0))) {
+        error = [NSError errorWithDomain:SKErrorDomain code:-1 userInfo:nil];
+        failure(error);
+        return;
+    }
+    
+    NSDictionary *receiptDictionary = [NSPropertyListSerialization propertyListWithData:transaction.transactionReceipt options:NSPropertyListImmutable format:nil error:&error];
+    if (!receiptDictionary) {
+        failure(error);
+        return;
+    }
+    
+    NSString *environment = [receiptDictionary objectForKey:@"environment"];
+    AFHTTPClient *client = [environment isEqual:@"Sandbox"] ? [self sandboxReceiptVerificationClient] : [self productionReceiptVerificationClient];
+    
     [self verifyTransaction:transaction client:client password:password success:success failure:failure];
 }
 
