@@ -485,8 +485,8 @@ theOutLabel:
     return _sharedManager;
 }
 
-- (AFHTTPClient *)sandboxReceiptVerificationClient {
-    AFHTTPClient *theHTTPClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationBaseURLString]];
+- (AFHTTPClient *)receiptVerificationClientWithBaseURL:(NSURL *)theBaseURL {
+    AFHTTPClient *theHTTPClient = [[AFHTTPClient alloc] initWithBaseURL:theBaseURL];
     [theHTTPClient setDefaultHeader:@"Accept" value:@"application/json"];
     [theHTTPClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
     [theHTTPClient setParameterEncoding:AFJSONParameterEncoding];
@@ -494,12 +494,25 @@ theOutLabel:
     return theHTTPClient;
 }
 
+- (AFHTTPClient *)sandboxReceiptVerificationClient {
+    static AFHTTPClient *theHTTPClient = nil;
+    
+    static dispatch_once_t theOnceToken;
+    dispatch_once(&theOnceToken, ^{
+        theHTTPClient = [self receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationBaseURLString]];
+    });
+    
+    return theHTTPClient;
+}
+
 - (AFHTTPClient *)productionReceiptVerificationClient {
-    AFHTTPClient *theHTTPClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kCargoBayProductionReceiptVerificationBaseURLString]];
-    [theHTTPClient setDefaultHeader:@"Accept" value:@"application/json"];
-    [theHTTPClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
-    [theHTTPClient setParameterEncoding:AFJSONParameterEncoding];
-    [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObject:@"text/plain"]];
+    static AFHTTPClient *theHTTPClient = nil;
+    
+    static dispatch_once_t theOnceToken;
+    dispatch_once(&theOnceToken, ^{
+        theHTTPClient = [self receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBayProductionReceiptVerificationBaseURLString]];
+    });
+    
     return theHTTPClient;
 }
 
@@ -549,6 +562,7 @@ theOutLabel:
 }
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
+                   client:(AFHTTPClient *)client
                  password:(NSString *)password
                   success:(void (^)(NSDictionary *receipt))success
                   failure:(void (^)(NSError *error))failure
@@ -572,8 +586,8 @@ theOutLabel:
         [parameters setObject:password forKey:@"password"];
     }
     
-    NSURLRequest *request = [_receiptVerificationClient requestWithMethod:@"POST" path:@"verifyReceipt" parameters:parameters];
-    AFHTTPRequestOperation *operation = [_receiptVerificationClient HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    NSURLRequest *request = [client requestWithMethod:@"POST" path:@"verifyReceipt" parameters:parameters];
+    AFHTTPRequestOperation *operation = [client HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
         
         switch (status) {
@@ -594,15 +608,15 @@ theOutLabel:
                 }
             } break;
             case 21007: {   // Status 21007: This receipt is a sandbox receipt, but it was sent to the production service for verification.
-                _receiptVerificationClient = [self sandboxReceiptVerificationClient];
                 [self verifyTransaction:transaction
+                                 client:[self sandboxReceiptVerificationClient]
                                password:password
                                 success:success
                                 failure:failure];
             } break;
             case 21008: {   // Status 21008: This receipt is a production receipt, but it was sent to the sandbox service for verification.
-                _receiptVerificationClient = [self productionReceiptVerificationClient];
                 [self verifyTransaction:transaction
+                                 client:[self productionReceiptVerificationClient]
                                password:password
                                 success:success
                                 failure:failure];
@@ -651,6 +665,14 @@ theOutLabel:
     }];
     
     [_receiptVerificationClient enqueueHTTPRequestOperation:operation];
+}
+
+- (void)verifyTransaction:(SKPaymentTransaction *)transaction
+                 password:(NSString *)password
+                  success:(void (^)(NSDictionary *receipt))success
+                  failure:(void (^)(NSError *error))failure {
+    AFHTTPClient *client = _receiptVerificationClient;
+    [self verifyTransaction:transaction client:client password:password success:success failure:failure];
 }
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
