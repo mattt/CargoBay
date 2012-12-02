@@ -567,7 +567,7 @@ theOutLabel:
         return;
     }
     NSError *error = nil;
-    if (![self verifyPurchase:transaction error:&error]) {
+    if (![self isTransactionAndItsReceiptValid:transaction error:&error]) {
         if (failure) {
             if (!error) {
                 error = [[NSError alloc] initWithDomain:SKErrorDomain code:-1 userInfo:nil];
@@ -711,20 +711,8 @@ theOutLabel:
 
 #pragma mark - Receipt Verification
 
-// This method should be called once a transaction gets to the SKPaymentTransactionStatePurchased or SKPaymentTransactionStateRestored state
-// Call it with the SKPaymentTransaction.transactionReceipt
-- (BOOL)verifyPurchase:(SKPaymentTransaction *)theTransaction error:(NSError * __autoreleasing *)theError {
-    BOOL isOK = [self isTransactionAndItsReceiptValid:theTransaction error:theError];
-    if (isOK) {
-        // The transaction looks ok, so start the verify process.
-        return YES;
-    } else {
-        // There was something wrong with the transaction we got back, so no need to call verifyReceipt.
-        return NO;
-    }
-}
-
 // Check the validity of the receipt.
+// This method should be called once a transaction gets to the SKPaymentTransactionStatePurchased or SKPaymentTransactionStateRestored state
 - (BOOL)isTransactionAndItsReceiptValid:(SKPaymentTransaction *)theTransaction error:(NSError * __autoreleasing *)theError {
     if (!((theTransaction) && (theTransaction.transactionReceipt) && (theTransaction.transactionReceipt.length > 0))) {
         // Transaction is not valid.
