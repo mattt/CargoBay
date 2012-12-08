@@ -563,7 +563,7 @@ theOutLabel:
                   success:(void (^)(NSDictionary *receipt))success
                   failure:(void (^)(NSError *error))failure
 {
-    if ((transaction.transactionState != SKPaymentTransactionStatePurchased) || (transaction.transactionState != SKPaymentTransactionStateRestored)) {
+    if ((transaction.transactionState != SKPaymentTransactionStatePurchased) && (transaction.transactionState != SKPaymentTransactionStateRestored)) {
         return;
     }
     NSError *error = nil;
