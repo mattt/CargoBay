@@ -756,9 +756,7 @@ theOutLabel:
     
     // Check the authenticity of the receipt response/signature etc.
     
-    BOOL theResult = CBCheckReceiptSecurity(theTransactionPurchaseInfo, theSignature, (__bridge CFDateRef)thePurchaseDate);
-    
-    if (!theResult) {
+    if (!CBCheckReceiptSecurity(theTransactionPurchaseInfo, theSignature, (__bridge CFDateRef)thePurchaseDate)) {
         return NO;
     }
     
