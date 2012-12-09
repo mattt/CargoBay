@@ -197,21 +197,6 @@ static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSD
     return YES;
 }
 
-static BOOL CBValidateTransactionMatchesReceipt(SKPaymentTransaction *transaction, NSDictionary *receipt, NSError * __autoreleasing *error) {
-    NSDictionary *transactionReceipt = [NSPropertyListSerialization propertyListWithData:transaction.transactionReceipt options:NSPropertyListImmutable format:nil error:error];
-    if (!transactionReceipt) {
-        return NO;
-    }
-    
-    NSString *transactionReceiptPurchaseInfoBase64Encoded = [transactionReceipt objectForKey:@"purchase-info"];
-    NSDictionary *purchaseInfo = [NSPropertyListSerialization propertyListWithData:CBDataFromBase64EncodedString(transactionReceiptPurchaseInfoBase64Encoded) options:NSPropertyListImmutable format:nil error:error];
-    if (!purchaseInfo) {
-        return NO;
-    }
-        
-    return CBValidatePurchaseInfoMatchesReceipt(purchaseInfo, receipt, error);
-}
-
 // Make sure the transaction details actually match the purchase info
 static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *theTransaction, NSDictionary *thePurchaseInfoDictionary) {
     if ((!theTransaction) || (!thePurchaseInfoDictionary)) {
@@ -663,30 +648,12 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
     [_productsHTTPClient.operationQueue addOperation:operation];
 }
 
-- (void)verifyTransaction:(SKPaymentTransaction *)transaction
-                   client:(AFHTTPClient *)client
-                 password:(NSString *)password
-                  success:(void (^)(NSDictionary *receipt))success
-                  failure:(void (^)(NSError *error))failure
-{
-    if ((transaction.transactionState != SKPaymentTransactionStatePurchased) && (transaction.transactionState != SKPaymentTransactionStateRestored)) {
-        if (failure) {
-            failure([[NSError alloc] initWithDomain:SKErrorDomain code:-1 userInfo:nil]);
-        }
-        return;
-    }
-    NSError *error = nil;
-    if (![self isTransactionAndItsReceiptValid:transaction error:&error]) {
-        if (failure) {
-            if (!error) {
-                error = [[NSError alloc] initWithDomain:SKErrorDomain code:-1 userInfo:nil];
-            }
-            failure(error);
-        }
-        return;
-    }
-    
-    NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transaction.transactionReceipt) forKey:@"receipt-data"];
+- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
+                          client:(AFHTTPClient *)client
+                        password:(NSString *)password
+                         success:(void (^)(NSDictionary *responseObject))success
+                         failure:(void (^)(NSError *error))failure {
+    NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transactionReceipt) forKey:@"receipt-data"];
     if (password) {
         [parameters setObject:password forKey:@"password"];
     }
@@ -701,30 +668,68 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
                 NSDictionary *receipt = [responseObject valueForKey:@"receipt"];
                 NSError *error = nil;
                 
-                BOOL isValid = CBValidateTransactionMatchesReceipt(transaction, receipt, &error);
-                if (isValid) {
-                    if (success) {
-                        success(receipt);
-                    }
-                } else {
+                NSDictionary *purchaseInfo = CBPurchaseInfoFromTransactionReceipt(transactionReceipt, &error);
+                if (!purchaseInfo) {
                     if (failure) {
                         failure(error);
+                    }
+                    return;
+                }
+                
+                BOOL isValid = CBValidatePurchaseInfoMatchesReceipt(purchaseInfo, receipt, &error);
+                if (!isValid) {
+                    if (failure) {
+                        failure(error);
+                    }
+                    return;
+                }
+                
+                NSString *latestBase64EncodedTransactionReceipt = [responseObject valueForKey:@"latest_receipt"];
+                NSDictionary *latestReceipt = [responseObject valueForKey:@"latest_receipt_info"];
+                if ((latestBase64EncodedTransactionReceipt) && (latestReceipt)) {
+                    NSData *latestTransactionReceipt = CBDataFromBase64EncodedString(latestBase64EncodedTransactionReceipt);
+                    NSDictionary *latestPurchaseInfo = CBPurchaseInfoFromTransactionReceipt(latestTransactionReceipt, &error);
+                    if (!latestPurchaseInfo) {
+                        if (failure) {
+                            failure(error);
+                        }
+                        return;
+                    }
+                    
+                    BOOL isLatestValid = CBValidatePurchaseInfoMatchesReceipt(latestPurchaseInfo, latestReceipt, &error);
+                    if (!isLatestValid) {
+                        if (failure) {
+                            failure(error);
+                        }
+                        return;
+                    }
+                    
+                    if (success) {
+                        success(responseObject);
+                    }
+                } else if ((latestBase64EncodedTransactionReceipt) || (latestReceipt)) {
+                    if (failure) {
+                        failure(error);
+                    }
+                } else {
+                    if (success) {
+                        success(responseObject);
                     }
                 }
             } break;
             case 21007: {   // Status 21007: This receipt is a sandbox receipt, but it was sent to the production service for verification.
-                [self verifyTransaction:transaction
-                                 client:[self sandboxReceiptVerificationClient]
-                               password:password
-                                success:success
-                                failure:failure];
+                [self verifyTransactionReceipt:transactionReceipt
+                                        client:[self sandboxReceiptVerificationClient]
+                                      password:password
+                                       success:success
+                                       failure:failure];
             } break;
             case 21008: {   // Status 21008: This receipt is a production receipt, but it was sent to the sandbox service for verification.
-                [self verifyTransaction:transaction
-                                 client:[self productionReceiptVerificationClient]
-                               password:password
-                                success:success
-                                failure:failure];
+                [self verifyTransactionReceipt:transactionReceipt
+                                        client:[self productionReceiptVerificationClient]
+                                      password:password
+                                       success:success
+                                       failure:failure];
             } break;
             default: {
                 if (failure) {
@@ -772,19 +777,13 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
     [client enqueueHTTPRequestOperation:operation];
 }
 
-- (void)verifyTransaction:(SKPaymentTransaction *)transaction
-                 password:(NSString *)password
-                  success:(void (^)(NSDictionary *receipt))success
+- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
+                        password:(NSString *)password
+                  success:(void (^)(NSDictionary *responseObject))success
                   failure:(void (^)(NSError *error))failure {
     NSError *error = nil;
     
-    if (!((transaction) && (transaction.transactionReceipt) && (transaction.transactionReceipt.length > 0))) {
-        error = [NSError errorWithDomain:SKErrorDomain code:-1 userInfo:nil];
-        failure(error);
-        return;
-    }
-    
-    NSDictionary *receiptDictionary = [NSPropertyListSerialization propertyListWithData:transaction.transactionReceipt options:NSPropertyListImmutable format:nil error:&error];
+    NSDictionary *receiptDictionary = [NSPropertyListSerialization propertyListWithData:transactionReceipt options:NSPropertyListImmutable format:nil error:&error];
     if (!receiptDictionary) {
         failure(error);
         return;
@@ -793,7 +792,39 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
     NSString *environment = [receiptDictionary objectForKey:@"environment"];
     AFHTTPClient *client = [environment isEqual:@"Sandbox"] ? [self sandboxReceiptVerificationClient] : [self productionReceiptVerificationClient];
     
-    [self verifyTransaction:transaction client:client password:password success:success failure:failure];
+    [self verifyTransactionReceipt:transactionReceipt client:client password:password success:success failure:failure];
+}
+
+- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
+                  success:(void (^)(NSDictionary *responseObject))success
+                  failure:(void (^)(NSError *error))failure
+{
+    [self verifyTransactionReceipt:transactionReceipt password:nil success:success failure:failure];
+}
+
+- (void)verifyTransaction:(SKPaymentTransaction *)transaction
+                 password:(NSString *)password
+                  success:(void (^)(NSDictionary *responseObject))success
+                  failure:(void (^)(NSError *error))failure
+{
+    if ((transaction.transactionState != SKPaymentTransactionStatePurchased) && (transaction.transactionState != SKPaymentTransactionStateRestored)) {
+        if (failure) {
+            failure([[NSError alloc] initWithDomain:SKErrorDomain code:-1 userInfo:nil]);
+        }
+        return;
+    }
+    NSError *error = nil;
+    if (![self isTransactionAndItsReceiptValid:transaction error:&error]) {
+        if (failure) {
+            if (!error) {
+                error = [[NSError alloc] initWithDomain:SKErrorDomain code:-1 userInfo:nil];
+            }
+            failure(error);
+        }
+        return;
+    }
+    
+    [self verifyTransactionReceipt:transaction.transactionReceipt password:password success:success failure:failure];
 }
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
