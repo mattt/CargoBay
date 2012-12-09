@@ -527,6 +527,33 @@ theOutLabel:
 #endif
 }
 
+static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransactionReceiptData, NSError * __autoreleasing *theError) {
+    NSDictionary *theTransactionReceiptDictionary = [NSPropertyListSerialization propertyListWithData:theTransactionReceiptData options:NSPropertyListImmutable format:nil error:theError];
+    if (!theTransactionReceiptDictionary) {
+        return nil;
+    }
+    NSString *thePurchaseInfo = [theTransactionReceiptDictionary objectForKey:@"purchase-info"];
+    NSDictionary *thePurchaseInfoDictionary = [NSPropertyListSerialization propertyListWithData:CBDataFromBase64EncodedString(thePurchaseInfo) options:NSPropertyListImmutable format:nil error:theError];
+    if (!thePurchaseInfoDictionary) {
+        return nil;
+    }
+    NSString *thePurchaseDateString = [thePurchaseInfoDictionary objectForKey:@"purchase-date"];
+    NSString *theSignature = [theTransactionReceiptDictionary objectForKey:@"signature"];
+    
+    // Converts the string into a date
+    NSDateFormatter *theDateFormatter =  [[NSDateFormatter alloc] init];
+    theDateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
+    
+    NSDate *thePurchaseDate = [theDateFormatter dateFromString:[thePurchaseDateString stringByReplacingOccurrencesOfString:@"Etc/" withString:@""]];
+    
+    // Check the authenticity of the receipt response/signature etc.
+    if (!CBCheckReceiptSecurity(thePurchaseInfo, theSignature, (__bridge CFDateRef)thePurchaseDate)) {
+        return nil;
+    }
+    
+    return thePurchaseInfoDictionary;
+}
+
 #pragma mark
 
 @interface CargoBayProductRequestDelegate : NSObject <SKRequestDelegate, SKProductsRequestDelegate> {
@@ -798,26 +825,10 @@ theOutLabel:
         return NO;
     }
     
-    // Pull the purchase-info out of the transaction receipt, decode it, and save it for later so
-    // it can be cross checked with the verifyReceipt.
-    NSDictionary *theReceiptDictionary = [NSPropertyListSerialization propertyListWithData:theTransaction.transactionReceipt options:NSPropertyListImmutable format:nil error:theError];
-    if (!theReceiptDictionary) {
-        return NO;
-    }
-    NSString *theTransactionPurchaseInfo = [theReceiptDictionary objectForKey:@"purchase-info"];
-    NSDictionary *thePurchaseInfoDictionary = [NSPropertyListSerialization propertyListWithData:CBDataFromBase64EncodedString(theTransactionPurchaseInfo) options:NSPropertyListImmutable format:nil error:theError];
+    NSDictionary *thePurchaseInfoDictionary = CBPurchaseInfoFromTransactionReceipt(theTransaction.transactionReceipt, theError);
     if (!thePurchaseInfoDictionary) {
         return NO;
     }
-    __unused NSString *theTransactionID = [thePurchaseInfoDictionary objectForKey:@"transaction-id"];
-    NSString *thePurchaseDateString = [thePurchaseInfoDictionary objectForKey:@"purchase-date"];
-    NSString *theSignature = [theReceiptDictionary objectForKey:@"signature"];
-    
-    // Converts the string into a date
-    NSDateFormatter *theDateFormatter =  [[NSDateFormatter alloc] init];
-    theDateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
-    
-    NSDate *thePurchaseDate = [theDateFormatter dateFromString:[thePurchaseDateString stringByReplacingOccurrencesOfString:@"Etc/" withString:@""]];
     
     // In Apple's implementation, it stores the transaction ID together with its receipt.
     // Apple chooses the `NSUserDefaults` for storage. I'm not sure about whether we should
@@ -826,18 +837,14 @@ theOutLabel:
     // The TODOs below is written as a reminder that this portion of the code is still in review.
     
 //    // TODO: Checks to see if the transaction ID is unique.
+//    //NSString *theTransactionID = theTransaction.transactionIdentifier;
+//    NSString *theTransactionID = [thePurchaseInfoDictionary objectForKey:@"transaction-id"];
 //    if (![self isTransactionIDUnique:theTransactionID]) {
 //        // We've seen this transaction before.
 //        // Had [self.transactionsReceiptStorageDictionary objectForKey:theTransactionID];
 //        // Got thePurchaseInfoDictionary
 //        return NO;
 //    }
-    
-    // Check the authenticity of the receipt response/signature etc.
-    
-    if (!CBCheckReceiptSecurity(theTransactionPurchaseInfo, theSignature, (__bridge CFDateRef)thePurchaseDate)) {
-        return NO;
-    }
     
     // Ensure the transaction itself is legit
     if (!CBValidateTransactionMatchesPurchaseInfo(theTransaction, thePurchaseInfoDictionary)) {
