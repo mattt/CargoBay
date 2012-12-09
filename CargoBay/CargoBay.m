@@ -670,6 +670,9 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
                   failure:(void (^)(NSError *error))failure
 {
     if ((transaction.transactionState != SKPaymentTransactionStatePurchased) && (transaction.transactionState != SKPaymentTransactionStateRestored)) {
+        if (failure) {
+            failure([[NSError alloc] initWithDomain:SKErrorDomain code:-1 userInfo:nil]);
+        }
         return;
     }
     NSError *error = nil;
