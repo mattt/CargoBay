@@ -29,6 +29,37 @@
 
 @class AFHTTPClient;
 
+extern NSString * const CBErrorDomain;
+
+typedef NS_ENUM(NSInteger, CBStatusCode) {
+    CBStatusOK = 0,
+    
+    // Status codes for auto-renewable subscriptions
+    CBStatusCannotParseJSON = 21000,
+    CBStatusMalformedReceiptData = 21002,
+    CBStatusCannotAuthenticateReceiptData = 21003,
+    CBStatusSharedSecretDoesNotMatch = 21004,
+    CBStatusReceiptServerUnavailable = 21005,
+    CBStatusReceiptValidButSubscriptionExpired = 21006,
+    CBStatusSandboxReceiptSentToProduction = 21007,
+    CBStatusProductionReceiptSentToSandbox = 21008
+};
+
+typedef NS_ENUM(NSInteger, CBErrorCode) {
+    CBErrorUnknown = -1,
+    
+    CBErrorPurchaseInfoDoesNotMatchReceipt = 1,
+    CBErrorTransactionDoesNotMatchesPurchaseInfo = 2,
+    CBErrorCannotExtractPurchaseInfoFromTransactionReceipt = 3,
+    
+    // Error codes derived from status codes for auto-renewable subscriptions
+    CBErrorCannotParseJSON = CBStatusCannotParseJSON,
+    CBErrorMalformedReceiptData = CBStatusMalformedReceiptData,
+    CBErrorCannotAuthenticateReceiptData = CBStatusCannotAuthenticateReceiptData,
+    CBErrorSharedSecretDoesNotMatch = CBStatusSharedSecretDoesNotMatch,
+    CBErrorReceiptServerUnavailable = CBStatusReceiptServerUnavailable
+};
+
 @interface CargoBay : NSObject <SKPaymentTransactionObserver>
 
 @property (nonatomic) AFHTTPClient *productsHTTPClient;

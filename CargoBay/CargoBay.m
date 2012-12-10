@@ -27,6 +27,8 @@
 #import "AFHTTPClient.h"
 #import "AFJSONRequestOperation.h"
 
+NSString * const CBErrorDomain = @"me.mattt.CargoBay.ErrorDomain";
+
 static NSString * const kCargoBaySandboxReceiptVerificationBaseURLString = @"https://sandbox.itunes.apple.com/";
 static NSString * const kCargoBayProductionReceiptVerificationBaseURLString = @"https://buy.itunes.apple.com/";
 
@@ -142,14 +144,14 @@ static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error)
         trusted = [extendedValidation isKindOfClass:[NSValue class]] && [extendedValidation boolValue];
     }
     
-    if (trust) {
-        if (!trusted && error) {
+    if (!trusted) {
+        if (error != NULL) {
             *error = [NSError errorWithDomain:@"kSecTrustError" code:(NSInteger)result userInfo:nil];
         }
-        return trusted;
+        return NO;
     }
 
-    return NO;
+    return YES;
 #else
     return YES;
 #endif
@@ -157,12 +159,44 @@ static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error)
 
 static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSDictionary *receipt, NSError * __autoreleasing *error) {
     if (![[receipt objectForKey:@"bid"] isEqual:[purchaseInfo objectForKey:@"bid"]]) {
+        if (error != NULL) {
+            NSDictionary *userInfo =
+            [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSString stringWithFormat:@"Purchase info does not match receipt because purchase info's bundle ID (%@) does not match receipt's bundle ID (%@).", [purchaseInfo objectForKey:@"bid"], [receipt objectForKey:@"bid"]], NSLocalizedDescriptionKey,
+             [NSString stringWithFormat:@"Purchase info's bundle ID (%@) does not match receipt's bundle ID (%@).", [purchaseInfo objectForKey:@"bid"], [receipt objectForKey:@"bid"]], NSLocalizedFailureReasonErrorKey,
+             nil];
+            *error = [NSError errorWithDomain:CBErrorDomain code:CBErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
+        }
         return NO;
     } else if (![[receipt objectForKey:@"product_id"] isEqual:[purchaseInfo objectForKey:@"product-id"]]) {
+        if (error != NULL) {
+            NSDictionary *userInfo =
+            [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSString stringWithFormat:@"Purchase info does not match receipt because purchase info's product ID (%@) does not match receipt's product ID (%@).", [purchaseInfo objectForKey:@"product-id"], [receipt objectForKey:@"product_id"]], NSLocalizedDescriptionKey,
+             [NSString stringWithFormat:@"Purchase info's product ID (%@) does not match receipt's product ID (%@).", [purchaseInfo objectForKey:@"product-id"], [receipt objectForKey:@"product_id"]], NSLocalizedFailureReasonErrorKey,
+             nil];
+            *error = [NSError errorWithDomain:CBErrorDomain code:CBErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
+        }
         return NO;
     } else if (![[receipt objectForKey:@"quantity"] isEqual:[purchaseInfo objectForKey:@"quantity"]]) {
+        if (error != NULL) {
+            NSDictionary *userInfo =
+            [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSString stringWithFormat:@"Purchase info does not match receipt because purchase info's quantity (%@) does not match receipt's quantity (%@).", [purchaseInfo objectForKey:@"quantity"], [receipt objectForKey:@"quantity"]], NSLocalizedDescriptionKey,
+             [NSString stringWithFormat:@"Purchase info's quantity (%@) does not match receipt's quantity (%@).", [purchaseInfo objectForKey:@"quantity"], [receipt objectForKey:@"quantity"]], NSLocalizedFailureReasonErrorKey,
+             nil];
+            *error = [NSError errorWithDomain:CBErrorDomain code:CBErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
+        }
         return NO;
     } else if (![[receipt objectForKey:@"item_id"] isEqual:[purchaseInfo objectForKey:@"item-id"]]) {
+        if (error != NULL) {
+            NSDictionary *userInfo =
+            [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSString stringWithFormat:@"Purchase info does not match receipt because purchase info's item ID (%@) does not match receipt's item ID (%@).", [purchaseInfo objectForKey:@"item-id"], [receipt objectForKey:@"item_id"]], NSLocalizedDescriptionKey,
+             [NSString stringWithFormat:@"Purchase info's item ID (%@) does not match receipt's item ID (%@).", [purchaseInfo objectForKey:@"item-id"], [receipt objectForKey:@"item_id"]], NSLocalizedFailureReasonErrorKey,
+             nil];
+            *error = [NSError errorWithDomain:CBErrorDomain code:CBErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
+        }
         return NO;
     }
     
@@ -176,6 +210,14 @@ static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSD
             if (![transactionUniqueVendorIdentifier isEqual:receiptVendorIdentifier] || ![transactionUniqueVendorIdentifier isEqual:deviceIdentifier])
             {
 #if !TARGET_IPHONE_SIMULATOR
+                if (error != NULL) {
+                    NSDictionary *userInfo =
+                    [NSDictionary dictionaryWithObjectsAndKeys:
+                     [NSString stringWithFormat:@"Purchase info does not match receipt because device's identifier for vendor (%@) does not match purchase info's (%@) and receipt's unique vendor identifier (%@).", deviceIdentifier, transactionUniqueVendorIdentifier, receiptVendorIdentifier], NSLocalizedDescriptionKey,
+                     [NSString stringWithFormat:@"Device's identifier for vendor (%@) does not match purchase info's (%@) and receipt's unique vendor identifier (%@).", deviceIdentifier, transactionUniqueVendorIdentifier, receiptVendorIdentifier], NSLocalizedFailureReasonErrorKey,
+                     nil];
+                    *error = [NSError errorWithDomain:CBErrorDomain code:CBErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
+                }
                 return NO;
 #endif
             }
@@ -190,6 +232,14 @@ static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSD
         NSString *receiptUniqueIdentifier = [receipt objectForKey:@"unique_identifier"];
         if (![transactionUniqueIdentifier isEqual:receiptUniqueIdentifier] || ![transactionUniqueIdentifier isEqual:deviceIdentifier])
         {
+            if (error != NULL) {
+                NSDictionary *userInfo =
+                [NSDictionary dictionaryWithObjectsAndKeys:
+                 [NSString stringWithFormat:@"Purchase info does not match receipt because device's unique identifier (%@) does not match purchase info's (%@) and receipt's unique identifier (%@).", deviceIdentifier, transactionUniqueIdentifier, receiptUniqueIdentifier], NSLocalizedDescriptionKey,
+                 [NSString stringWithFormat:@"Device's unique identifier (%@) does not match purchase info's (%@) and receipt's unique identifier (%@).", deviceIdentifier, transactionUniqueIdentifier, receiptUniqueIdentifier], NSLocalizedFailureReasonErrorKey,
+                 nil];
+                *error = [NSError errorWithDomain:CBErrorDomain code:CBErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
+            }
             return NO;
         }
     }
@@ -533,6 +583,14 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
     
     // Check the authenticity of the receipt response/signature etc.
     if (!CBCheckReceiptSecurity(thePurchaseInfo, theSignature, (__bridge CFDateRef)thePurchaseDate)) {
+        if (theError != NULL) {
+            NSDictionary *theUserInfo =
+            [NSDictionary dictionaryWithObjectsAndKeys:
+             @"Cannot extract purchase info from transaction receipt because purchase info failed to validate against its signature.", NSLocalizedDescriptionKey,
+             @"Purchase info failed to validate against its signature.", NSLocalizedFailureReasonErrorKey,
+             nil];
+            *theError = [NSError errorWithDomain:CBErrorDomain code:CBErrorCannotExtractPurchaseInfoFromTransactionReceipt userInfo:theUserInfo];
+        }
         return nil;
     }
     
@@ -663,8 +721,8 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
         
         switch (status) {
-            case 0:         // Status 0: The receipt is valid.
-            case 21006: {   // Status 21006: This receipt is valid but the subscription has expired.
+            case CBStatusOK:         // Status 0: The receipt is valid.
+            case CBStatusReceiptValidButSubscriptionExpired: {   // Status 21006: This receipt is valid but the subscription has expired.
                 NSDictionary *receipt = [responseObject valueForKey:@"receipt"];
                 NSError *error = nil;
                 
@@ -717,14 +775,14 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
                     }
                 }
             } break;
-            case 21007: {   // Status 21007: This receipt is a sandbox receipt, but it was sent to the production service for verification.
+            case CBStatusSandboxReceiptSentToProduction: {   // Status 21007: This receipt is a sandbox receipt, but it was sent to the production service for verification.
                 [self verifyTransactionReceipt:transactionReceipt
                                         client:[self sandboxReceiptVerificationClient]
                                       password:password
                                        success:success
                                        failure:failure];
             } break;
-            case 21008: {   // Status 21008: This receipt is a production receipt, but it was sent to the sandbox service for verification.
+            case CBStatusProductionReceiptSentToSandbox: {   // Status 21008: This receipt is a production receipt, but it was sent to the sandbox service for verification.
                 [self verifyTransactionReceipt:transactionReceipt
                                         client:[self productionReceiptVerificationClient]
                                       password:password
@@ -736,7 +794,7 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
                     NSString *exception = [responseObject valueForKey:@"exception"];
                     NSDictionary *userInfo = exception ? [NSDictionary dictionaryWithObject:exception forKey:NSLocalizedFailureReasonErrorKey] : nil;
                     
-                    NSError *error = [[NSError alloc] initWithDomain:SKErrorDomain code:status userInfo:userInfo];
+                    NSError *error = [[NSError alloc] initWithDomain:CBErrorDomain code:status userInfo:userInfo];
                     failure(error);
                 }
             } break;
@@ -882,6 +940,13 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
     
     // Ensure the transaction itself is legit
     if (!CBValidateTransactionMatchesPurchaseInfo(theTransaction, thePurchaseInfoDictionary)) {
+        if (theError != NULL) {
+            NSDictionary *theUserInfo =
+            [NSDictionary dictionaryWithObjectsAndKeys:
+             @"Transaction does not match purchase info", NSLocalizedDescriptionKey,
+             nil];
+            *theError = [NSError errorWithDomain:CBErrorDomain code:CBErrorTransactionDoesNotMatchesPurchaseInfo userInfo:theUserInfo];
+        }
         return NO;
     }
     
