@@ -53,6 +53,7 @@ typedef NS_ENUM(NSInteger, CargoBayErrorCode) {
     CargoBayErrorCannotExtractPurchaseInfoFromTransactionReceipt = 3,
     CargoBayErrorTransactionNotInPurchasedOrRestoredState = 4,
     CargoBayErrorTransactionNotValid = 5,
+    CargoBayErrorTransactionIDNotUnique = 6,
     
     // Error codes derived from status codes for auto-renewable subscriptions
     CargoBayErrorCannotParseJSON = CargoBayStatusCannotParseJSON,
@@ -116,5 +117,15 @@ typedef NS_ENUM(NSInteger, CargoBayErrorCode) {
 
 - (void)setPaymentQueueRestoreCompletedTransactionsWithSuccess:(void (^)(SKPaymentQueue *queue))success
                                                        failure:(void (^)(SKPaymentQueue *queue, NSError *error))failure;
+
+///-------------------------------------------------------
+/// @name Verif Transaction ID Uniqueness delegate methods
+///-------------------------------------------------------
+
+- (void)setTransactionIDUniquenessWithVerify:(BOOL (^)(NSString *transactionID))verify
+                                        save:(void (^)(NSString *transactionID))save;
+
+- (void)setDefaultTransactionIDUniquenessBehavior;
+
 
 @end
