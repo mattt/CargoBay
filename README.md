@@ -10,6 +10,8 @@
 - Block-based callbacks for payment queue observation delegate methods
 - One-step receipt verification
 
+> This project is part of a series of open source libraries covering the mission-critical aspects of an iOS app's infrastructure. Be sure to check out its sister projects: [GroundControl](https://github.com/mattt/GroundControl), [SkyLab](https://github.com/mattt/SkyLab), [houston](https://github.com/mattt/houston), and [Orbiter](https://github.com/mattt/Orbiter).
+
 ## Usage
 
 ### Product Requests
