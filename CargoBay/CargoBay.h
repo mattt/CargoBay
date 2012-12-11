@@ -29,37 +29,37 @@
 
 @class AFHTTPClient;
 
-extern NSString * const CBErrorDomain;
+extern NSString * const CargoBayErrorDomain;
 
-typedef NS_ENUM(NSInteger, CBStatusCode) {
-    CBStatusOK = 0,
+typedef NS_ENUM(NSInteger, CargoBayStatusCode) {
+    CargoBayStatusOK = 0,
     
     // Status codes for auto-renewable subscriptions
-    CBStatusCannotParseJSON = 21000,
-    CBStatusMalformedReceiptData = 21002,
-    CBStatusCannotAuthenticateReceiptData = 21003,
-    CBStatusSharedSecretDoesNotMatch = 21004,
-    CBStatusReceiptServerUnavailable = 21005,
-    CBStatusReceiptValidButSubscriptionExpired = 21006,
-    CBStatusSandboxReceiptSentToProduction = 21007,
-    CBStatusProductionReceiptSentToSandbox = 21008
+    CargoBayStatusCannotParseJSON = 21000,
+    CargoBayStatusMalformedReceiptData = 21002,
+    CargoBayStatusCannotAuthenticateReceiptData = 21003,
+    CargoBayStatusSharedSecretDoesNotMatch = 21004,
+    CargoBayStatusReceiptServerUnavailable = 21005,
+    CargoBayStatusReceiptValidButSubscriptionExpired = 21006,
+    CargoBayStatusSandboxReceiptSentToProduction = 21007,
+    CargoBayStatusProductionReceiptSentToSandbox = 21008
 };
 
-typedef NS_ENUM(NSInteger, CBErrorCode) {
-    CBErrorUnknown = -1,
+typedef NS_ENUM(NSInteger, CargoBayErrorCode) {
+    CargoBayErrorUnknown = -1,
     
-    CBErrorPurchaseInfoDoesNotMatchReceipt = 1,
-    CBErrorTransactionDoesNotMatchesPurchaseInfo = 2,
-    CBErrorCannotExtractPurchaseInfoFromTransactionReceipt = 3,
-    CBErrorTransactionNotInPurchasedOrRestoredState = 4,
-    CBErrorTransactionNotValid = 5,
+    CargoBayErrorPurchaseInfoDoesNotMatchReceipt = 1,
+    CargoBayErrorTransactionDoesNotMatchesPurchaseInfo = 2,
+    CargoBayErrorCannotExtractPurchaseInfoFromTransactionReceipt = 3,
+    CargoBayErrorTransactionNotInPurchasedOrRestoredState = 4,
+    CargoBayErrorTransactionNotValid = 5,
     
     // Error codes derived from status codes for auto-renewable subscriptions
-    CBErrorCannotParseJSON = CBStatusCannotParseJSON,
-    CBErrorMalformedReceiptData = CBStatusMalformedReceiptData,
-    CBErrorCannotAuthenticateReceiptData = CBStatusCannotAuthenticateReceiptData,
-    CBErrorSharedSecretDoesNotMatch = CBStatusSharedSecretDoesNotMatch,
-    CBErrorReceiptServerUnavailable = CBStatusReceiptServerUnavailable
+    CargoBayErrorCannotParseJSON = CargoBayStatusCannotParseJSON,
+    CargoBayErrorMalformedReceiptData = CargoBayStatusMalformedReceiptData,
+    CargoBayErrorCannotAuthenticateReceiptData = CargoBayStatusCannotAuthenticateReceiptData,
+    CargoBayErrorSharedSecretDoesNotMatch = CargoBayStatusSharedSecretDoesNotMatch,
+    CargoBayErrorReceiptServerUnavailable = CargoBayStatusReceiptServerUnavailable
 };
 
 @interface CargoBay : NSObject <SKPaymentTransactionObserver>
