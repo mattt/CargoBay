@@ -867,16 +867,18 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
 {
     if ((transaction.transactionState != SKPaymentTransactionStatePurchased) && (transaction.transactionState != SKPaymentTransactionStateRestored)) {
         if (failure) {
-            failure([[NSError alloc] initWithDomain:SKErrorDomain code:-1 userInfo:nil]);
+            NSDictionary *userInfo =
+            [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSString stringWithFormat:@"Cannot verify transaction because transaction (%@) not in purchased or restored state.", transaction.transactionIdentifier], NSLocalizedDescriptionKey,
+             [NSString stringWithFormat:@"Transaction (%@) not in purchased or restored state.", transaction.transactionIdentifier], NSLocalizedFailureReasonErrorKey,
+             nil];
+            failure([NSError errorWithDomain:CBErrorDomain code:CBErrorTransactionNotInPurchasedOrRestoredState userInfo:userInfo]);
         }
         return;
     }
     NSError *error = nil;
     if (![self isTransactionAndItsReceiptValid:transaction error:&error]) {
         if (failure) {
-            if (!error) {
-                error = [[NSError alloc] initWithDomain:SKErrorDomain code:-1 userInfo:nil];
-            }
             failure(error);
         }
         return;
@@ -914,6 +916,14 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
 - (BOOL)isTransactionAndItsReceiptValid:(SKPaymentTransaction *)theTransaction error:(NSError * __autoreleasing *)theError {
     if (!((theTransaction) && (theTransaction.transactionReceipt) && (theTransaction.transactionReceipt.length > 0))) {
         // Transaction is not valid.
+        if (theError != NULL) {
+            NSDictionary *theUserInfo =
+            [NSDictionary dictionaryWithObjectsAndKeys:
+             @"Transaction and its receipt is not valid because transaction object is not valid.", NSLocalizedDescriptionKey,
+             @"Transaction object is not valid.", NSLocalizedDescriptionKey,
+             nil];
+            *theError = [NSError errorWithDomain:CBErrorDomain code:CBErrorTransactionNotValid userInfo:theUserInfo];
+        }
         return NO;
     }
     

@@ -51,6 +51,8 @@ typedef NS_ENUM(NSInteger, CBErrorCode) {
     CBErrorPurchaseInfoDoesNotMatchReceipt = 1,
     CBErrorTransactionDoesNotMatchesPurchaseInfo = 2,
     CBErrorCannotExtractPurchaseInfoFromTransactionReceipt = 3,
+    CBErrorTransactionNotInPurchasedOrRestoredState = 4,
+    CBErrorTransactionNotValid = 5,
     
     // Error codes derived from status codes for auto-renewable subscriptions
     CBErrorCannotParseJSON = CBStatusCannotParseJSON,
