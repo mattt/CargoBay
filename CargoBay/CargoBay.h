@@ -93,6 +93,19 @@ typedef NS_ENUM(NSInteger, CBErrorCode) {
                   success:(void (^)(NSDictionary *receipt))success
                   failure:(void (^)(NSError *error))failure;
 
+///---------------------------------------
+/// @name Transaction Receipt Verification
+///---------------------------------------
+
+- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
+                        password:(NSString *)password
+                         success:(void (^)(NSDictionary *responseObject))success
+                         failure:(void (^)(NSError *error))failure;
+
+- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
+                         success:(void (^)(NSDictionary *responseObject))success
+                         failure:(void (^)(NSError *error))failure;
+
 ///--------------------------------------------------
 /// @name Transaction Queue Observer Delegate Methods
 ///--------------------------------------------------
