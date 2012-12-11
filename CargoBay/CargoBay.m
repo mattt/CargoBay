@@ -562,6 +562,8 @@ theOutLabel:
 #endif
 }
 
+#pragma mark - Parsers
+
 static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransactionReceiptData, NSError * __autoreleasing *theError) {
     NSDictionary *theTransactionReceiptDictionary = [NSPropertyListSerialization propertyListWithData:theTransactionReceiptData options:NSPropertyListImmutable format:nil error:theError];
     if (!theTransactionReceiptDictionary) {
@@ -632,7 +634,8 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
     return _sharedManager;
 }
 
-- (AFHTTPClient *)receiptVerificationClientWithBaseURL:(NSURL *)theBaseURL {
+- (AFHTTPClient *)receiptVerificationClientWithBaseURL:(NSURL *)theBaseURL
+{
     AFHTTPClient *theHTTPClient = [[AFHTTPClient alloc] initWithBaseURL:theBaseURL];
     [theHTTPClient setDefaultHeader:@"Accept" value:@"application/json"];
     [theHTTPClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
@@ -641,7 +644,8 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
     return theHTTPClient;
 }
 
-- (AFHTTPClient *)sandboxReceiptVerificationClient {
+- (AFHTTPClient *)sandboxReceiptVerificationClient
+{
     static AFHTTPClient *theHTTPClient = nil;
     
     static dispatch_once_t theOnceToken;
@@ -652,7 +656,8 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
     return theHTTPClient;
 }
 
-- (AFHTTPClient *)productionReceiptVerificationClient {
+- (AFHTTPClient *)productionReceiptVerificationClient
+{
     static AFHTTPClient *theHTTPClient = nil;
     
     static dispatch_once_t theOnceToken;
@@ -663,7 +668,8 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
     return theHTTPClient;
 }
 
-- (id)init {
+- (id)init
+{
     self = [super init];
     if (!self) {
         return nil;
@@ -710,7 +716,8 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
                           client:(AFHTTPClient *)client
                         password:(NSString *)password
                          success:(void (^)(NSDictionary *responseObject))success
-                         failure:(void (^)(NSError *error))failure {
+                         failure:(void (^)(NSError *error))failure
+{
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transactionReceipt) forKey:@"receipt-data"];
     if (password) {
         [parameters setObject:password forKey:@"password"];
@@ -837,8 +844,9 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
 
 - (void)verifyTransactionReceipt:(NSData *)transactionReceipt
                         password:(NSString *)password
-                  success:(void (^)(NSDictionary *responseObject))success
-                  failure:(void (^)(NSError *error))failure {
+                         success:(void (^)(NSDictionary *responseObject))success
+                         failure:(void (^)(NSError *error))failure
+{
     NSError *error = nil;
     
     NSDictionary *receiptDictionary = [NSPropertyListSerialization propertyListWithData:transactionReceipt options:NSPropertyListImmutable format:nil error:&error];
@@ -854,8 +862,8 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
 }
 
 - (void)verifyTransactionReceipt:(NSData *)transactionReceipt
-                  success:(void (^)(NSDictionary *responseObject))success
-                  failure:(void (^)(NSError *error))failure
+                         success:(void (^)(NSDictionary *responseObject))success
+                         failure:(void (^)(NSError *error))failure
 {
     [self verifyTransactionReceipt:transactionReceipt password:nil success:success failure:failure];
 }
@@ -913,7 +921,8 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
 
 // Check the validity of the receipt.
 // This method should be called once a transaction gets to the SKPaymentTransactionStatePurchased or SKPaymentTransactionStateRestored state
-- (BOOL)isTransactionAndItsReceiptValid:(SKPaymentTransaction *)theTransaction error:(NSError * __autoreleasing *)theError {
+- (BOOL)isTransactionAndItsReceiptValid:(SKPaymentTransaction *)theTransaction error:(NSError * __autoreleasing *)theError
+{
     if (!((theTransaction) && (theTransaction.transactionReceipt) && (theTransaction.transactionReceipt.length > 0))) {
         // Transaction is not valid.
         if (theError != NULL) {
