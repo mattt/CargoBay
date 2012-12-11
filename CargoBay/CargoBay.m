@@ -330,6 +330,8 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *theTr
         }
     }
     
+    // Do not check against bundle version because it will likely fails if the app is updated.
+    /*
     {
         NSString *thePurchaseInfoDictionaryBundleVersion = thePurchaseInfoDictionary[@"bvrs"];
         NSString *theAppBundleVersion = [NSBundle mainBundle].infoDictionary[(__bridge NSString *)kCFBundleVersionKey];
@@ -345,6 +347,7 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *theTr
             return NO;
         }
     }
+    */
     
     // Optionally check the requestData.
     {
