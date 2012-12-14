@@ -27,12 +27,12 @@
 #import "AFHTTPClient.h"
 #import "AFJSONRequestOperation.h"
 
-NSString * const CargoBayErrorDomain = @"me.mattt.CargoBay.ErrorDomain";
+NSString * const CargoBayErrorDomain = @"com.mattt.CargoBay.ErrorDomain";
 
 static NSString * const kCargoBaySandboxReceiptVerificationBaseURLString = @"https://sandbox.itunes.apple.com/";
 static NSString * const kCargoBayProductionReceiptVerificationBaseURLString = @"https://buy.itunes.apple.com/";
 
-static NSString * const kCargoBayKnownIAPTransactionsKey = @"me.mattt.CargoBay.knownIAPTransactions";
+static NSString * const kCargoBayKnownIAPTransactionsKey = @"com.mattt.CargoBay.knownIAPTransactions";
 
 typedef void (^CargoBayPaymentQueueProductSuccessBlock)(NSArray *products, NSArray *invalidIdentifiers);
 typedef void (^CargoBayPaymentQueueProductFailureBlock)(NSError *error);
