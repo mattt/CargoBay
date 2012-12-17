@@ -205,7 +205,7 @@ static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSD
     }
     
     if ([[UIDevice currentDevice] respondsToSelector:NSSelectorFromString(@"identifierForVendor")]) {
-#ifdef __IPHONE_6_0
+#if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_5_1)
         NSString *deviceIdentifier = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         NSString *transactionUniqueVendorIdentifier = [purchaseInfo objectForKey:@"unique-vendor-identifier"];
         NSString *receiptVendorIdentifier = [receipt objectForKey:@"unique_vendor_identifier"];
