@@ -119,7 +119,7 @@ typedef NS_ENUM(NSInteger, CargoBayErrorCode) {
                                                        failure:(void (^)(SKPaymentQueue *queue, NSError *error))failure;
 
 ///-------------------------------------------------------
-/// @name Verif Transaction ID Uniqueness delegate methods
+/// @name Verify Transaction ID Uniqueness delegate methods
 ///-------------------------------------------------------
 
 - (void)setTransactionIDUniquenessWithVerify:(BOOL (^)(NSString *transactionID))verify

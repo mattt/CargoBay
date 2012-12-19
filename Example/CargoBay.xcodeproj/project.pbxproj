@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB0E582B167B159500B52560 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB0E582A167B159500B52560 /* SenTestingKit.framework */; };
+		AB0E582C167B159500B52560 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17715FD71A100D5AC59 /* UIKit.framework */; };
+		AB0E582D167B159500B52560 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17915FD71A100D5AC59 /* Foundation.framework */; };
+		AB0E5833167B159500B52560 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB0E5831167B159500B52560 /* InfoPlist.strings */; };
+		AB0E5836167B159500B52560 /* CargoBayTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AB0E5835167B159500B52560 /* CargoBayTests.m */; };
+		AB1B6B0A167F705200210289 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8AA37EE15FD747D00C21309 /* StoreKit.framework */; };
+		AB28E09C167F1E200052CCFF /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F87666F416595C72007CD103 /* Security.framework */; };
+		AB2973771680B4F20053E9DC /* CargoBay+PrivateMethods.h in Resources */ = {isa = PBXBuildFile; fileRef = AB2973761680B4F20053E9DC /* CargoBay+PrivateMethods.h */; };
 		F853B17815FD71A100D5AC59 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17715FD71A100D5AC59 /* UIKit.framework */; };
 		F853B17A15FD71A100D5AC59 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17915FD71A100D5AC59 /* Foundation.framework */; };
 		F853B17C15FD71A100D5AC59 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17B15FD71A100D5AC59 /* CoreGraphics.framework */; };
@@ -29,7 +37,25 @@
 		F8AA381715FD7A5300C21309 /* UIImageView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380D15FD7A5300C21309 /* UIImageView+AFNetworking.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		AB0E583C167B1A0A00B52560 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F853B16A15FD71A100D5AC59 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F853B17215FD71A100D5AC59;
+			remoteInfo = CargoBay;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		AB0E5829167B159500B52560 /* CargoBayTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CargoBayTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB0E582A167B159500B52560 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		AB0E5830167B159500B52560 /* CargoBayTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CargoBayTests-Info.plist"; sourceTree = "<group>"; };
+		AB0E5832167B159500B52560 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		AB0E5834167B159500B52560 /* CargoBayTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CargoBayTests.h; sourceTree = "<group>"; };
+		AB0E5835167B159500B52560 /* CargoBayTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CargoBayTests.m; sourceTree = "<group>"; };
+		AB0E5837167B159500B52560 /* CargoBayTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CargoBayTests-Prefix.pch"; sourceTree = "<group>"; };
+		AB2973761680B4F20053E9DC /* CargoBay+PrivateMethods.h */ = {isa = PBXFileReference; lastKnownFileType = file; path = "CargoBay+PrivateMethods.h"; sourceTree = "<group>"; };
 		F853B17315FD71A100D5AC59 /* CargoBay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CargoBay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F853B17715FD71A100D5AC59 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		F853B17915FD71A100D5AC59 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -71,6 +97,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		AB0E5825167B159500B52560 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB1B6B0A167F705200210289 /* StoreKit.framework in Frameworks */,
+				AB28E09C167F1E200052CCFF /* Security.framework in Frameworks */,
+				AB0E582B167B159500B52560 /* SenTestingKit.framework in Frameworks */,
+				AB0E582C167B159500B52560 /* UIKit.framework in Frameworks */,
+				AB0E582D167B159500B52560 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F853B17015FD71A100D5AC59 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -86,10 +124,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AB0E582E167B159500B52560 /* CargoBayTests */ = {
+			isa = PBXGroup;
+			children = (
+				AB0E5834167B159500B52560 /* CargoBayTests.h */,
+				AB0E5835167B159500B52560 /* CargoBayTests.m */,
+				AB0E582F167B159500B52560 /* Supporting Files */,
+			);
+			path = CargoBayTests;
+			sourceTree = "<group>";
+		};
+		AB0E582F167B159500B52560 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				AB0E5830167B159500B52560 /* CargoBayTests-Info.plist */,
+				AB0E5831167B159500B52560 /* InfoPlist.strings */,
+				AB0E5837167B159500B52560 /* CargoBayTests-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		F853B16815FD71A100D5AC59 = {
 			isa = PBXGroup;
 			children = (
 				F853B17D15FD71A100D5AC59 /* Example */,
+				AB0E582E167B159500B52560 /* CargoBayTests */,
 				F853B17615FD71A100D5AC59 /* Frameworks */,
 				F853B17415FD71A100D5AC59 /* Products */,
 				F8AA37ED15FD725300C21309 /* Vendor */,
@@ -100,6 +159,7 @@
 			isa = PBXGroup;
 			children = (
 				F853B17315FD71A100D5AC59 /* CargoBay.app */,
+				AB0E5829167B159500B52560 /* CargoBayTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -112,6 +172,7 @@
 				F853B17715FD71A100D5AC59 /* UIKit.framework */,
 				F853B17915FD71A100D5AC59 /* Foundation.framework */,
 				F853B17B15FD71A100D5AC59 /* CoreGraphics.framework */,
+				AB0E582A167B159500B52560 /* SenTestingKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -154,6 +215,7 @@
 			children = (
 				F8AA37EA15FD724E00C21309 /* CargoBay.h */,
 				F8AA37EB15FD724E00C21309 /* CargoBay.m */,
+				AB2973761680B4F20053E9DC /* CargoBay+PrivateMethods.h */,
 			);
 			name = CargoBay;
 			path = ../CargoBay;
@@ -200,6 +262,25 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		AB0E5828167B159500B52560 /* CargoBayTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB0E583A167B159500B52560 /* Build configuration list for PBXNativeTarget "CargoBayTests" */;
+			buildPhases = (
+				AB0E5824167B159500B52560 /* Sources */,
+				AB0E5825167B159500B52560 /* Frameworks */,
+				AB0E5826167B159500B52560 /* Resources */,
+				AB0E5827167B159500B52560 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AB0E583D167B1A0A00B52560 /* PBXTargetDependency */,
+			);
+			name = CargoBayTests;
+			productName = CargoBayTests;
+			productReference = AB0E5829167B159500B52560 /* CargoBayTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
 		F853B17215FD71A100D5AC59 /* CargoBay */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F853B19115FD71A200D5AC59 /* Build configuration list for PBXNativeTarget "CargoBay" */;
@@ -239,11 +320,21 @@
 			projectRoot = "";
 			targets = (
 				F853B17215FD71A100D5AC59 /* CargoBay */,
+				AB0E5828167B159500B52560 /* CargoBayTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		AB0E5826167B159500B52560 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB0E5833167B159500B52560 /* InfoPlist.strings in Resources */,
+				AB2973771680B4F20053E9DC /* CargoBay+PrivateMethods.h in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F853B17115FD71A100D5AC59 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -254,7 +345,31 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		AB0E5827167B159500B52560 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		AB0E5824167B159500B52560 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB0E5836167B159500B52560 /* CargoBayTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F853B16F15FD71A100D5AC59 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -278,7 +393,23 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		AB0E583D167B1A0A00B52560 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F853B17215FD71A100D5AC59 /* CargoBay */;
+			targetProxy = AB0E583C167B1A0A00B52560 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
+		AB0E5831167B159500B52560 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AB0E5832167B159500B52560 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		F8AA37DA15FD71F800C21309 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -298,6 +429,47 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		AB0E5838167B159500B52560 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/CargoBay.app/CargoBay";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CargoBayTests/CargoBayTests-Prefix.pch";
+				INFOPLIST_FILE = "CargoBayTests/CargoBayTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		AB0E5839167B159500B52560 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/CargoBay.app/CargoBay";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CargoBayTests/CargoBayTests-Prefix.pch";
+				INFOPLIST_FILE = "CargoBayTests/CargoBayTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
 		F853B18F15FD71A200D5AC59 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -372,6 +544,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		AB0E583A167B159500B52560 /* Build configuration list for PBXNativeTarget "CargoBayTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB0E5838167B159500B52560 /* Debug */,
+				AB0E5839167B159500B52560 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F853B16D15FD71A100D5AC59 /* Build configuration list for PBXProject "CargoBay" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
