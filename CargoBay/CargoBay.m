@@ -115,7 +115,7 @@ static NSData *CBDataFromBase64EncodedString(NSString *theBase64EncodedString) {
     
     for (NSUInteger theIndex = 0; theIndex < theLength; theIndex += 4) {
         NSUInteger theValue = 0;
-        for (NSUInteger theOtherIndex = 0; theOtherIndex < (theIndex + 4); theOtherIndex++) {
+        for (NSUInteger theOtherIndex = theIndex; theOtherIndex < (theIndex + 4); theOtherIndex++) {
             theValue <<= 6;
             if (theOtherIndex < theLength) {
                 theValue |= (0x3F & theBase64DecodingTable[theInput[theOtherIndex]]);
