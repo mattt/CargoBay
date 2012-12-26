@@ -689,6 +689,12 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
     CargoBayPaymentQueueRestoreFailureBlock _paymentQueueRestoreFailureBlock;
     CargoBayTransactionIDUniquenessVerifyBlock _transactionIDUniquenessVerifyBlock;
     CargoBayTransactionIDUniquenessSaveBlock _transactionIDUniquenessSaveBlock;
+    
+    dispatch_once_t _sandboxReceiptVerificationClientOnceToken;
+    AFHTTPClient *_sandboxReceiptVerificationClient;
+    
+    dispatch_once_t _productionReceiptVerificationClientOnceToken;
+    AFHTTPClient *_productionReceiptVerificationClient;
 }
 
 + (CargoBay *)sharedManager {
@@ -713,26 +719,20 @@ static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransaction
 
 - (AFHTTPClient *)sandboxReceiptVerificationClient
 {
-    static AFHTTPClient *theHTTPClient = nil;
-    
-    static dispatch_once_t theOnceToken;
-    dispatch_once(&theOnceToken, ^{
-        theHTTPClient = [self receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationBaseURLString]];
+    dispatch_once(&_sandboxReceiptVerificationClientOnceToken, ^{
+        _sandboxReceiptVerificationClient = [self receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationBaseURLString]];
     });
     
-    return theHTTPClient;
+    return _sandboxReceiptVerificationClient;
 }
 
 - (AFHTTPClient *)productionReceiptVerificationClient
 {
-    static AFHTTPClient *theHTTPClient = nil;
-    
-    static dispatch_once_t theOnceToken;
-    dispatch_once(&theOnceToken, ^{
-        theHTTPClient = [self receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBayProductionReceiptVerificationBaseURLString]];
+    dispatch_once(&_productionReceiptVerificationClientOnceToken, ^{
+        _productionReceiptVerificationClient = [self receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBayProductionReceiptVerificationBaseURLString]];
     });
     
-    return theHTTPClient;
+    return _productionReceiptVerificationClient;
 }
 
 - (id)init
