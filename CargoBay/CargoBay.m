@@ -275,7 +275,7 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *theTr
                 NSDictionary *userInfo = [NSMutableDictionary dictionary];
                 [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction does not match purchase info because transaction's quantity (%d) does not match purchase info's quantity (%d).", @"CargoBay", nil), theTransactionQuantity, thePurchaseInfoDictionaryQuantity] forKey:NSLocalizedDescriptionKey];
                 [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction's quantity (%d) does not match purchase info's quantity (%d).", @"CargoBay", nil), theTransactionQuantity, thePurchaseInfoDictionaryQuantity] forKey:NSLocalizedFailureReasonErrorKey];
-                *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:theUserInfo];
+                *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:userInfo];
             }
             
             return NO;
@@ -347,11 +347,16 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *theTr
     {
         NSDate *theTransactionTransactionDate = theTransaction.transactionDate;
         NSString *thePurchaseInfoDictionaryPurchaseDateString = thePurchaseInfoDictionary[@"purchase-date"];
-        // Converts the string into a date
-        NSDateFormatter *theDateFormatter =  [[NSDateFormatter alloc] init];
-        theDateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
 
-        NSDate *thePurchaseInfoDictionaryPurchaseDate = [theDateFormatter dateFromString:[thePurchaseInfoDictionaryPurchaseDateString stringByReplacingOccurrencesOfString:@"Etc/" withString:@""]];
+        static NSDateFormatter *_dateFormatter = nil;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            _dateFormatter =  [[NSDateFormatter alloc] init];
+            _dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            _dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
+        });
+
+        NSDate *thePurchaseInfoDictionaryPurchaseDate = [_dateFormatter dateFromString:[thePurchaseInfoDictionaryPurchaseDateString stringByReplacingOccurrencesOfString:@"Etc/" withString:@""]];
 
         if (![theTransactionTransactionDate isEqualToDate:thePurchaseInfoDictionaryPurchaseDate]) {
             if (theError != NULL) {
