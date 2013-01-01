@@ -44,6 +44,22 @@ typedef void (^CargoBayTransactionIDUniquenessSaveBlock)(NSString *transactionID
 
 #pragma mark - Serializations
 
+static NSDate * CBDateFromDateString(NSString *string) {
+    if (!string) {
+        return nil;
+    }
+
+    static NSDateFormatter *_dateFormatter = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _dateFormatter =  [[NSDateFormatter alloc] init];
+        _dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+        _dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
+    });
+
+    return [_dateFormatter dateFromString:string];
+}
+
 static NSString * CBBase64EncodedStringFromData(NSData *data) {
     NSUInteger length = [data length];
     NSMutableData *mutableData = [NSMutableData dataWithLength:((length + 2) / 3) * 4];
@@ -342,16 +358,9 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *trans
 
     // Optionally check the dates.
     {
-        static NSDateFormatter *_dateFormatter = nil;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            _dateFormatter =  [[NSDateFormatter alloc] init];
-            _dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-            _dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
-        });
 
         NSDate *transactionDate = transaction.transactionDate;
-        NSDate *purchaseInfoDictionaryPurchaseDate = [_dateFormatter dateFromString:[purchaseInfoDictionary[@"purchase-date"] stringByReplacingOccurrencesOfString:@"Etc/" withString:@""]];
+        NSDate *purchaseInfoDictionaryPurchaseDate = CBDateFromDateString([purchaseInfoDictionary[@"purchase-date"] stringByReplacingOccurrencesOfString:@"Etc/" withString:@""]);
 
         if (![transactionDate isEqualToDate:purchaseInfoDictionaryPurchaseDate]) {
             if (error != NULL) {
@@ -591,39 +600,33 @@ _out:
 
 #pragma mark - Parsers
 
-static NSDictionary *CBPurchaseInfoFromTransactionReceipt(NSData *theTransactionReceiptData, NSError * __autoreleasing *theError) {
-    NSDictionary *theTransactionReceiptDictionary = [NSPropertyListSerialization propertyListWithData:theTransactionReceiptData options:NSPropertyListImmutable format:nil error:theError];
-    if (!theTransactionReceiptDictionary) {
+static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptData, NSError * __autoreleasing *error) {
+    NSDictionary *transactionReceiptDictionary = [NSPropertyListSerialization propertyListWithData:transactionReceiptData options:NSPropertyListImmutable format:nil error:error];
+    if (!transactionReceiptDictionary) {
         return nil;
     }
-    NSString *thePurchaseInfo = [theTransactionReceiptDictionary objectForKey:@"purchase-info"];
-    NSDictionary *thePurchaseInfoDictionary = [NSPropertyListSerialization propertyListWithData:CBDataFromBase64EncodedString(thePurchaseInfo) options:NSPropertyListImmutable format:nil error:theError];
-    if (!thePurchaseInfoDictionary) {
+    
+    NSString *purchaseInfo = [transactionReceiptDictionary objectForKey:@"purchase-info"];
+    NSDictionary *purchaseInfoDictionary = [NSPropertyListSerialization propertyListWithData:CBDataFromBase64EncodedString(purchaseInfo) options:NSPropertyListImmutable format:nil error:error];
+    if (!purchaseInfoDictionary) {
         return nil;
     }
-    NSString *thePurchaseDateString = [thePurchaseInfoDictionary objectForKey:@"purchase-date"];
-    NSString *theSignature = [theTransactionReceiptDictionary objectForKey:@"signature"];
-
-    // Converts the string into a date
-    NSDateFormatter *theDateFormatter =  [[NSDateFormatter alloc] init];
-    theDateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
-
-    NSDate *thePurchaseDate = [theDateFormatter dateFromString:[thePurchaseDateString stringByReplacingOccurrencesOfString:@"Etc/" withString:@""]];
-
-    // Check the authenticity of the receipt response/signature etc.
-    if (!CBCheckReceiptSecurity(thePurchaseInfo, theSignature, (__bridge CFDateRef)thePurchaseDate)) {
-        if (theError != NULL) {
-            NSDictionary *theUserInfo =
-            [NSDictionary dictionaryWithObjectsAndKeys:
-             @"Cannot extract purchase info from transaction receipt because purchase info failed to validate against its signature.", NSLocalizedDescriptionKey,
-             @"Purchase info failed to validate against its signature.", NSLocalizedFailureReasonErrorKey,
-             nil];
-            *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorCannotExtractPurchaseInfoFromTransactionReceipt userInfo:theUserInfo];
+    
+    NSString *signature = [transactionReceiptDictionary objectForKey:@"signature"];
+    NSDate *purchaseDate = CBDateFromDateString([purchaseInfoDictionary objectForKey:@"purchase-date"]);
+    
+    if (!CBCheckReceiptSecurity(purchaseInfo, signature, (__bridge CFDateRef)purchaseDate)) {
+        if (error != NULL) {
+            NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+            [userInfo setValue:NSLocalizedStringFromTable(@"Cannot extract purchase info from transaction receipt because purchase info failed to validate against its signature.", @"CargoBay", nil) forKey:NSLocalizedDescriptionKey];
+            [userInfo setValue:NSLocalizedStringFromTable(@"Purchase info failed to validate against its signature.", @"CargoBay", nil) forKey:NSLocalizedFailureReasonErrorKey];
+            *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorCannotExtractPurchaseInfoFromTransactionReceipt userInfo:userInfo];
         }
+        
         return nil;
     }
 
-    return thePurchaseInfoDictionary;
+    return purchaseInfoDictionary;
 }
 
 #pragma mark
