@@ -15,6 +15,7 @@
 		AB1B6B0A167F705200210289 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8AA37EE15FD747D00C21309 /* StoreKit.framework */; };
 		AB28E09C167F1E200052CCFF /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F87666F416595C72007CD103 /* Security.framework */; };
 		AB2973771680B4F20053E9DC /* CargoBay+PrivateMethods.h in Resources */ = {isa = PBXBuildFile; fileRef = AB2973761680B4F20053E9DC /* CargoBay+PrivateMethods.h */; };
+		F84068541693676700B4966B /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F84068531693676700B4966B /* Default-568h@2x.png */; };
 		F853B17815FD71A100D5AC59 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17715FD71A100D5AC59 /* UIKit.framework */; };
 		F853B17A15FD71A100D5AC59 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17915FD71A100D5AC59 /* Foundation.framework */; };
 		F853B17C15FD71A100D5AC59 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17B15FD71A100D5AC59 /* CoreGraphics.framework */; };
@@ -55,7 +56,8 @@
 		AB0E5834167B159500B52560 /* CargoBayTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CargoBayTests.h; sourceTree = "<group>"; };
 		AB0E5835167B159500B52560 /* CargoBayTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CargoBayTests.m; sourceTree = "<group>"; };
 		AB0E5837167B159500B52560 /* CargoBayTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CargoBayTests-Prefix.pch"; sourceTree = "<group>"; };
-		AB2973761680B4F20053E9DC /* CargoBay+PrivateMethods.h */ = {isa = PBXFileReference; lastKnownFileType = file; path = "CargoBay+PrivateMethods.h"; sourceTree = "<group>"; };
+		AB2973761680B4F20053E9DC /* CargoBay+PrivateMethods.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CargoBay+PrivateMethods.h"; sourceTree = "<group>"; };
+		F84068531693676700B4966B /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		F853B17315FD71A100D5AC59 /* CargoBay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CargoBay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F853B17715FD71A100D5AC59 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		F853B17915FD71A100D5AC59 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -124,13 +126,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AB0E582E167B159500B52560 /* CargoBayTests */ = {
+		AB0E582E167B159500B52560 /* CargoBay Tests */ = {
 			isa = PBXGroup;
 			children = (
 				AB0E5834167B159500B52560 /* CargoBayTests.h */,
 				AB0E5835167B159500B52560 /* CargoBayTests.m */,
 				AB0E582F167B159500B52560 /* Supporting Files */,
 			);
+			name = "CargoBay Tests";
 			path = CargoBayTests;
 			sourceTree = "<group>";
 		};
@@ -147,8 +150,9 @@
 		F853B16815FD71A100D5AC59 = {
 			isa = PBXGroup;
 			children = (
-				F853B17D15FD71A100D5AC59 /* Example */,
-				AB0E582E167B159500B52560 /* CargoBayTests */,
+				F84068531693676700B4966B /* Default-568h@2x.png */,
+				F853B17D15FD71A100D5AC59 /* CargoBay Example */,
+				AB0E582E167B159500B52560 /* CargoBay Tests */,
 				F853B17615FD71A100D5AC59 /* Frameworks */,
 				F853B17415FD71A100D5AC59 /* Products */,
 				F8AA37ED15FD725300C21309 /* Vendor */,
@@ -177,7 +181,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		F853B17D15FD71A100D5AC59 /* Example */ = {
+		F853B17D15FD71A100D5AC59 /* CargoBay Example */ = {
 			isa = PBXGroup;
 			children = (
 				F8AA37D615FD71F800C21309 /* AppDelegate.h */,
@@ -186,7 +190,7 @@
 				F8AA37E015FD71F800C21309 /* ViewController.m */,
 				F8AA37E815FD720300C21309 /* Supporting Files */,
 			);
-			name = Example;
+			name = "CargoBay Example";
 			path = CargoBay;
 			sourceTree = "<group>";
 		};
@@ -340,6 +344,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8AA37E315FD71F800C21309 /* ViewController.xib in Resources */,
+				F84068541693676700B4966B /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
