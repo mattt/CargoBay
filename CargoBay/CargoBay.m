@@ -39,8 +39,7 @@ typedef void (^CargoBayPaymentQueueProductFailureBlock)(NSError *error);
 typedef void (^CargoBayPaymentQueueTransactionsBlock)(SKPaymentQueue *queue, NSArray *transactions);
 typedef void (^CargoBayPaymentQueueRestoreSuccessBlock)(SKPaymentQueue *queue);
 typedef void (^CargoBayPaymentQueueRestoreFailureBlock)(SKPaymentQueue *queue, NSError *error);
-typedef BOOL (^CargoBayTransactionIDUniquenessVerifyBlock)(NSString *transactionID);
-typedef void (^CargoBayTransactionIDUniquenessSaveBlock)(NSString *transactionID);
+typedef BOOL (^CargoBayTransactionIDUniquenessVerificationBlock)(NSString *transactionID);
 
 #pragma mark - Serializations
 
@@ -646,58 +645,39 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
 
 #pragma mark -
 
-@implementation CargoBay {
+@interface CargoBay () {
 @private
     CargoBayPaymentQueueTransactionsBlock _paymentQueueTransactionsUpdated;
     CargoBayPaymentQueueTransactionsBlock _paymentQueueTransactionsRemoved;
     CargoBayPaymentQueueRestoreSuccessBlock _paymentQueueRestoreSuccessBlock;
     CargoBayPaymentQueueRestoreFailureBlock _paymentQueueRestoreFailureBlock;
-    CargoBayTransactionIDUniquenessVerifyBlock _transactionIDUniquenessVerifyBlock;
-    CargoBayTransactionIDUniquenessSaveBlock _transactionIDUniquenessSaveBlock;
-
-    dispatch_once_t _sandboxReceiptVerificationClientOnceToken;
-    AFHTTPClient *_sandboxReceiptVerificationClient;
-
-    dispatch_once_t _productionReceiptVerificationClientOnceToken;
-    AFHTTPClient *_productionReceiptVerificationClient;
+    CargoBayTransactionIDUniquenessVerificationBlock _transactionIDUniquenessVerificationBlock;
 }
 
-+ (CargoBay *)sharedManager {
-    static CargoBay *_sharedManager = nil;
+@property (readwrite, nonatomic, strong) AFHTTPClient *sandboxReceiptVerificationClient;
+@property (readwrite, nonatomic, strong) AFHTTPClient *productionReceiptVerificationClient;
+@end
+
+@implementation CargoBay
+
++ (instancetype)sharedManager {
+    static id _sharedManager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _sharedManager = [[CargoBay alloc] init];
+        _sharedManager = [[self alloc] init];
     });
 
     return _sharedManager;
 }
 
-- (AFHTTPClient *)receiptVerificationClientWithBaseURL:(NSURL *)theBaseURL
-{
-    AFHTTPClient *theHTTPClient = [[AFHTTPClient alloc] initWithBaseURL:theBaseURL];
-    [theHTTPClient setDefaultHeader:@"Accept" value:@"application/json"];
-    [theHTTPClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
-    [theHTTPClient setParameterEncoding:AFJSONParameterEncoding];
++ (AFHTTPClient *)receiptVerificationClientWithBaseURL:(NSURL *)baseURL {
+    AFHTTPClient *HTTPClient = [[AFHTTPClient alloc] initWithBaseURL:baseURL];
+    [HTTPClient setDefaultHeader:@"Accept" value:@"application/json"];
+    [HTTPClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
+    [HTTPClient setParameterEncoding:AFJSONParameterEncoding];
     [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObject:@"text/plain"]];
-    return theHTTPClient;
-}
-
-- (AFHTTPClient *)sandboxReceiptVerificationClient
-{
-    dispatch_once(&_sandboxReceiptVerificationClientOnceToken, ^{
-        _sandboxReceiptVerificationClient = [self receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationBaseURLString]];
-    });
-
-    return _sandboxReceiptVerificationClient;
-}
-
-- (AFHTTPClient *)productionReceiptVerificationClient
-{
-    dispatch_once(&_productionReceiptVerificationClientOnceToken, ^{
-        _productionReceiptVerificationClient = [self receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBayProductionReceiptVerificationBaseURLString]];
-    });
-
-    return _productionReceiptVerificationClient;
+    
+    return HTTPClient;
 }
 
 - (id)init {
@@ -705,6 +685,9 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
     if (!self) {
         return nil;
     }
+
+    self.sandboxReceiptVerificationClient = [[self class] receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationBaseURLString]];
+    self.productionReceiptVerificationClient = [[self class] receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBayProductionReceiptVerificationBaseURLString]];
 
     return self;
 }
@@ -874,7 +857,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
 }
 
 - (void)verifyTransactionReceipt:(NSData *)transactionReceipt
-                        password:(NSString *)password
+                        password:(NSString *)passwordOrNil
                          success:(void (^)(NSDictionary *responseObject))success
                          failure:(void (^)(NSError *error))failure
 {
@@ -889,18 +872,12 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
     NSString *environment = [receiptDictionary objectForKey:@"environment"];
     AFHTTPClient *client = [environment isEqual:@"Sandbox"] ? [self sandboxReceiptVerificationClient] : [self productionReceiptVerificationClient];
 
-    [self verifyTransactionReceipt:transactionReceipt client:client password:password success:success failure:failure];
+    [self verifyTransactionReceipt:transactionReceipt client:client password:passwordOrNil success:success failure:failure];
 }
 
-- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
-                         success:(void (^)(NSDictionary *responseObject))success
-                         failure:(void (^)(NSError *error))failure
-{
-    [self verifyTransactionReceipt:transactionReceipt password:nil success:success failure:failure];
-}
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
-                 password:(NSString *)password
+                 password:(NSString *)passwordOrNil
                   success:(void (^)(NSDictionary *responseObject))success
                   failure:(void (^)(NSError *error))failure
 {
@@ -917,7 +894,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
     }
     
     NSError *error = nil;
-    if (![self isTransactionAndItsReceiptValid:transaction error:&error]) {
+    if (![self isValidTransaction:transaction error:&error]) {
         if (failure) {
             failure(error);
         }
@@ -925,14 +902,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
         return;
     }
 
-    [self verifyTransactionReceipt:transaction.transactionReceipt password:password success:success failure:failure];
-}
-
-- (void)verifyTransaction:(SKPaymentTransaction *)transaction
-                  success:(void (^)(NSDictionary *receipt))success
-                  failure:(void (^)(NSError *error))failure
-{
-    [self verifyTransaction:transaction password:nil success:success failure:failure];
+    [self verifyTransactionReceipt:transaction.transactionReceipt password:passwordOrNil success:success failure:failure];
 }
 
 - (void)setPaymentQueueUpdatedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block {
@@ -950,58 +920,15 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
     _paymentQueueRestoreFailureBlock = [failure copy];
 }
 
-- (void)setTransactionIDUniquenessWithVerify:(BOOL (^)(NSString *transactionID))verify
-                                        save:(void (^)(NSString *transactionID))save
-{
-    _transactionIDUniquenessVerifyBlock = [verify copy];
-    _transactionIDUniquenessSaveBlock = [save copy];
-}
-
-- (void)setDefaultTransactionIDUniquenessBehavior
-{
-    [self
-     setTransactionIDUniquenessWithVerify:^BOOL(NSString *transactionID) {
-         // Save the transactionID to the standardUserDefaults so we can check against that later
-         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-         [defaults synchronize];
-
-         NSMutableDictionary *knownIAPTransactionsDictionary = [defaults objectForKey:kCargoBayKnownIAPTransactionsKey];
-         if (!knownIAPTransactionsDictionary) {
-             [defaults setObject:[[NSMutableDictionary alloc] init] forKey:kCargoBayKnownIAPTransactionsKey];
-             [defaults synchronize];
-             knownIAPTransactionsDictionary = [defaults objectForKey:kCargoBayKnownIAPTransactionsKey];
-         }
-
-         if (![knownIAPTransactionsDictionary objectForKey:transactionID]) {
-             return YES;
-         }
-
-         // The transaction already exists in the defaults.
-         return NO;
-     }
-     save:^(NSString *transactionID) {
-         // Save the transactionID to the standardUserDefaults so we can check against that later
-         // If dictionary exists already then retrieve it and add new transactionID
-         // Regardless save transactionID to dictionary which gets saved to NSUserDefaults
-         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-         NSMutableDictionary *knownIAPTransactionsDictionary = [NSMutableDictionary dictionaryWithDictionary:[defaults objectForKey:kCargoBayKnownIAPTransactionsKey]];
-
-         if (!knownIAPTransactionsDictionary) {
-             knownIAPTransactionsDictionary = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithInt:1], transactionID, nil];
-         } else {
-             [knownIAPTransactionsDictionary setObject:[NSNumber numberWithInt:1] forKey:transactionID];
-         }
-
-         [defaults setObject:knownIAPTransactionsDictionary forKey:kCargoBayKnownIAPTransactionsKey];
-         [defaults synchronize];
-     }];
+- (void)setVerifyUniquenessofTransactionIDWithBlock:(BOOL (^)(NSString *transactionID))block {
+    _transactionIDUniquenessVerificationBlock = [block copy];
 }
 
 #pragma mark - Receipt Verification
 
 // This method should be called once a transaction gets to the SKPaymentTransactionStatePurchased or SKPaymentTransactionStateRestored state
-- (BOOL)isTransactionAndItsReceiptValid:(SKPaymentTransaction *)transaction
-                                  error:(NSError * __autoreleasing *)error
+- (BOOL)isValidTransaction:(SKPaymentTransaction *)transaction
+                     error:(NSError * __autoreleasing *)error
 {
     if (!((transaction) && (transaction.transactionReceipt) && (transaction.transactionReceipt.length > 0))) {
         if (error != NULL) {
@@ -1018,9 +945,13 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
         return NO;
     }
 
-    if (_transactionIDUniquenessVerifyBlock) {
-        NSString *transactionID = [purchaseInfoDictionary objectForKey:@"transaction-id"];
-        if (!_transactionIDUniquenessVerifyBlock(transactionID)) {
+    if (!CBValidateTransactionMatchesPurchaseInfo(transaction, purchaseInfoDictionary, error)) {
+        return NO;
+    }
+
+    NSString *transactionID = [purchaseInfoDictionary objectForKey:@"transaction-id"];
+    if (_transactionIDUniquenessVerificationBlock) {
+        if (!_transactionIDUniquenessVerificationBlock(transactionID)) {
             if (error != NULL) {
                 NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
                 [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction ID (%@) is not unique.", @"CargoBay", nil), transactionID] forKey:NSLocalizedDescriptionKey];
@@ -1029,14 +960,28 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
             
             return NO;
         }
-    }
+    } else {
+        NSMutableDictionary *knownIAPTransactionsDictionary = [[NSUserDefaults standardUserDefaults] objectForKey:kCargoBayKnownIAPTransactionsKey];
+        if (!knownIAPTransactionsDictionary) {
+            knownIAPTransactionsDictionary = [NSMutableDictionary dictionary];
+        }
 
-    if (!CBValidateTransactionMatchesPurchaseInfo(transaction, purchaseInfoDictionary, error)) {
-        return NO;
-    }
+        if (![knownIAPTransactionsDictionary objectForKey:transactionID]) {
+            [knownIAPTransactionsDictionary setObject:[NSNumber numberWithBool:YES] forKey:transactionID];
 
-    if (_transactionIDUniquenessSaveBlock) {
-        _transactionIDUniquenessSaveBlock([purchaseInfoDictionary objectForKey:@"transaction-id"]);
+            [[NSUserDefaults standardUserDefaults] setObject:knownIAPTransactionsDictionary forKey:kCargoBayKnownIAPTransactionsKey];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+
+            return YES;
+        } else {
+            if (error != NULL) {
+                NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction ID (%@) is not unique.", @"CargoBay", nil), transactionID] forKey:NSLocalizedDescriptionKey];
+                *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionIDNotUnique userInfo:userInfo];
+            }
+
+            return NO;
+        }        
     }
 
     return YES;

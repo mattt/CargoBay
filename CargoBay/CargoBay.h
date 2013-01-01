@@ -29,11 +29,109 @@
 
 @class AFHTTPClient;
 
+/**
+ 
+ */
+@interface CargoBay : NSObject <SKPaymentTransactionObserver>
+
+/**
+ 
+ */
+@property (nonatomic) AFHTTPClient *productsHTTPClient;
+
+/**
+ 
+ */
++ (instancetype)sharedManager;
+
+///---------------------
+/// @name Product Lookup
+///---------------------
+
+/**
+ 
+ */
+- (void)productsWithIdentifiers:(NSSet *)identifiers
+                        success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
+                        failure:(void (^)(NSError *error))failure;
+
+/**
+ 
+ */
+- (void)productsWithRequest:(NSURLRequest *)request
+                    success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
+                    failure:(void (^)(NSError *error))failure;
+
+///-------------------------------
+/// @name Transaction Verification
+///-------------------------------
+
+/**
+ 
+ */
+- (void)verifyTransaction:(SKPaymentTransaction *)transaction
+                 password:(NSString *)passwordOrNil
+                  success:(void (^)(NSDictionary *receipt))success
+                  failure:(void (^)(NSError *error))failure;
+
+///---------------------------------------
+/// @name Transaction Receipt Verification
+///---------------------------------------
+
+/**
+ 
+ */
+- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
+                        password:(NSString *)passwordOrNil
+                         success:(void (^)(NSDictionary *responseObject))success
+                         failure:(void (^)(NSError *error))failure;
+
+///--------------------------------------------------
+/// @name Transaction Queue Observer Delegate Methods
+///--------------------------------------------------
+
+/**
+ 
+ */
+- (void)setPaymentQueueUpdatedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block;
+
+/**
+ 
+ */
+- (void)setPaymentQueueRemovedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block;
+
+/**
+ 
+ */
+- (void)setPaymentQueueRestoreCompletedTransactionsWithSuccess:(void (^)(SKPaymentQueue *queue))success
+                                                       failure:(void (^)(SKPaymentQueue *queue, NSError *error))failure;
+
+///---------------------------------------
+/// @name Verify Transaction ID Uniqueness
+///---------------------------------------
+
+/**
+ 
+ */
+- (void)setVerifyUniquenessofTransactionIDWithBlock:(BOOL (^)(NSString *transactionID))block;
+
+@end
+
+///----------------
+/// @name Constants
+///----------------
+
+/**
+ 
+ */
 extern NSString * const CargoBayErrorDomain;
 
+/**
+ 
+ */
 typedef NS_ENUM(NSInteger, CargoBayStatusCode) {
     CargoBayStatusOK = 0,
-    
+
     // Status codes for auto-renewable subscriptions
     CargoBayStatusCannotParseJSON = 21000,
     CargoBayStatusMalformedReceiptData = 21002,
@@ -47,14 +145,14 @@ typedef NS_ENUM(NSInteger, CargoBayStatusCode) {
 
 typedef NS_ENUM(NSInteger, CargoBayErrorCode) {
     CargoBayErrorUnknown = -1,
-    
+
     CargoBayErrorPurchaseInfoDoesNotMatchReceipt = 1,
     CargoBayErrorTransactionDoesNotMatchesPurchaseInfo = 2,
     CargoBayErrorCannotExtractPurchaseInfoFromTransactionReceipt = 3,
     CargoBayErrorTransactionNotInPurchasedOrRestoredState = 4,
     CargoBayErrorTransactionNotValid = 5,
     CargoBayErrorTransactionIDNotUnique = 6,
-    
+
     // Error codes derived from status codes for auto-renewable subscriptions
     CargoBayErrorCannotParseJSON = CargoBayStatusCannotParseJSON,
     CargoBayErrorMalformedReceiptData = CargoBayStatusMalformedReceiptData,
@@ -62,70 +160,3 @@ typedef NS_ENUM(NSInteger, CargoBayErrorCode) {
     CargoBayErrorSharedSecretDoesNotMatch = CargoBayStatusSharedSecretDoesNotMatch,
     CargoBayErrorReceiptServerUnavailable = CargoBayStatusReceiptServerUnavailable
 };
-
-@interface CargoBay : NSObject <SKPaymentTransactionObserver>
-
-@property (nonatomic) AFHTTPClient *productsHTTPClient;
-
-+ (CargoBay *)sharedManager;
-
-///---------------------
-/// @name Product Lookup
-///---------------------
-
-- (void)productsWithIdentifiers:(NSSet *)identifiers
-                        success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
-                        failure:(void (^)(NSError *error))failure;
-
-- (void)productsWithRequest:(NSURLRequest *)request
-                    success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
-                    failure:(void (^)(NSError *error))failure;
-
-///-------------------------------
-/// @name Transaction Verification
-///-------------------------------
-
-- (void)verifyTransaction:(SKPaymentTransaction *)transaction
-                 password:(NSString *)password
-                  success:(void (^)(NSDictionary *receipt))success
-                  failure:(void (^)(NSError *error))failure;
-
-- (void)verifyTransaction:(SKPaymentTransaction *)transaction
-                  success:(void (^)(NSDictionary *receipt))success
-                  failure:(void (^)(NSError *error))failure;
-
-///---------------------------------------
-/// @name Transaction Receipt Verification
-///---------------------------------------
-
-- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
-                        password:(NSString *)password
-                         success:(void (^)(NSDictionary *responseObject))success
-                         failure:(void (^)(NSError *error))failure;
-
-- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
-                         success:(void (^)(NSDictionary *responseObject))success
-                         failure:(void (^)(NSError *error))failure;
-
-///--------------------------------------------------
-/// @name Transaction Queue Observer Delegate Methods
-///--------------------------------------------------
-
-- (void)setPaymentQueueUpdatedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block;
-
-- (void)setPaymentQueueRemovedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block;
-
-- (void)setPaymentQueueRestoreCompletedTransactionsWithSuccess:(void (^)(SKPaymentQueue *queue))success
-                                                       failure:(void (^)(SKPaymentQueue *queue, NSError *error))failure;
-
-///-------------------------------------------------------
-/// @name Verify Transaction ID Uniqueness delegate methods
-///-------------------------------------------------------
-
-- (void)setTransactionIDUniquenessWithVerify:(BOOL (^)(NSString *transactionID))verify
-                                        save:(void (^)(NSString *transactionID))save;
-
-- (void)setDefaultTransactionIDUniquenessBehavior;
-
-
-@end
