@@ -742,8 +742,8 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
 
         switch (status) {
-            case CargoBayStatusOK:         // Status 0: The receipt is valid.
-            case CargoBayStatusReceiptValidButSubscriptionExpired: {   // Status 21006: This receipt is valid but the subscription has expired.
+            case CargoBayStatusOK:
+            case CargoBayStatusReceiptValidButSubscriptionExpired: {
                 NSDictionary *receipt = [responseObject valueForKey:@"receipt"];
                 NSError *error = nil;
 
@@ -752,6 +752,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
                     if (failure) {
                         failure(error);
                     }
+                    
                     return;
                 }
 
@@ -760,6 +761,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
                     if (failure) {
                         failure(error);
                     }
+                    
                     return;
                 }
 
@@ -772,6 +774,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
                         if (failure) {
                             failure(error);
                         }
+                        
                         return;
                     }
 
@@ -795,30 +798,24 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
                         success(responseObject);
                     }
                 }
-            } break;
-            case CargoBayStatusSandboxReceiptSentToProduction: {   // Status 21007: This receipt is a sandbox receipt, but it was sent to the production service for verification.
-                [self verifyTransactionReceipt:transactionReceipt
-                                        client:[self sandboxReceiptVerificationClient]
-                                      password:password
-                                       success:success
-                                       failure:failure];
-            } break;
-            case CargoBayStatusProductionReceiptSentToSandbox: {   // Status 21008: This receipt is a production receipt, but it was sent to the sandbox service for verification.
-                [self verifyTransactionReceipt:transactionReceipt
-                                        client:[self productionReceiptVerificationClient]
-                                      password:password
-                                       success:success
-                                       failure:failure];
-            } break;
-            default: {
+
+                break;
+            }
+            case CargoBayStatusSandboxReceiptSentToProduction:
+                [self verifyTransactionReceipt:transactionReceipt client:[self sandboxReceiptVerificationClient] password:password success:success failure:failure];
+                break;
+            case CargoBayStatusProductionReceiptSentToSandbox:
+                [self verifyTransactionReceipt:transactionReceipt client:[self productionReceiptVerificationClient] password:password success:success failure:failure];
+                break;
+            default:
                 if (failure) {
                     NSString *exception = [responseObject valueForKey:@"exception"];
                     NSDictionary *userInfo = exception ? [NSDictionary dictionaryWithObject:exception forKey:NSLocalizedFailureReasonErrorKey] : nil;
-
                     NSError *error = [[NSError alloc] initWithDomain:CargoBayErrorDomain code:status userInfo:userInfo];
+                    
                     failure(error);
                 }
-            } break;
+                break;
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if (failure) {
