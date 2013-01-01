@@ -311,11 +311,12 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *trans
         }
     }
 
-    // Do not check against bundle version because it will likely fails if the app is updated.
-#if NO
+#ifndef _CARGOBAY_VALIDATE_TRANSACTION_BUNDLE_VERSION_
+    // Optionally check the bundle version
+    // Disable check by default, because it will fail if the app was updated since original purchase
     {
         NSString *purchaseInfoDictionaryBundleVersion = purchaseInfoDictionary[@"bvrs"];
-        NSString *appBundleVersion = [NSBundle mainBundle].infoDictionary[(__bridge NSString *)kCFBundleVersionKey];
+        NSString *appBundleVersion = [[[NSBundle mainBundle] infoDictionary] valueForKey:(__bridge NSString *)kCFBundleVersionKey];
         if (![purchaseInfoDictionaryBundleVersion isEqualToString:appBundleVersion]) {
             if (error != NULL) {
                 NSDictionary *userInfo = [NSMutableDictionary dictionary];
@@ -333,13 +334,10 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *trans
     // Optionally check the requestData.
     {
         /*
-         `theTransaction.payment.requestData` is reserved for future use as stated
-         in the document (iOS 6). It is mentioned that the default value will be nil.
-         If the value is not nil, it will be rejected by the Apple App Store.
-         We could check for nil. But Apple might decides to populate this field
-         in the future, which will break our code by then. So I think the wisest
-         choice would be to avoid doing anything to this field all together for now.
-         */
+         `transaction.payment.requestData` is reserved for future use as stated in the document (iOS 6). 
+         It is mentioned that the default value will be `nil`. 
+         If the value is not `nil`, it will be rejected by the Apple App Store.
+        */
     }
 
     // Optionally check the dates.
