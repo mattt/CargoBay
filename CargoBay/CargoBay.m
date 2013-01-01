@@ -705,27 +705,6 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
     [request start];
 }
 
-- (void)productsWithRequest:(NSURLRequest *)request
-                    success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
-                    failure:(void (^)(NSError *error))failure
-{
-    if (!_productsHTTPClient) {
-        return;
-    }
-
-    AFHTTPRequestOperation *operation = [_productsHTTPClient HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        if (success && [responseObject isKindOfClass:[NSArray class]]) {
-            [self productsWithIdentifiers:[NSSet setWithArray:responseObject] success:success failure:failure];
-        }
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        if (failure) {
-            failure(error);
-        }
-    }];
-
-    [_productsHTTPClient.operationQueue addOperation:operation];
-}
-
 - (void)verifyTransactionReceipt:(NSData *)transactionReceipt
                           client:(AFHTTPClient *)client
                         password:(NSString *)password

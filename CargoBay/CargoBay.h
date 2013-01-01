@@ -37,11 +37,6 @@
 /**
  
  */
-@property (nonatomic) AFHTTPClient *productsHTTPClient;
-
-/**
- 
- */
 + (instancetype)sharedManager;
 
 ///---------------------
@@ -54,13 +49,6 @@
 - (void)productsWithIdentifiers:(NSSet *)identifiers
                         success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
                         failure:(void (^)(NSError *error))failure;
-
-/**
- 
- */
-- (void)productsWithRequest:(NSURLRequest *)request
-                    success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
-                    failure:(void (^)(NSError *error))failure;
 
 ///-------------------------------
 /// @name Transaction Verification
