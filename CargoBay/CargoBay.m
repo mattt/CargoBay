@@ -384,7 +384,7 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *trans
     #import <AssertMacros.h>
 #endif
 
-static BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureString, CFDateRef purchaseDate) {
+static BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureString, NSDate *purchaseDate) {
 #ifdef _SECURITY_SECBASE_H_
     BOOL isValid = NO;
     SecCertificateRef leaf = NULL;
@@ -546,7 +546,7 @@ static BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signa
         require_noerr(SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef)anchors), _out);
 
         if (purchaseDate) {
-            require_noerr(SecTrustSetVerifyDate(trust, purchaseDate), _out);
+            require_noerr(SecTrustSetVerifyDate(trust, (__bridge CFDateRef)purchaseDate), _out);
         }
 
         SecTrustResultType trustResult;
@@ -615,7 +615,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
     NSString *signature = [transactionReceiptDictionary objectForKey:@"signature"];
     NSDate *purchaseDate = CBDateFromDateString([purchaseInfoDictionary objectForKey:@"purchase-date"]);
     
-    if (!CBCheckReceiptSecurity(purchaseInfo, signature, (__bridge CFDateRef)purchaseDate)) {
+    if (!CBCheckReceiptSecurity(purchaseInfo, signature, purchaseDate)) {
         if (error != NULL) {
             NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
             [userInfo setValue:NSLocalizedStringFromTable(@"Cannot extract purchase info from transaction receipt because purchase info failed to validate against its signature.", @"CargoBay", nil) forKey:NSLocalizedDescriptionKey];
@@ -700,8 +700,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
     return _productionReceiptVerificationClient;
 }
 
-- (id)init
-{
+- (id)init {
     self = [super init];
     if (!self) {
         return nil;
@@ -907,20 +906,22 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
 {
     if ((transaction.transactionState != SKPaymentTransactionStatePurchased) && (transaction.transactionState != SKPaymentTransactionStateRestored)) {
         if (failure) {
-            NSDictionary *userInfo =
-            [NSDictionary dictionaryWithObjectsAndKeys:
-             [NSString stringWithFormat:@"Cannot verify transaction because transaction (%@) not in purchased or restored state.", transaction.transactionIdentifier], NSLocalizedDescriptionKey,
-             [NSString stringWithFormat:@"Transaction (%@) not in purchased or restored state.", transaction.transactionIdentifier], NSLocalizedFailureReasonErrorKey,
-             nil];
-            failure([NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionNotInPurchasedOrRestoredState userInfo:userInfo]);
+            NSDictionary *userInfo = [NSMutableDictionary dictionary];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Cannot verify transaction because transaction (%@) not in purchased or restored state.", @"CargoBay", nil), transaction.transactionIdentifier] forKey:NSLocalizedDescriptionKey];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction (%@) not in purchased or restored state.", @"CargoBay", nil), transaction.transactionIdentifier] forKey:NSLocalizedFailureReasonErrorKey];
+            NSError *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionNotInPurchasedOrRestoredState userInfo:userInfo];
+
+            failure(error);
         }
         return;
     }
+    
     NSError *error = nil;
     if (![self isTransactionAndItsReceiptValid:transaction error:&error]) {
         if (failure) {
             failure(error);
         }
+        
         return;
     }
 
@@ -1000,7 +1001,8 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
 
 // Check the validity of the receipt.
 // This method should be called once a transaction gets to the SKPaymentTransactionStatePurchased or SKPaymentTransactionStateRestored state
-- (BOOL)isTransactionAndItsReceiptValid:(SKPaymentTransaction *)theTransaction error:(NSError * __autoreleasing *)theError
+- (BOOL)isTransactionAndItsReceiptValid:(SKPaymentTransaction *)theTransaction
+                                  error:(NSError * __autoreleasing *)theError
 {
     if (!((theTransaction) && (theTransaction.transactionReceipt) && (theTransaction.transactionReceipt.length > 0))) {
         // Transaction is not valid.
@@ -1037,15 +1039,12 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
         }
     }
 
-    // Ensure the transaction itself is legit
     if (!CBValidateTransactionMatchesPurchaseInfo(theTransaction, thePurchaseInfoDictionary, theError)) {
         return NO;
     }
 
     if (_transactionIDUniquenessSaveBlock) {
-        // Make a note of the fact that we've seen the transaction id already
-        NSString *theTransactionID = [thePurchaseInfoDictionary objectForKey:@"transaction-id"];
-        _transactionIDUniquenessSaveBlock(theTransactionID);
+        _transactionIDUniquenessSaveBlock([thePurchaseInfoDictionary objectForKey:@"transaction-id"]);
     }
 
     return YES;
@@ -1106,7 +1105,7 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
     return CBValidateTransactionMatchesPurchaseInfo(theTransaction, thePurchaseInfoDictionary, theError);
 }
 
-+ (BOOL)_checkReceiptSecurityWithPurchaseInfo:(NSString *)thePurchaseInfoString signature:(NSString *)theSignatureString purchaseDate:(CFDateRef)thePurchaseDate {
++ (BOOL)_checkReceiptSecurityWithPurchaseInfo:(NSString *)thePurchaseInfoString signature:(NSString *)theSignatureString purchaseDate:(NSDate *)thePurchaseDate {
     return CBCheckReceiptSecurity(thePurchaseInfoString, theSignatureString, thePurchaseDate);
 }
 
