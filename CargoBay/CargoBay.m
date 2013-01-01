@@ -160,44 +160,36 @@ static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error)
 static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSDictionary *receipt, NSError * __autoreleasing *error) {
     if (![[receipt objectForKey:@"bid"] isEqual:[purchaseInfo objectForKey:@"bid"]]) {
         if (error != NULL) {
-            NSDictionary *userInfo =
-            [NSDictionary dictionaryWithObjectsAndKeys:
-             [NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because purchase info's bundle ID (%@) does not match receipt's bundle ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"bid"], [receipt objectForKey:@"bid"]], NSLocalizedDescriptionKey,
-             [NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info's bundle ID (%@) does not match receipt's bundle ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"bid"], [receipt objectForKey:@"bid"]], NSLocalizedFailureReasonErrorKey,
-             nil];
+            NSDictionary *userInfo = [NSMutableDictionary dictionary];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because purchase info's bundle ID (%@) does not match receipt's bundle ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"bid"], [receipt objectForKey:@"bid"]] forKey:NSLocalizedDescriptionKey];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info's bundle ID (%@) does not match receipt's bundle ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"bid"], [receipt objectForKey:@"bid"]] forKey:NSLocalizedFailureReasonErrorKey];
             *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
         }
         
         return NO;
     } else if (![[receipt objectForKey:@"product_id"] isEqual:[purchaseInfo objectForKey:@"product-id"]]) {
         if (error != NULL) {
-            NSDictionary *userInfo =
-            [NSDictionary dictionaryWithObjectsAndKeys:
-             [NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because purchase info's product ID (%@) does not match receipt's product ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"product-id"], [receipt objectForKey:@"product_id"]], NSLocalizedDescriptionKey,
-             [NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info's product ID (%@) does not match receipt's product ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"product-id"], [receipt objectForKey:@"product_id"]], NSLocalizedFailureReasonErrorKey,
-             nil];
+            NSDictionary *userInfo = [NSMutableDictionary dictionary];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because purchase info's product ID (%@) does not match receipt's product ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"product-id"], [receipt objectForKey:@"product_id"]] forKey:NSLocalizedDescriptionKey];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info's product ID (%@) does not match receipt's product ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"product-id"], [receipt objectForKey:@"product_id"]] forKey:NSLocalizedFailureReasonErrorKey];
             *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
         }
         
         return NO;
     } else if (![[receipt objectForKey:@"quantity"] isEqual:[purchaseInfo objectForKey:@"quantity"]]) {
         if (error != NULL) {
-            NSDictionary *userInfo =
-            [NSDictionary dictionaryWithObjectsAndKeys:
-             [NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because purchase info's quantity (%@) does not match receipt's quantity (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"quantity"], [receipt objectForKey:@"quantity"]], NSLocalizedDescriptionKey,
-             [NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info's quantity (%@) does not match receipt's quantity (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"quantity"], [receipt objectForKey:@"quantity"]], NSLocalizedFailureReasonErrorKey,
-             nil];
+            NSDictionary *userInfo = [NSMutableDictionary dictionary];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because purchase info's quantity (%@) does not match receipt's quantity (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"quantity"], [receipt objectForKey:@"quantity"]] forKey:NSLocalizedDescriptionKey];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info's quantity (%@) does not match receipt's quantity (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"quantity"], [receipt objectForKey:@"quantity"]] forKey:NSLocalizedFailureReasonErrorKey];
             *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
         }
         
         return NO;
     } else if (![[receipt objectForKey:@"item_id"] isEqual:[purchaseInfo objectForKey:@"item-id"]]) {
         if (error != NULL) {
-            NSDictionary *userInfo =
-            [NSDictionary dictionaryWithObjectsAndKeys:
-             [NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because purchase info's item ID (%@) does not match receipt's item ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"item-id"], [receipt objectForKey:@"item_id"]], NSLocalizedDescriptionKey,
-             [NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info's item ID (%@) does not match receipt's item ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"item-id"], [receipt objectForKey:@"item_id"]], NSLocalizedFailureReasonErrorKey,
-             nil];
+            NSDictionary *userInfo = [NSMutableDictionary dictionary];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because purchase info's item ID (%@) does not match receipt's item ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"item-id"], [receipt objectForKey:@"item_id"]] forKey:NSLocalizedDescriptionKey];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info's item ID (%@) does not match receipt's item ID (%@).", @"CargoBay", nil), [purchaseInfo objectForKey:@"item-id"], [receipt objectForKey:@"item_id"]] forKey:NSLocalizedFailureReasonErrorKey];
             *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
         }
         
@@ -214,11 +206,9 @@ static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSD
             if (![transactionUniqueVendorIdentifier isEqual:receiptVendorIdentifier] || ![transactionUniqueVendorIdentifier isEqual:deviceIdentifier]) {
 #if !TARGET_IPHONE_SIMULATOR
                 if (error != NULL) {
-                    NSDictionary *userInfo =
-                    [NSDictionary dictionaryWithObjectsAndKeys:
-                     [NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because device's identifier for vendor (%@) does not match purchase info's (%@) and receipt's unique vendor identifier (%@).", @"CargoBay", nil), deviceIdentifier, transactionUniqueVendorIdentifier, receiptVendorIdentifier], NSLocalizedDescriptionKey,
-                     [NSString stringWithFormat:NSLocalizedStringFromTable(@"Device's identifier for vendor (%@) does not match purchase info's (%@) and receipt's unique vendor identifier (%@).", @"CargoBay", nil), deviceIdentifier, transactionUniqueVendorIdentifier, receiptVendorIdentifier], NSLocalizedFailureReasonErrorKey,
-                     nil];
+                    NSDictionary *userInfo = [NSMutableDictionary dictionary];
+                    [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because device's identifier for vendor (%@) does not match purchase info's (%@) and receipt's unique vendor identifier (%@).", @"CargoBay", nil), deviceIdentifier, transactionUniqueVendorIdentifier, receiptVendorIdentifier] forKey:NSLocalizedDescriptionKey];
+                    [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Device's identifier for vendor (%@) does not match purchase info's (%@) and receipt's unique vendor identifier (%@).", @"CargoBay", nil), deviceIdentifier, transactionUniqueVendorIdentifier, receiptVendorIdentifier] forKey:NSLocalizedFailureReasonErrorKey];
                     *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
                 }
                 
@@ -236,11 +226,9 @@ static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSD
         NSString *receiptUniqueIdentifier = [receipt objectForKey:@"unique_identifier"];
         if (![transactionUniqueIdentifier isEqual:receiptUniqueIdentifier] || ![transactionUniqueIdentifier isEqual:deviceIdentifier]) {
             if (error != NULL) {
-                NSDictionary *userInfo =
-                [NSDictionary dictionaryWithObjectsAndKeys:
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because device's unique identifier (%@) does not match purchase info's (%@) and receipt's unique identifier (%@).", @"CargoBay", nil), deviceIdentifier, transactionUniqueIdentifier, receiptUniqueIdentifier], NSLocalizedDescriptionKey,
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Device's unique identifier (%@) does not match purchase info's (%@) and receipt's unique identifier (%@).", @"CargoBay", nil), deviceIdentifier, transactionUniqueIdentifier, receiptUniqueIdentifier], NSLocalizedFailureReasonErrorKey,
-                 nil];
+                NSDictionary *userInfo = [NSMutableDictionary dictionary];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because device's unique identifier (%@) does not match purchase info's (%@) and receipt's unique identifier (%@).", @"CargoBay", nil), deviceIdentifier, transactionUniqueIdentifier, receiptUniqueIdentifier] forKey:NSLocalizedDescriptionKey];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Device's unique identifier (%@) does not match purchase info's (%@) and receipt's unique identifier (%@).", @"CargoBay", nil), deviceIdentifier, transactionUniqueIdentifier, receiptUniqueIdentifier] forKey:NSLocalizedFailureReasonErrorKey];
                 *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
             }
             
@@ -255,12 +243,10 @@ static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSD
 static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *theTransaction, NSDictionary *thePurchaseInfoDictionary, NSError * __autoreleasing *theError) {
     if ((!theTransaction) || (!thePurchaseInfoDictionary)) {
         if (theError != NULL) {
-            NSDictionary *theUserInfo =
-            [NSDictionary dictionaryWithObjectsAndKeys:
-             NSLocalizedStringFromTable(@"Transaction does not match purchase info because either transaction or purchase info is invalid.", @"CargoBay", nil), NSLocalizedDescriptionKey,
-             NSLocalizedStringFromTable(@"Either transaction or purchase info is invalid.", @"CargoBay", nil), NSLocalizedFailureReasonErrorKey,
-             nil];
-            *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:theUserInfo];
+            NSDictionary *userInfo = [NSMutableDictionary dictionary];
+            [userInfo setValue:NSLocalizedStringFromTable(@"Transaction does not match purchase info because either transaction or purchase info is invalid.", @"CargoBay", nil) forKey:NSLocalizedDescriptionKey];
+            [userInfo setValue:NSLocalizedStringFromTable(@"Either transaction or purchase info is invalid.", @"CargoBay", nil) forKey:NSLocalizedFailureReasonErrorKey];
+            *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:userInfo];
         }
         
         return NO;
@@ -271,12 +257,10 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *theTr
         NSString *thePurchaseInfoDictionaryProductIdentifier = thePurchaseInfoDictionary[@"product-id"];
         if (![theTransactionProductIdentifier isEqualToString:thePurchaseInfoDictionaryProductIdentifier]) {
             if (theError != NULL) {
-                NSDictionary *theUserInfo =
-                [NSDictionary dictionaryWithObjectsAndKeys:
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction does not match purchase info because transaction's product ID (%@) does not match purchase info's product ID (%@).", @"CargoBay", nil), theTransactionProductIdentifier, thePurchaseInfoDictionaryProductIdentifier], NSLocalizedDescriptionKey,
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction's product ID (%@) does not match purchase info's product ID (%@).", @"CargoBay", nil), theTransactionProductIdentifier, thePurchaseInfoDictionaryProductIdentifier], NSLocalizedFailureReasonErrorKey,
-                 nil];
-                *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:theUserInfo];
+                NSDictionary *userInfo = [NSMutableDictionary dictionary];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction does not match purchase info because transaction's product ID (%@) does not match purchase info's product ID (%@).", @"CargoBay", nil), theTransactionProductIdentifier, thePurchaseInfoDictionaryProductIdentifier] forKey:NSLocalizedDescriptionKey];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction's product ID (%@) does not match purchase info's product ID (%@).", @"CargoBay", nil), theTransactionProductIdentifier, thePurchaseInfoDictionaryProductIdentifier] forKey:NSLocalizedFailureReasonErrorKey];
+                *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:userInfo];
             }
             
             return NO;
@@ -288,11 +272,9 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *theTr
         NSInteger thePurchaseInfoDictionaryQuantity = [thePurchaseInfoDictionary[@"quantity"] integerValue];
         if (theTransactionQuantity != thePurchaseInfoDictionaryQuantity) {
             if (theError != NULL) {
-                NSDictionary *theUserInfo =
-                [NSDictionary dictionaryWithObjectsAndKeys:
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction does not match purchase info because transaction's quantity (%d) does not match purchase info's quantity (%d).", @"CargoBay", nil), theTransactionQuantity, thePurchaseInfoDictionaryQuantity], NSLocalizedDescriptionKey,
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction's quantity (%d) does not match purchase info's quantity (%d).", @"CargoBay", nil), theTransactionQuantity, thePurchaseInfoDictionaryQuantity], NSLocalizedFailureReasonErrorKey,
-                 nil];
+                NSDictionary *userInfo = [NSMutableDictionary dictionary];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction does not match purchase info because transaction's quantity (%d) does not match purchase info's quantity (%d).", @"CargoBay", nil), theTransactionQuantity, thePurchaseInfoDictionaryQuantity] forKey:NSLocalizedDescriptionKey];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction's quantity (%d) does not match purchase info's quantity (%d).", @"CargoBay", nil), theTransactionQuantity, thePurchaseInfoDictionaryQuantity] forKey:NSLocalizedFailureReasonErrorKey];
                 *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:theUserInfo];
             }
             
@@ -305,12 +287,10 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *theTr
         NSString *thePurchaseInfoDictionaryTransactionIdentifier = thePurchaseInfoDictionary[@"transaction-id"];
         if (![theTransactionTransactionIdentifier isEqualToString:thePurchaseInfoDictionaryTransactionIdentifier]) {
             if (theError != NULL) {
-                NSDictionary *theUserInfo =
-                [NSDictionary dictionaryWithObjectsAndKeys:
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction does not match purchase info because transaction's transaction ID (%@) does not match purchase info's transaction ID (%@).", @"CargoBay", nil), theTransactionTransactionIdentifier, thePurchaseInfoDictionaryTransactionIdentifier], NSLocalizedDescriptionKey,
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction's transaction ID (%@) does not match purchase info's transaction ID (%@).", @"CargoBay", nil), theTransactionTransactionIdentifier, thePurchaseInfoDictionaryTransactionIdentifier], NSLocalizedFailureReasonErrorKey,
-                 nil];
-                *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:theUserInfo];
+                NSDictionary *userInfo = [NSMutableDictionary dictionary];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction does not match purchase info because transaction's transaction ID (%@) does not match purchase info's transaction ID (%@).", @"CargoBay", nil), theTransactionTransactionIdentifier, thePurchaseInfoDictionaryTransactionIdentifier] forKey:NSLocalizedDescriptionKey];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction's transaction ID (%@) does not match purchase info's transaction ID (%@).", @"CargoBay", nil), theTransactionTransactionIdentifier, thePurchaseInfoDictionaryTransactionIdentifier] forKey:NSLocalizedFailureReasonErrorKey];
+                *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:userInfo];
             }
             
             return NO;
@@ -323,12 +303,10 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *theTr
         NSString *theAppBundleID = [NSBundle mainBundle].bundleIdentifier;
         if (![thePurchaseInfoDictionaryBundleID isEqualToString:theAppBundleID]) {
             if (theError != NULL) {
-                NSDictionary *theUserInfo =
-                [NSDictionary dictionaryWithObjectsAndKeys:
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction does not match purchase info because purchase info's bundle ID (%@) does not match the app bundle ID (%@).", @"CargoBay", nil), thePurchaseInfoDictionaryBundleID, theAppBundleID], NSLocalizedDescriptionKey,
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info's bundle ID (%@) does not match the app bundle ID (%@).", @"CargoBay", nil), thePurchaseInfoDictionaryBundleID, theAppBundleID], NSLocalizedFailureReasonErrorKey,
-                 nil];
-                *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:theUserInfo];
+                NSDictionary *userInfo = [NSMutableDictionary dictionary];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction does not match purchase info because purchase info's bundle ID (%@) does not match the app bundle ID (%@).", @"CargoBay", nil), thePurchaseInfoDictionaryBundleID, theAppBundleID] forKey:NSLocalizedDescriptionKey];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info's bundle ID (%@) does not match the app bundle ID (%@).", @"CargoBay", nil), thePurchaseInfoDictionaryBundleID, theAppBundleID] forKey:NSLocalizedFailureReasonErrorKey];
+                *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:userInfo];
             }
             return NO;
         }
@@ -377,12 +355,10 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *theTr
 
         if (![theTransactionTransactionDate isEqualToDate:thePurchaseInfoDictionaryPurchaseDate]) {
             if (theError != NULL) {
-                NSDictionary *theUserInfo =
-                [NSDictionary dictionaryWithObjectsAndKeys:
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction does not match purchase info because transaction's transaction date (%@) does not match purchase info's purchase date (%@).", @"CargoBay", nil), theTransactionTransactionDate, thePurchaseInfoDictionaryPurchaseDate], NSLocalizedDescriptionKey,
-                 [NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction's transaction date (%@) does not match purchase info's purchase date (%@).", @"CargoBay", nil), theTransactionTransactionDate, thePurchaseInfoDictionaryPurchaseDate], NSLocalizedFailureReasonErrorKey,
-                 nil];
-                *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:theUserInfo];
+                NSDictionary *userInfo = [NSMutableDictionary dictionary];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction does not match purchase info because transaction's transaction date (%@) does not match purchase info's purchase date (%@).", @"CargoBay", nil), theTransactionTransactionDate, thePurchaseInfoDictionaryPurchaseDate] forKey:NSLocalizedDescriptionKey];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction's transaction date (%@) does not match purchase info's purchase date (%@).", @"CargoBay", nil), theTransactionTransactionDate, thePurchaseInfoDictionaryPurchaseDate] forKey:NSLocalizedFailureReasonErrorKey];
+                *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionDoesNotMatchesPurchaseInfo userInfo:userInfo];
             }
             
             return NO;
