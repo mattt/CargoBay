@@ -202,7 +202,7 @@ static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSD
         NSString *transactionUniqueVendorIdentifier = [purchaseInfo objectForKey:@"unique-vendor-identifier"];
         NSString *receiptVendorIdentifier = [receipt objectForKey:@"unique_vendor_identifier"];
 
-        if(receiptVendorIdentifier) {
+        if (receiptVendorIdentifier) {
             if (![transactionUniqueVendorIdentifier isEqual:receiptVendorIdentifier] || ![transactionUniqueVendorIdentifier isEqual:deviceIdentifier]) {
 #if !TARGET_IPHONE_SIMULATOR
                 if (error != NULL) {
