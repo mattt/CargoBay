@@ -762,6 +762,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
                         if (failure) {
                             failure(error);
                         }
+                        
                         return;
                     }
 
@@ -993,37 +994,6 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
     if (_paymentQueueRestoreFailureBlock) {
         _paymentQueueRestoreFailureBlock(queue, error);
     }
-}
-
-
-#pragma mark - Binding Methods
-
-+ (NSString *)_base64EncodedStringFromData:(NSData *)data {
-    return CBBase64EncodedStringFromData(data);
-}
-
-+ (NSData *)_dataFromBase64EncodedString:(NSString *)theBase64EncodedString {
-    return CBDataFromBase64EncodedString(theBase64EncodedString);
-}
-
-+ (BOOL)_validateTrust:(SecTrustRef)trust error:(NSError * __autoreleasing *)error {
-    return CBValidateTrust(trust, error);
-}
-
-+ (BOOL)_validatePurchaseInfo:(NSDictionary *)purchaseInfo matchesReceipt:(NSDictionary *)receipt error:(NSError * __autoreleasing *)error {
-    return CBValidatePurchaseInfoMatchesReceipt(purchaseInfo, receipt, error);
-}
-
-+ (BOOL)_validateTransaction:(SKPaymentTransaction *)theTransaction matchesPurchaseInfo:(NSDictionary *)thePurchaseInfoDictionary error:(NSError * __autoreleasing *)theError {
-    return CBValidateTransactionMatchesPurchaseInfo(theTransaction, thePurchaseInfoDictionary, theError);
-}
-
-+ (BOOL)_checkReceiptSecurityWithPurchaseInfo:(NSString *)thePurchaseInfoString signature:(NSString *)theSignatureString purchaseDate:(NSDate *)thePurchaseDate {
-    return CBCheckReceiptSecurity(thePurchaseInfoString, theSignatureString, thePurchaseDate);
-}
-
-+ (NSDictionary *)_purchaseInfoFromTransactionReceipt:(NSData *)theTransactionReceiptData error:(NSError * __autoreleasing *)theError {
-    return CBPurchaseInfoFromTransactionReceipt(theTransactionReceiptData, theError);
 }
 
 @end
