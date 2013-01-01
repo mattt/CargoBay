@@ -22,10 +22,10 @@
 
 #import "CargoBay.h"
 
-#import <Availability.h>
-
 #import "AFHTTPClient.h"
 #import "AFJSONRequestOperation.h"
+
+#import <Availability.h>
 
 NSString * const CargoBayErrorDomain = @"com.mattt.CargoBay.ErrorDomain";
 
@@ -41,9 +41,7 @@ typedef void (^CargoBayPaymentQueueRestoreSuccessBlock)(SKPaymentQueue *queue);
 typedef void (^CargoBayPaymentQueueRestoreFailureBlock)(SKPaymentQueue *queue, NSError *error);
 typedef BOOL (^CargoBayTransactionIDUniquenessVerificationBlock)(NSString *transactionID);
 
-#pragma mark - Serializations
-
-static NSDate * CBDateFromDateString(NSString *string) {
+NSDate * CBDateFromDateString(NSString *string) {
     if (!string) {
         return nil;
     }
@@ -59,7 +57,7 @@ static NSDate * CBDateFromDateString(NSString *string) {
     return [_dateFormatter dateFromString:string];
 }
 
-static NSString * CBBase64EncodedStringFromData(NSData *data) {
+NSString * CBBase64EncodedStringFromData(NSData *data) {
     NSUInteger length = [data length];
     NSMutableData *mutableData = [NSMutableData dataWithLength:((length + 2) / 3) * 4];
 
@@ -88,7 +86,7 @@ static NSString * CBBase64EncodedStringFromData(NSData *data) {
 }
 
 // Reference http://cocoawithlove.com/2009/06/base64-encoding-options-on-mac-and.html
-static NSData * CBDataFromBase64EncodedString(NSString *base64EncodedString) {
+NSData * CBDataFromBase64EncodedString(NSString *base64EncodedString) {
     NSData *base64EncodedStringASCIIData = [base64EncodedString dataUsingEncoding:NSASCIIStringEncoding];
     uint8_t *input = (uint8_t *)base64EncodedStringASCIIData.bytes;
     NSUInteger length = base64EncodedStringASCIIData.length;
@@ -142,9 +140,7 @@ static NSData * CBDataFromBase64EncodedString(NSString *base64EncodedString) {
     return [NSData dataWithData:data];
 }
 
-#pragma mark - Validations
-
-static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error) {
+BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error) {
 #ifdef _SECURITY_SECBASE_H_
     extern CFStringRef kSecTrustInfoExtendedValidationKey;
     extern CFDictionaryRef SecTrustCopyInfo(SecTrustRef trust);
@@ -172,7 +168,7 @@ static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error)
 #endif
 }
 
-static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSDictionary *receipt, NSError * __autoreleasing *error) {
+BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSDictionary *receipt, NSError * __autoreleasing *error) {
     if (![[receipt objectForKey:@"bid"] isEqual:[purchaseInfo objectForKey:@"bid"]]) {
         if (error != NULL) {
             NSDictionary *userInfo = [NSMutableDictionary dictionary];
@@ -254,7 +250,7 @@ static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSD
     return YES;
 }
 
-static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *transaction, NSDictionary *purchaseInfoDictionary, NSError * __autoreleasing *error) {
+BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *transaction, NSDictionary *purchaseInfoDictionary, NSError * __autoreleasing *error) {
     if ((!transaction) || (!purchaseInfoDictionary)) {
         if (error != NULL) {
             NSDictionary *userInfo = [NSMutableDictionary dictionary];
@@ -326,7 +322,7 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *trans
         }
     }
 
-#ifndef _CARGOBAY_VALIDATE_TRANSACTION_BUNDLE_VERSION_
+#ifdef _CARGOBAY_VALIDATE_TRANSACTION_BUNDLE_VERSION_
     // Optionally check the bundle version
     // Disable check by default, because it will fail if the app was updated since original purchase
     {
@@ -376,14 +372,12 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *trans
     return YES;
 }
 
-#pragma mark - Check Receipt Signature
-
 #ifdef _SECURITY_SECBASE_H_
     #import <CommonCrypto/CommonDigest.h>
     #import <AssertMacros.h>
 #endif
 
-static BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureString, NSDate *purchaseDate) {
+BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureString, NSDate *purchaseDate) {
 #ifdef _SECURITY_SECBASE_H_
     BOOL isValid = NO;
     SecCertificateRef leaf = NULL;
@@ -599,7 +593,7 @@ _out:
 
 #pragma mark - Parsers
 
-static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptData, NSError * __autoreleasing *error) {
+NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptData, NSError * __autoreleasing *error) {
     NSDictionary *transactionReceiptDictionary = [NSPropertyListSerialization propertyListWithData:transactionReceiptData options:NSPropertyListImmutable format:nil error:error];
     if (!transactionReceiptDictionary) {
         return nil;
@@ -706,6 +700,25 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
 }
 
 - (void)verifyTransactionReceipt:(NSData *)transactionReceipt
+                        password:(NSString *)passwordOrNil
+                         success:(void (^)(NSDictionary *responseObject))success
+                         failure:(void (^)(NSError *error))failure
+{
+    NSError *error = nil;
+
+    NSDictionary *receiptDictionary = [NSPropertyListSerialization propertyListWithData:transactionReceipt options:NSPropertyListImmutable format:nil error:&error];
+    if (!receiptDictionary) {
+        failure(error);
+        return;
+    }
+
+    NSString *environment = [receiptDictionary objectForKey:@"environment"];
+    AFHTTPClient *client = [environment isEqual:@"Sandbox"] ? [self sandboxReceiptVerificationClient] : [self productionReceiptVerificationClient];
+
+    [self verifyTransactionReceipt:transactionReceipt client:client password:passwordOrNil success:success failure:failure];
+}
+
+- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
                           client:(AFHTTPClient *)client
                         password:(NSString *)password
                          success:(void (^)(NSDictionary *responseObject))success
@@ -762,7 +775,6 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
                         if (failure) {
                             failure(error);
                         }
-                        
                         return;
                     }
 
@@ -832,26 +844,6 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
 
     [client enqueueHTTPRequestOperation:operation];
 }
-
-- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
-                        password:(NSString *)passwordOrNil
-                         success:(void (^)(NSDictionary *responseObject))success
-                         failure:(void (^)(NSError *error))failure
-{
-    NSError *error = nil;
-
-    NSDictionary *receiptDictionary = [NSPropertyListSerialization propertyListWithData:transactionReceipt options:NSPropertyListImmutable format:nil error:&error];
-    if (!receiptDictionary) {
-        failure(error);
-        return;
-    }
-
-    NSString *environment = [receiptDictionary objectForKey:@"environment"];
-    AFHTTPClient *client = [environment isEqual:@"Sandbox"] ? [self sandboxReceiptVerificationClient] : [self productionReceiptVerificationClient];
-
-    [self verifyTransactionReceipt:transactionReceipt client:client password:passwordOrNil success:success failure:failure];
-}
-
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
                  password:(NSString *)passwordOrNil
