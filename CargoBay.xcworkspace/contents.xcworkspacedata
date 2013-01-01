@@ -10,9 +10,6 @@
       <FileRef
          location = "group:CargoBay.m">
       </FileRef>
-      <FileRef
-         location = "group:CargoBay+PrivateMethods.h">
-      </FileRef>
    </Group>
    <FileRef
       location = "group:Example/CargoBay.xcodeproj">

@@ -14,7 +14,6 @@
 		AB0E5836167B159500B52560 /* CargoBayTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AB0E5835167B159500B52560 /* CargoBayTests.m */; };
 		AB1B6B0A167F705200210289 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8AA37EE15FD747D00C21309 /* StoreKit.framework */; };
 		AB28E09C167F1E200052CCFF /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F87666F416595C72007CD103 /* Security.framework */; };
-		AB2973771680B4F20053E9DC /* CargoBay+PrivateMethods.h in Resources */ = {isa = PBXBuildFile; fileRef = AB2973761680B4F20053E9DC /* CargoBay+PrivateMethods.h */; };
 		F84068541693676700B4966B /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F84068531693676700B4966B /* Default-568h@2x.png */; };
 		F853B17815FD71A100D5AC59 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17715FD71A100D5AC59 /* UIKit.framework */; };
 		F853B17A15FD71A100D5AC59 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17915FD71A100D5AC59 /* Foundation.framework */; };
@@ -335,7 +334,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AB0E5833167B159500B52560 /* InfoPlist.strings in Resources */,
-				AB2973771680B4F20053E9DC /* CargoBay+PrivateMethods.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

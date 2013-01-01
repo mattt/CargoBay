@@ -6,41 +6,126 @@
 //  Copyright (c) 2012 Mattt Thompson. All rights reserved.
 //
 
+#import <StoreKit/StoreKit.h>
+
 #import "CargoBayTests.h"
+
 #import "CargoBay.h"
 #import "AFNetworking.h"
-#import <StoreKit/StoreKit.h>
-#import "CargoBay+PrivateMethods.h"
+
+@protocol _CargoBay <NSObject>
+@optional
+- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
+                          client:(AFHTTPClient *)client
+                        password:(NSString *)password
+                         success:(void (^)(NSDictionary *responseObject))success
+                         failure:(void (^)(NSError *error))failure;
+
++ (NSString *)_base64EncodedStringFromData:(NSData *)data;
++ (NSData *)_dataFromBase64EncodedString:(NSString *)theBase64EncodedString;
++ (BOOL)_validateTrust:(SecTrustRef)trust
+                 error:(NSError * __autoreleasing *)error;
++ (BOOL)_validatePurchaseInfo:(NSDictionary *)purchaseInfo
+               matchesReceipt:(NSDictionary *)receipt
+                        error:(NSError * __autoreleasing *)error;
++ (BOOL)_validateTransaction:(SKPaymentTransaction *)theTransaction
+         matchesPurchaseInfo:(NSDictionary *)thePurchaseInfoDictionary
+                       error:(NSError * __autoreleasing *)theError;
++ (BOOL)_checkReceiptSecurityWithPurchaseInfo:(NSString *)thePurchaseInfoString
+                                    signature:(NSString *)theSignatureString
+                                 purchaseDate:(NSDate *)thePurchaseDate;
++ (NSDictionary *)_purchaseInfoFromTransactionReceipt:(NSData *)theTransactionReceiptData
+                                                error:(NSError * __autoreleasing *)theError;
+@end
+
+@interface CargoBay (Private) <_CargoBay>
+@property (readwrite, nonatomic, strong) AFHTTPClient *sandboxReceiptVerificationClient;
+@property (readwrite, nonatomic, strong) AFHTTPClient *productionReceiptVerificationClient;
+@end
+
+@implementation CargoBay (Private)
+@dynamic sandboxReceiptVerificationClient;
+@dynamic productionReceiptVerificationClient;
+
+extern NSString * CBBase64EncodedStringFromData(NSData *);
+extern NSData * CBDataFromBase64EncodedString(NSString *);
+extern BOOL CBValidateTrust(SecTrustRef, NSError * __autoreleasing *);
+extern BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *, NSDictionary *, NSError * __autoreleasing *);
+extern BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *, NSDictionary *, NSError * __autoreleasing *);
+extern BOOL CBCheckReceiptSecurity(NSString *, NSString *, NSDate *);
+extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * __autoreleasing *);
+
++ (NSString *)_base64EncodedStringFromData:(NSData *)data {
+    return CBBase64EncodedStringFromData(data);
+}
+
++ (NSData *)_dataFromBase64EncodedString:(NSString *)theBase64EncodedString {
+    return CBDataFromBase64EncodedString(theBase64EncodedString);
+}
+
++ (BOOL)_validateTrust:(SecTrustRef)trust
+                 error:(NSError * __autoreleasing *)error
+{
+    return CBValidateTrust(trust, error);
+}
+
++ (BOOL)_validatePurchaseInfo:(NSDictionary *)purchaseInfo
+               matchesReceipt:(NSDictionary *)receipt
+                        error:(NSError * __autoreleasing *)error
+{
+    return CBValidatePurchaseInfoMatchesReceipt(purchaseInfo, receipt, error);
+}
+
++ (BOOL)_validateTransaction:(SKPaymentTransaction *)theTransaction
+         matchesPurchaseInfo:(NSDictionary *)thePurchaseInfoDictionary
+                       error:(NSError * __autoreleasing *)theError
+{
+    return CBValidateTransactionMatchesPurchaseInfo(theTransaction, thePurchaseInfoDictionary, theError);
+}
+
++ (BOOL)_checkReceiptSecurityWithPurchaseInfo:(NSString *)thePurchaseInfoString
+                                    signature:(NSString *)theSignatureString
+                                 purchaseDate:(NSDate *)thePurchaseDate
+{
+    return CBCheckReceiptSecurity(thePurchaseInfoString, theSignatureString, thePurchaseDate);
+}
+
++ (NSDictionary *)_purchaseInfoFromTransactionReceipt:(NSData *)theTransactionReceiptData error:(NSError * __autoreleasing *)theError {
+    return CBPurchaseInfoFromTransactionReceipt(theTransactionReceiptData, theError);
+}
+
+@end
+
+#pragma mark -
 
 @interface MockSKPaymentTransaction : NSObject <NSCopying>
-
-@property (nonatomic, strong) NSError *error;
-@property (nonatomic, strong) SKPaymentTransaction *originalTransaction;
-@property (nonatomic, strong) SKPayment *payment;
-@property (nonatomic, strong) NSArray *downloads;
-@property (nonatomic, strong) NSDate *transactionDate;
-@property (nonatomic, strong) NSString *transactionIdentifier;
-@property (nonatomic, strong) NSData *transactionReceipt;
-@property (nonatomic, assign) SKPaymentTransactionState transactionState;
-
+@property NSError *error;
+@property SKPaymentTransaction *originalTransaction;
+@property SKPayment *payment;
+@property NSArray *downloads;
+@property NSDate *transactionDate;
+@property NSString *transactionIdentifier;
+@property NSData *transactionReceipt;
+@property SKPaymentTransactionState transactionState;
 @end
 
 @implementation MockSKPaymentTransaction
 
-- (id)copyWithZone:(NSZone *)theZone {
-    __typeof(self) theCopy = [[[self class] allocWithZone:theZone] init];
-    if (theCopy) {
-        theCopy.error = [self.error copyWithZone:theZone];
-        theCopy.originalTransaction = self.originalTransaction; // Not copied.
-        theCopy.error = [self.error copyWithZone:theZone];
-        theCopy.payment = [self.payment copyWithZone:theZone];
-        theCopy.downloads = [self.downloads copyWithZone:theZone];
-        theCopy.transactionDate = [self.transactionDate copyWithZone:theZone];
-        theCopy.transactionIdentifier = [self.transactionIdentifier copyWithZone:theZone];
-        theCopy.transactionReceipt = [self.transactionReceipt copyWithZone:theZone];
-        theCopy.transactionState = self.transactionState;
+- (id)copyWithZone:(NSZone *)zone {
+    __typeof(self) copy = [[[self class] allocWithZone:zone] init];
+    if (copy) {
+        copy.error = [self.error copyWithZone:zone];
+        copy.originalTransaction = self.originalTransaction;
+        copy.error = [self.error copyWithZone:zone];
+        copy.payment = [self.payment copyWithZone:zone];
+        copy.downloads = [self.downloads copyWithZone:zone];
+        copy.transactionDate = [self.transactionDate copyWithZone:zone];
+        copy.transactionIdentifier = [self.transactionIdentifier copyWithZone:zone];
+        copy.transactionReceipt = [self.transactionReceipt copyWithZone:zone];
+        copy.transactionState = self.transactionState;
     }
-    return theCopy;
+    
+    return copy;
 }
 
 @end
@@ -602,28 +687,28 @@
      -----END CERTIFICATE-----
      */
     
-    STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoString signature:theSignatureString purchaseDate:(__bridge CFDateRef)thePurchaseDate], @"The result should be true.");
+    STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoString signature:theSignatureString purchaseDate:thePurchaseDate], @"The result should be true.");
     
     // If this fails, it is likely that the signature certificate have expired.
     // This means that Apple will have to sign it with a new certificate though.
     // Although the hardcoded intermediate certificate still have around 2 more
     // years of validity, care have to be taken to determine if Apple have
     // updated its intermediate certificate.
-    STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoString signature:theSignatureString purchaseDate:(__bridge CFDateRef)[NSDate date]], @"The result should be true.");
+    STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoString signature:theSignatureString purchaseDate:[NSDate date]], @"The result should be true.");
     
     
-    STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoString signature:theSignatureString purchaseDate:(__bridge CFDateRef)[NSDate dateWithTimeIntervalSince1970:1402783556.0]], @"The result should be true.");
+    STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoString signature:theSignatureString purchaseDate:[NSDate dateWithTimeIntervalSince1970:1402783556.0]], @"The result should be true.");
     
-    STAssertFalse([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoString signature:theSignatureString purchaseDate:(__bridge CFDateRef)[NSDate dateWithTimeIntervalSince1970:1402783557.0]], @"The result should be false.");
+    STAssertFalse([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoString signature:theSignatureString purchaseDate:[NSDate dateWithTimeIntervalSince1970:1402783557.0]], @"The result should be false.");
     
     {
         //NSString *thePurchaseInfoPlist = [[NSString alloc] initWithData:CBDataFromBase64EncodedString(thePurchaseInfoString) encoding:NSUTF8StringEncoding];
         NSString *thePurchaseInfoPlist = @"{\n	\"original-purchase-date-pst\" = \"2012-12-01 23:15:54 America/Los_Angeles\";\n	\"purchase-date-ms\" = \"1354432554000\";\n	\"unique-identifier\" = \"0000b0092818\";\n	\"original-transaction-id\" = \"1000000059632385\";\n	\"expires-date\" = \"1354436154000\";\n	\"transaction-id\" = \"1000000059632385\";\n	\"original-purchase-date-ms\" = \"1354432554000\";\n	\"web-order-line-item-id\" = \"1000000026436290\";\n	\"bvrs\" = \"7\";\n	\"expires-date-formatted-pst\" = \"2012-12-02 00:15:54 America/Los_Angeles\";\n	\"item-id\" = \"580193937\";\n	\"expires-date-formatted\" = \"2012-12-02 08:15:54 Etc/GMT\";\n	\"product-id\" = \"com.d__buzz.gag_plus.ios.001.ars.premium.1y\";\n	\"purchase-date\" = \"2012-12-02 07:15:54 Etc/GMT\";\n	\"original-purchase-date\" = \"2012-12-02 07:15:54 Etc/GMT\";\n	\"bid\" = \"com.d--buzz.gag-plus.ios.001\";\n	\"purchase-date-pst\" = \"2012-12-01 23:15:54 America/Los_Angeles\";\n	\"quantity\" = \"1\";\n}";
         NSString *thePurchaseInfoPlistBase64Encoded = [CargoBay _base64EncodedStringFromData:[thePurchaseInfoPlist dataUsingEncoding:NSUTF8StringEncoding]];
-        STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoPlistBase64Encoded signature:theSignatureString purchaseDate:(__bridge CFDateRef)thePurchaseDate], @"The result should be true.");
+        STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoPlistBase64Encoded signature:theSignatureString purchaseDate:thePurchaseDate], @"The result should be true.");
         thePurchaseInfoPlist = [thePurchaseInfoPlist stringByReplacingOccurrencesOfString:@"\"quantity\" = \"1\";" withString:@"\"quantity\" = \"9\";"];
         thePurchaseInfoPlistBase64Encoded = [CargoBay _base64EncodedStringFromData:[thePurchaseInfoPlist dataUsingEncoding:NSUTF8StringEncoding]];
-        STAssertFalse([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoPlistBase64Encoded signature:theSignatureString purchaseDate:(__bridge CFDateRef)thePurchaseDate], @"The result should be false.");
+        STAssertFalse([CargoBay _checkReceiptSecurityWithPurchaseInfo:thePurchaseInfoPlistBase64Encoded signature:theSignatureString purchaseDate:thePurchaseDate], @"The result should be false.");
     }
 }
 
@@ -712,32 +797,6 @@
              }];
         }];
         
-        /*
-        // You can use the following method to validate your transaction receipt. If you are validating auto-renewable subscription transaction receipt, you will need shared secret to succeed though.
-        [self dispatchSemaphoreInBlock:^(void (^theResume)(void)) {
-            [theCargoBay
-             verifyTransactionReceipt:<#(Auto-Renewable Subscription Transaction Receipt)#>
-             client:theSandboxClient
-             password:<#(Shared Secret)#>
-             success:^(NSDictionary *responseObject) {
-                 STAssertNotNil(responseObject, @"The result should not be nil.");
-                 NSError *error = nil;
-                 NSDictionary *purchaseInfo = [CargoBay _purchaseInfoFromTransactionReceipt:<#(Auto-Renewable Subscription Transaction Receipt)#> error:&error];
-                 STAssertNil(error, @"The result should be nil.");
-                 STAssertNotNil(purchaseInfo, @"The result should not be nil.");
-                 NSDictionary *receipt = responseObject[@"receipt"];
-                 STAssertNotNil(receipt, @"The result should not be nil.");
-                 STAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
-                 STAssertNil(error, @"The result should be nil.");
-                 theResume();
-             }
-             failure:^(NSError *error) {
-                 STFail(@"The result should not fail.");
-                 theResume();
-             }];
-        }];
-        */
-        
         // Checks (Sandbox) non-consumable transaction receipt on production server. Server should auto retry on sandbox server.
         [self dispatchSemaphoreInBlock:^(void (^theResume)(void)) {
             NSString *theReceiptBase64EncodedString = @"ewoJInNpZ25hdHVyZSIgPSAiQW50d3ljU0tSOUpEVWZ6bWFaS0xGUVd2WU1TY3c2NlZ1aFAxbGhVMGZEVVZpZGwwUjdEdDR3bkVJY3I1N3BKSEM1T0FGNG10em02SFZ2UnBjWWg1eDZmMnNDSHBGZEdXa21RaHN5QzdFNFR0SEpheGRpZ2ZCNTFHdTRoUlp2dW1WVVB1K0VndFQ2cUFoUzgvVjZhUnJTYW1pVTdrbm5yUm1yZHRDN3liYUdlY0FBQURWekNDQTFNd2dnSTdvQU1DQVFJQ0NHVVVrVTNaV0FTMU1BMEdDU3FHU0liM0RRRUJCUVVBTUg4eEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVNZd0pBWURWUVFMREIxQmNIQnNaU0JEWlhKMGFXWnBZMkYwYVc5dUlFRjFkR2h2Y21sMGVURXpNREVHQTFVRUF3d3FRWEJ3YkdVZ2FWUjFibVZ6SUZOMGIzSmxJRU5sY25ScFptbGpZWFJwYjI0Z1FYVjBhRzl5YVhSNU1CNFhEVEE1TURZeE5USXlNRFUxTmxvWERURTBNRFl4TkRJeU1EVTFObG93WkRFak1DRUdBMVVFQXd3YVVIVnlZMmhoYzJWU1pXTmxhWEIwUTJWeWRHbG1hV05oZEdVeEd6QVpCZ05WQkFzTUVrRndjR3hsSUdsVWRXNWxjeUJUZEc5eVpURVRNQkVHQTFVRUNnd0tRWEJ3YkdVZ1NXNWpMakVMTUFrR0ExVUVCaE1DVlZNd2daOHdEUVlKS29aSWh2Y05BUUVCQlFBRGdZMEFNSUdKQW9HQkFNclJqRjJjdDRJclNkaVRDaGFJMGc4cHd2L2NtSHM4cC9Sd1YvcnQvOTFYS1ZoTmw0WElCaW1LalFRTmZnSHNEczZ5anUrK0RyS0pFN3VLc3BoTWRkS1lmRkU1ckdYc0FkQkVqQndSSXhleFRldngzSExFRkdBdDFtb0t4NTA5ZGh4dGlJZERnSnYyWWFWczQ5QjB1SnZOZHk2U01xTk5MSHNETHpEUzlvWkhBZ01CQUFHamNqQndNQXdHQTFVZEV3RUIvd1FDTUFBd0h3WURWUjBqQkJnd0ZvQVVOaDNvNHAyQzBnRVl0VEpyRHRkREM1RllRem93RGdZRFZSMFBBUUgvQkFRREFnZUFNQjBHQTFVZERnUVdCQlNwZzRQeUdVakZQaEpYQ0JUTXphTittVjhrOVRBUUJnb3Foa2lHOTJOa0JnVUJCQUlGQURBTkJna3Foa2lHOXcwQkFRVUZBQU9DQVFFQUVhU2JQanRtTjRDL0lCM1FFcEszMlJ4YWNDRFhkVlhBZVZSZVM1RmFaeGMrdDg4cFFQOTNCaUF4dmRXLzNlVFNNR1k1RmJlQVlMM2V0cVA1Z204d3JGb2pYMGlreVZSU3RRKy9BUTBLRWp0cUIwN2tMczlRVWU4Y3pSOFVHZmRNMUV1bVYvVWd2RGQ0TndOWXhMUU1nNFdUUWZna1FRVnk4R1had1ZIZ2JFL1VDNlk3MDUzcEdYQms1MU5QTTN3b3hoZDNnU1JMdlhqK2xvSHNTdGNURXFlOXBCRHBtRzUrc2s0dHcrR0szR01lRU41LytlMVFUOW5wL0tsMW5qK2FCdzdDMHhzeTBiRm5hQWQxY1NTNnhkb3J5L0NVdk02Z3RLc21uT09kcVRlc2JwMGJzOHNuNldxczBDOWRnY3hSSHVPTVoydG04bnBMVW03YXJnT1N6UT09IjsKCSJwdXJjaGFzZS1pbmZvIiA9ICJld29KSW05eWFXZHBibUZzTFhCMWNtTm9ZWE5sTFdSaGRHVXRjSE4wSWlBOUlDSXlNREV5TFRFeExUSTNJREEzT2pJMk9qUXlJRUZ0WlhKcFkyRXZURzl6WDBGdVoyVnNaWE1pT3dvSkluVnVhWEYxWlMxcFpHVnVkR2xtYVdWeUlpQTlJQ0l3TURBd1lqQXpNV000TVRnaU93b0pJbTl5YVdkcGJtRnNMWFJ5WVc1ellXTjBhVzl1TFdsa0lpQTlJQ0l4TURBd01EQXdNRFU1TXpFNE5EWTRJanNLQ1NKaWRuSnpJaUE5SUNJNElqc0tDU0owY21GdWMyRmpkR2x2YmkxcFpDSWdQU0FpTVRBd01EQXdNREEyTURZNE16Y3dPQ0k3Q2draWNYVmhiblJwZEhraUlEMGdJakVpT3dvSkltOXlhV2RwYm1Gc0xYQjFjbU5vWVhObExXUmhkR1V0YlhNaUlEMGdJakV6TlRRd016QXdNREl3TURBaU93b0pJbkJ5YjJSMVkzUXRhV1FpSUQwZ0ltTnZiUzVrWDE5aWRYcDZMbWRoWjE5d2JIVnpMbWx2Y3k0d01ERXVibU11Y0hKbGJXbDFiU0k3Q2draWFYUmxiUzFwWkNJZ1BTQWlOVGd3TVRreE5qazRJanNLQ1NKaWFXUWlJRDBnSW1OdmJTNWtMUzFpZFhwNkxtZGhaeTF3YkhWekxtbHZjeTR3TURFaU93b0pJbkIxY21Ob1lYTmxMV1JoZEdVdGJYTWlJRDBnSWpFek5UVTRPVGt5TnpJME1EZ2lPd29KSW5CMWNtTm9ZWE5sTFdSaGRHVWlJRDBnSWpJd01USXRNVEl0TVRrZ01EWTZOREU2TVRJZ1JYUmpMMGROVkNJN0Nna2ljSFZ5WTJoaGMyVXRaR0YwWlMxd2MzUWlJRDBnSWpJd01USXRNVEl0TVRnZ01qSTZOREU2TVRJZ1FXMWxjbWxqWVM5TWIzTmZRVzVuWld4bGN5STdDZ2tpYjNKcFoybHVZV3d0Y0hWeVkyaGhjMlV0WkdGMFpTSWdQU0FpTWpBeE1pMHhNUzB5TnlBeE5Ub3lOam8wTWlCRmRHTXZSMDFVSWpzS2ZRPT0iOwoJImVudmlyb25tZW50IiA9ICJTYW5kYm94IjsKCSJwb2QiID0gIjEwMCI7Cgkic2lnbmluZy1zdGF0dXMiID0gIjAiOwp9";
@@ -801,6 +860,7 @@
             
             [theCargoBay
              verifyTransactionReceipt:theReceiptData
+             password:nil
              success:^(NSDictionary *responseObject) {
                  STAssertNotNil(responseObject, @"The result should not be nil.");
                  NSError *error = nil;
