@@ -999,52 +999,44 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
 
 #pragma mark - Receipt Verification
 
-// Check the validity of the receipt.
 // This method should be called once a transaction gets to the SKPaymentTransactionStatePurchased or SKPaymentTransactionStateRestored state
-- (BOOL)isTransactionAndItsReceiptValid:(SKPaymentTransaction *)theTransaction
-                                  error:(NSError * __autoreleasing *)theError
+- (BOOL)isTransactionAndItsReceiptValid:(SKPaymentTransaction *)transaction
+                                  error:(NSError * __autoreleasing *)error
 {
-    if (!((theTransaction) && (theTransaction.transactionReceipt) && (theTransaction.transactionReceipt.length > 0))) {
-        // Transaction is not valid.
-        if (theError != NULL) {
-            NSDictionary *theUserInfo =
-            [NSDictionary dictionaryWithObjectsAndKeys:
-             @"Transaction and its receipt is not valid because transaction object is not valid.", NSLocalizedDescriptionKey,
-             @"Transaction object is not valid.", NSLocalizedDescriptionKey,
-             nil];
-            *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionNotValid userInfo:theUserInfo];
+    if (!((transaction) && (transaction.transactionReceipt) && (transaction.transactionReceipt.length > 0))) {
+        if (error != NULL) {
+            NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+            [userInfo setValue:NSLocalizedStringFromTable(@"Transaction object is not valid.", @"CargoBay", nil) forKey:NSLocalizedDescriptionKey];
+            *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionNotValid userInfo:userInfo];
         }
+        
         return NO;
     }
 
-    NSDictionary *thePurchaseInfoDictionary = CBPurchaseInfoFromTransactionReceipt(theTransaction.transactionReceipt, theError);
-    if (!thePurchaseInfoDictionary) {
+    NSDictionary *purchaseInfoDictionary = CBPurchaseInfoFromTransactionReceipt(transaction.transactionReceipt, error);
+    if (!purchaseInfoDictionary) {
         return NO;
     }
 
     if (_transactionIDUniquenessVerifyBlock) {
-        // Checks to see if the transaction ID is unique.
-        NSString *theTransactionID = [thePurchaseInfoDictionary objectForKey:@"transaction-id"];
-        if (!_transactionIDUniquenessVerifyBlock(theTransactionID)) {
-            // We've seen this transaction before.
-            if (theError != NULL) {
-                NSDictionary *theUserInfo =
-                [NSDictionary dictionaryWithObjectsAndKeys:
-                 [NSString stringWithFormat:@"Transaction and its receipt is not valid because transaction ID (%@) is not unique.", theTransactionID], NSLocalizedDescriptionKey,
-                 @"Transaction ID (%@) is not unique.", NSLocalizedDescriptionKey,
-                 nil];
-                *theError = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionIDNotUnique userInfo:theUserInfo];
+        NSString *transactionID = [purchaseInfoDictionary objectForKey:@"transaction-id"];
+        if (!_transactionIDUniquenessVerifyBlock(transactionID)) {
+            if (error != NULL) {
+                NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction ID (%@) is not unique.", @"CargoBay", nil), transactionID] forKey:NSLocalizedDescriptionKey];
+                *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionIDNotUnique userInfo:userInfo];
             }
+            
             return NO;
         }
     }
 
-    if (!CBValidateTransactionMatchesPurchaseInfo(theTransaction, thePurchaseInfoDictionary, theError)) {
+    if (!CBValidateTransactionMatchesPurchaseInfo(transaction, purchaseInfoDictionary, error)) {
         return NO;
     }
 
     if (_transactionIDUniquenessSaveBlock) {
-        _transactionIDUniquenessSaveBlock([thePurchaseInfoDictionary objectForKey:@"transaction-id"]);
+        _transactionIDUniquenessSaveBlock([purchaseInfoDictionary objectForKey:@"transaction-id"]);
     }
 
     return YES;
