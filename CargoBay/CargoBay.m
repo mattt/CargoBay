@@ -371,18 +371,17 @@ static BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *trans
 #pragma mark - Check Receipt Signature
 
 #ifdef _SECURITY_SECBASE_H_
-#include <CommonCrypto/CommonDigest.h>
-//#include <Security/Security.h>
-#include <AssertMacros.h>
+    #import <CommonCrypto/CommonDigest.h>
+    #import <AssertMacros.h>
 #endif
 
-static BOOL CBCheckReceiptSecurity(NSString *thePurchaseInfoString, NSString *theSignatureString, CFDateRef thePurchaseDate) {
+static BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureString, CFDateRef purchaseDate) {
 #ifdef _SECURITY_SECBASE_H_
     BOOL isValid = NO;
-    SecCertificateRef theLeaf = NULL;
-    SecCertificateRef theIntermediate = NULL;
-    SecTrustRef theTrust = NULL;
-    SecPolicyRef thePolicy = SecPolicyCreateBasicX509();
+    SecCertificateRef leaf = NULL;
+    SecCertificateRef intermediate = NULL;
+    SecTrustRef trust = NULL;
+    SecPolicyRef policy = SecPolicyCreateBasicX509();
 
     {
         // This scope is required to prevent the compiler from complaining about protected scope
@@ -479,26 +478,17 @@ static BOOL CBCheckReceiptSecurity(NSString *thePurchaseInfoString, NSString *th
             0x54, 0x6b, 0x01, 0x0d, 0xc7, 0xdd, 0x1a
         };
 
-        NSData *theCertificateData;
-        NSArray *theAnchors;
+        require([purchaseInfoString canBeConvertedToEncoding:NSASCIIStringEncoding], _out);
+        NSData *purchaseInfoData = CBDataFromBase64EncodedString(purchaseInfoString);
+        size_t purchaseInfoLength = purchaseInfoData.length;
+        uint8_t *purchaseInfoBytes = (uint8_t *)purchaseInfoData.bytes;
 
-        /*
-         Parse inputs:
-         thePurchaseInfoString and theSignatureString are base64 encoded JSON blobs that need to
-         be decoded.
-         */
-        require([thePurchaseInfoString canBeConvertedToEncoding:NSASCIIStringEncoding] &&
-                [theSignatureString canBeConvertedToEncoding:NSASCIIStringEncoding], theOutLabel);
+        require([signatureString canBeConvertedToEncoding:NSASCIIStringEncoding], _out);
+        NSData *signatureData = CBDataFromBase64EncodedString(signatureString);
+        size_t signatureLength = signatureData.length;
+        uint8_t *signatureBytes = (uint8_t *)signatureData.bytes;
 
-        NSData *thePurchaseInfoData = CBDataFromBase64EncodedString(thePurchaseInfoString);
-        size_t thePurchaseInfoLength = thePurchaseInfoData.length;
-        uint8_t *thePurchaseInfoBytes = (uint8_t *)thePurchaseInfoData.bytes;
-
-        NSData *theSignatureData = CBDataFromBase64EncodedString(theSignatureString);
-        size_t theSignatureLength = theSignatureData.length;
-        uint8_t *theSignatureBytes = (uint8_t *)theSignatureData.bytes;
-
-        require(thePurchaseInfoBytes && theSignatureBytes, theOutLabel);
+        require(purchaseInfoBytes && signatureBytes, _out);
 
         /*
          Binary format looks as follows:
@@ -523,83 +513,74 @@ static BOOL CBCheckReceiptSecurity(NSString *thePurchaseInfoString, NSString *th
             uint8_t _signature[128];
             uint32_t _certificateLength;
             uint8_t _certificate[];
-        } *theSignatureBlobPtr = (struct CBSignatureBlob *)theSignatureBytes;
+        } *signatureBlob = (struct CBSignatureBlob *)signatureBytes;
 #pragma pack(pop)
-        uint32_t theCertificateLength;
+        uint32_t certificateLength;
 
-        /*
-         Make sure the signature blob is long enough to safely extract the _receiptVersion and
-         _certificateLength fields, then perform a sanity check on the fields.
-         */
-        require(theSignatureLength > offsetof(struct CBSignatureBlob, _certificate), theOutLabel);
-        require(theSignatureBlobPtr->_receiptVersion == 2, theOutLabel);
-        theCertificateLength = ntohl(theSignatureBlobPtr->_certificateLength);
-        require(theSignatureLength - offsetof(struct CBSignatureBlob, _certificate) >= theCertificateLength, theOutLabel);
+        // Make sure the signature blob is long enough to safely extract the _receiptVersion and _certificateLength fields, then perform a sanity check on the fields.
+        require(signatureLength > offsetof(struct CBSignatureBlob, _certificate), _out);
+        require(signatureBlob->_receiptVersion == 2, _out);
+        certificateLength = ntohl(signatureBlob->_certificateLength);
+        require(signatureLength - offsetof(struct CBSignatureBlob, _certificate) >= certificateLength, _out);
 
-        /*
-         Validate certificate chains back to valid receipt signer; policy approximation for now
-         set intermediate as a trust anchor; current intermediate lapses in 2016.
-         */
-        theCertificateData = [NSData dataWithBytes:theSignatureBlobPtr->_certificate length:theCertificateLength];
-        require(theLeaf = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)theCertificateData), theOutLabel);
+        // Validate certificate chains back to valid receipt signer; policy approximation for now set intermediate as a trust anchor; current intermediate lapses in 2016.
+        NSData *certificateData = [NSData dataWithBytes:signatureBlob->_certificate length:certificateLength];
+        require(leaf = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificateData), _out);
 
-        theCertificateData = [NSData dataWithBytes:iTS_intermediate_der length:iTS_intermediate_der_len];
-        require(theIntermediate = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)theCertificateData), theOutLabel);
+        certificateData = [NSData dataWithBytes:iTS_intermediate_der length:iTS_intermediate_der_len];
+        require(intermediate = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificateData), _out);
 
-        theAnchors = @[ (__bridge id)theIntermediate ];
-        require(theAnchors, theOutLabel);
+        NSArray *anchors = [NSArray arrayWithObject:(__bridge id)intermediate];
+        require(anchors, _out);
 
-        require_noerr(SecTrustCreateWithCertificates(theLeaf, thePolicy, &theTrust), theOutLabel);
-        require_noerr(SecTrustSetAnchorCertificates(theTrust, (__bridge CFArrayRef)theAnchors), theOutLabel);
+        require_noerr(SecTrustCreateWithCertificates(leaf, policy, &trust), _out);
+        require_noerr(SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef)anchors), _out);
 
-        if (thePurchaseDate) {
-            require_noerr(SecTrustSetVerifyDate(theTrust, thePurchaseDate), theOutLabel);
+        if (purchaseDate) {
+            require_noerr(SecTrustSetVerifyDate(trust, purchaseDate), _out);
         }
 
-        SecTrustResultType theTrustResult;
-        require_noerr(SecTrustEvaluate(theTrust, &theTrustResult), theOutLabel);
-        require(theTrustResult == kSecTrustResultUnspecified, theOutLabel);
+        SecTrustResultType trustResult;
+        require_noerr(SecTrustEvaluate(trust, &trustResult), _out);
+        require(trustResult == kSecTrustResultUnspecified, _out);
 
-        require(2 == SecTrustGetCertificateCount(theTrust), theOutLabel);
+        require(SecTrustGetCertificateCount(trust) == 2, _out);
 
-        /*
-         Chain is valid, use leaf key to verify signature on receipt by
-         calculating SHA1(version|purchaseinfo)
-         */
+        // Chain is valid, use leaf key to verify signature on receipt by calculating SHA1(version|purchaseinfo)
+        CC_SHA1_CTX SHA1Context;
+        uint8_t dataToBeVerified[CC_SHA1_DIGEST_LENGTH];
 
-        CC_SHA1_CTX theSHA1Context;
-        uint8_t theDataToBeVerified[CC_SHA1_DIGEST_LENGTH];
+        CC_SHA1_Init(&SHA1Context);
+        CC_SHA1_Update(&SHA1Context, &signatureBlob->_receiptVersion, sizeof(signatureBlob->_receiptVersion));
+        CC_SHA1_Update(&SHA1Context, purchaseInfoBytes, purchaseInfoLength);
+        CC_SHA1_Final(dataToBeVerified, &SHA1Context);
 
-        CC_SHA1_Init(&theSHA1Context);
-        CC_SHA1_Update(&theSHA1Context, &theSignatureBlobPtr->_receiptVersion, sizeof(theSignatureBlobPtr->_receiptVersion));
-        CC_SHA1_Update(&theSHA1Context, thePurchaseInfoBytes, thePurchaseInfoLength);
-        CC_SHA1_Final(theDataToBeVerified, &theSHA1Context);
-
-        SecKeyRef theReceiptSigningKey = SecTrustCopyPublicKey(theTrust);
-        require(theReceiptSigningKey, theOutLabel);
-        require_noerr(SecKeyRawVerify(theReceiptSigningKey, kSecPaddingPKCS1SHA1, theDataToBeVerified, sizeof(theDataToBeVerified), theSignatureBlobPtr->_signature, sizeof(theSignatureBlobPtr->_signature)), theOutLabel);
+        SecKeyRef receiptSigningKey = SecTrustCopyPublicKey(trust);
+        require(receiptSigningKey, _out);
+        require_noerr(SecKeyRawVerify(receiptSigningKey, kSecPaddingPKCS1SHA1, dataToBeVerified, sizeof(dataToBeVerified), signatureBlob->_signature, sizeof(signatureBlob->_signature)), _out);
 
         // TODO: Implements optional verification step.
-        /*
-         Optional: Verify that the receipt certificate has the 1.2.840.113635.100.6.5.1 Null OID
-
-         The signature is a 1024-bit RSA signature.
-         */
+        // Optional: Verify that the receipt certificate has the 1.2.840.113635.100.6.5.1 Null OID.
+        // The signature is a 1024-bit RSA signature.
 
         isValid = YES;
     }
-theOutLabel:
-    if (theLeaf) {
-        CFRelease(theLeaf);
+    
+_out:
+    if (leaf) {
+        CFRelease(leaf);
     }
-    if (theIntermediate) {
-        CFRelease(theIntermediate);
+    
+    if (intermediate) {
+        CFRelease(intermediate);
     }
-    if (theTrust) {
-        CFRelease(theTrust);
+    
+    if (trust) {
+        CFRelease(trust);
     }
-    if (thePolicy) {
-        CFRelease(thePolicy);
+    
+    if (policy) {
+        CFRelease(policy);
     }
 
     return isValid;
