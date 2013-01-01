@@ -94,14 +94,14 @@
 - (void)setPaymentQueueRestoreCompletedTransactionsWithSuccess:(void (^)(SKPaymentQueue *queue))success
                                                        failure:(void (^)(SKPaymentQueue *queue, NSError *error))failure;
 
-///---------------------------------------
-/// @name Verify Transaction ID Uniqueness
-///---------------------------------------
+///-------------------------------------------------------
+/// @name Customize Transaction ID Uniqueness Verification
+///-------------------------------------------------------
 
 /**
  
  */
-- (void)setVerifyUniquenessofTransactionIDWithBlock:(BOOL (^)(NSString *transactionID))block;
+- (void)setTransactionIDUniquenessVerificationWithBlock:(BOOL (^)(NSString *transactionID))block;
 
 @end
 

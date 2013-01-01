@@ -889,7 +889,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     _paymentQueueRestoreFailureBlock = [failure copy];
 }
 
-- (void)setVerifyUniquenessofTransactionIDWithBlock:(BOOL (^)(NSString *transactionID))block {
+- (void)setTransactionIDUniquenessVerificationWithBlock:(BOOL (^)(NSString *transactionID))block {
     _transactionIDUniquenessVerificationBlock = [block copy];
 }
 
