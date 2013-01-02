@@ -930,7 +930,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
             return NO;
         }
     } else {
-        NSMutableDictionary *knownIAPTransactionsDictionary = [[NSUserDefaults standardUserDefaults] objectForKey:kCargoBayKnownIAPTransactionsKey];
+        NSMutableDictionary *knownIAPTransactionsDictionary = [[[NSUserDefaults standardUserDefaults] objectForKey:kCargoBayKnownIAPTransactionsKey] mutableCopy];
         if (!knownIAPTransactionsDictionary) {
             knownIAPTransactionsDictionary = [NSMutableDictionary dictionary];
         }
