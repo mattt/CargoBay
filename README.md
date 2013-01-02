@@ -64,7 +64,7 @@ success:^(NSArray *products, NSArray *invalidIdentifiers) {
 ### Verifying Receipts
 
 ```objective-c
-[[CargoBay sharedManager] verifyTransaction:(SKPaymentTransaction *) password:nil success:^(NSDictionary *receipt) {
+[[CargoBay sharedManager] verifyTransaction:transaction password:nil success:^(NSDictionary *receipt) {
   NSLog(@"Receipt: %@", receipt);
 } failure:^(NSError *error) {
     NSLog(@"Error %d (%@)", [error code], [error localizedDescription]);
