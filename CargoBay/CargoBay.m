@@ -46,6 +46,8 @@ NSDate * CBDateFromDateString(NSString *string) {
         return nil;
     }
 
+    NSString* dateString = [string stringByReplacingOccurrencesOfString:@"Etc/" withString:@""];
+
     static NSDateFormatter *_dateFormatter = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -54,7 +56,7 @@ NSDate * CBDateFromDateString(NSString *string) {
         _dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
     });
 
-    return [_dateFormatter dateFromString:string];
+    return [_dateFormatter dateFromString:dateString];
 }
 
 NSString * CBBase64EncodedStringFromData(NSData *data) {
@@ -355,7 +357,7 @@ BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *transaction,
     {
 
         NSDate *transactionDate = transaction.transactionDate;
-        NSDate *purchaseInfoDictionaryPurchaseDate = CBDateFromDateString([purchaseInfoDictionary[@"purchase-date"] stringByReplacingOccurrencesOfString:@"Etc/" withString:@""]);
+        NSDate *purchaseInfoDictionaryPurchaseDate = CBDateFromDateString(purchaseInfoDictionary[@"purchase-date"]);
 
         if (![transactionDate isEqualToDate:purchaseInfoDictionaryPurchaseDate]) {
             if (error != NULL) {
