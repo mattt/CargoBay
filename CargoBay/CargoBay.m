@@ -41,6 +41,22 @@ typedef void (^CargoBayPaymentQueueRestoreSuccessBlock)(SKPaymentQueue *queue);
 typedef void (^CargoBayPaymentQueueRestoreFailureBlock)(SKPaymentQueue *queue, NSError *error);
 typedef BOOL (^CargoBayTransactionIDUniquenessVerificationBlock)(NSString *transactionID);
 
+////////////////////////////////////////////////////////////////////////////////////
+#pragma mark forward declarations
+////////////////////////////////////////////////////////////////////////////////////
+NSDate * CBDateFromDateString(NSString *string);
+NSString * CBBase64EncodedStringFromData(NSData *data);
+NSData * CBDataFromBase64EncodedString(NSString *base64EncodedString);
+BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSDictionary *receipt, NSError * __autoreleasing *error);
+BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error);
+BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureString, NSDate *purchaseDate);
+NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptData, NSError * __autoreleasing *error);
+BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *transaction, NSDictionary *purchaseInfoDictionary, NSError * __autoreleasing *error);
+
+////////////////////////////////////////////////////////////////////////////////////
+#pragma mark implementations
+////////////////////////////////////////////////////////////////////////////////////
+
 NSDate * CBDateFromDateString(NSString *string) {
     if (!string) {
         return nil;
@@ -732,7 +748,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     }
 
     NSURLRequest *request = [client requestWithMethod:@"POST" path:@"verifyReceipt" parameters:parameters];
-    AFHTTPRequestOperation *operation = [client HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    AFHTTPRequestOperation *requestOperation = [client HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
 
         switch (status) {
@@ -817,11 +833,11 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
         }
     }];
 
-    [operation setAuthenticationAgainstProtectionSpaceBlock:^BOOL(NSURLConnection *connection, NSURLProtectionSpace *protectionSpace) {
+    [requestOperation setAuthenticationAgainstProtectionSpaceBlock:^BOOL(NSURLConnection *connection, NSURLProtectionSpace *protectionSpace) {
         return [[protectionSpace authenticationMethod] isEqual:NSURLAuthenticationMethodServerTrust];
     }];
 
-    [operation setAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
+    [requestOperation setAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
         if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust]) {
             SecTrustRef trust = [[challenge protectionSpace] serverTrust];
             NSError *error = nil;
@@ -844,7 +860,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
         }
     }];
 
-    [client enqueueHTTPRequestOperation:operation];
+    [client enqueueHTTPRequestOperation:requestOperation];
 }
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
