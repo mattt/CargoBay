@@ -732,7 +732,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
     }
 
     NSURLRequest *request = [client requestWithMethod:@"POST" path:@"verifyReceipt" parameters:parameters];
-    AFHTTPRequestOperation *operation = [client HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    AFHTTPRequestOperation *requestOperation = [client HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
 
         switch (status) {
@@ -817,11 +817,11 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
         }
     }];
 
-    [operation setAuthenticationAgainstProtectionSpaceBlock:^BOOL(NSURLConnection *connection, NSURLProtectionSpace *protectionSpace) {
+    [requestOperation setAuthenticationAgainstProtectionSpaceBlock:^BOOL(NSURLConnection *connection, NSURLProtectionSpace *protectionSpace) {
         return [[protectionSpace authenticationMethod] isEqual:NSURLAuthenticationMethodServerTrust];
     }];
 
-    [operation setAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
+    [requestOperation setAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
         if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust]) {
             SecTrustRef trust = [[challenge protectionSpace] serverTrust];
             NSError *error = nil;
@@ -844,7 +844,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
         }
     }];
 
-    [client enqueueHTTPRequestOperation:operation];
+    [client enqueueHTTPRequestOperation:requestOperation];
 }
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
