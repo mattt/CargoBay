@@ -103,6 +103,11 @@
  */
 - (void)setTransactionIDUniquenessVerificationWithBlock:(BOOL (^)(NSString *transactionID))block;
 
+/**
+
+ */
+- (void)setPaymentQueueUpdatedDownloadsBlock:(void (^)(SKPaymentQueue *queue, NSArray *downloads))block;
+
 @end
 
 ///----------------
