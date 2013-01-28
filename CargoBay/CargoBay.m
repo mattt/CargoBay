@@ -39,6 +39,7 @@ typedef void (^CargoBayPaymentQueueProductFailureBlock)(NSError *error);
 typedef void (^CargoBayPaymentQueueTransactionsBlock)(SKPaymentQueue *queue, NSArray *transactions);
 typedef void (^CargoBayPaymentQueueRestoreSuccessBlock)(SKPaymentQueue *queue);
 typedef void (^CargoBayPaymentQueueRestoreFailureBlock)(SKPaymentQueue *queue, NSError *error);
+typedef void (^CargoBayPaymentQueueUpdatedDownloadsBlock)(SKPaymentQueue *queue, NSArray *downloads);
 typedef BOOL (^CargoBayTransactionIDUniquenessVerificationBlock)(NSString *transactionID);
 
 static NSDate * CBDateFromDateString(NSString *string) {
@@ -647,6 +648,7 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
     CargoBayPaymentQueueTransactionsBlock _paymentQueueTransactionsRemoved;
     CargoBayPaymentQueueRestoreSuccessBlock _paymentQueueRestoreSuccessBlock;
     CargoBayPaymentQueueRestoreFailureBlock _paymentQueueRestoreFailureBlock;
+    CargoBayPaymentQueueUpdatedDownloadsBlock _paymentQueueUpdatedDownloadsBlock;
     CargoBayTransactionIDUniquenessVerificationBlock _transactionIDUniquenessVerificationBlock;
 }
 
@@ -895,6 +897,10 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
     _transactionIDUniquenessVerificationBlock = [block copy];
 }
 
+- (void)setPaymentQueueUpdatedDownloadsBlock:(void (^)(SKPaymentQueue *queue, NSArray *downloads))block {
+    _paymentQueueUpdatedDownloadsBlock = [block copy];
+}
+
 #pragma mark - Receipt Verification
 
 // This method should be called once a transaction gets to the SKPaymentTransactionStatePurchased or SKPaymentTransactionStateRestored state
@@ -987,6 +993,12 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
 {
     if (_paymentQueueRestoreFailureBlock) {
         _paymentQueueRestoreFailureBlock(queue, error);
+    }
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedDownloads:(NSArray *)downloads {
+    if (_paymentQueueUpdatedDownloadsBlock) {
+        _paymentQueueUpdatedDownloadsBlock(queue, downloads);
     }
 }
 
