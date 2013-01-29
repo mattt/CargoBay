@@ -265,8 +265,8 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
         if (success) {
             success(products, invalidIdentifiers);
         }
-        
-        [[self class] unregisterDelegate:weakSelf];
+
+        [[weakSelf class] unregisterDelegate:weakSelf];
     } copy];
     
     _failure = [^(NSError *error) {
@@ -274,7 +274,7 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
             failure(error);
         }
         
-        [[self class] unregisterDelegate:weakSelf];
+        [[weakSelf class] unregisterDelegate:weakSelf];
     } copy];
 
     
