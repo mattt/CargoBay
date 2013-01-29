@@ -967,6 +967,14 @@ static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionRe
 #pragma mark - SKPaymentTransactionObserver
 
 - (void)paymentQueue:(SKPaymentQueue *)queue
+    updatedDownloads:(NSArray *)downloads
+{
+    if (_paymentQueueUpdatedDownloadsBlock) {
+        _paymentQueueUpdatedDownloadsBlock(queue, downloads);
+    }
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue
  updatedTransactions:(NSArray *)transactions
 {
     if (_paymentQueueTransactionsUpdated) {
@@ -993,12 +1001,6 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
 {
     if (_paymentQueueRestoreFailureBlock) {
         _paymentQueueRestoreFailureBlock(queue, error);
-    }
-}
-
-- (void)paymentQueue:(SKPaymentQueue *)queue updatedDownloads:(NSArray *)downloads {
-    if (_paymentQueueUpdatedDownloadsBlock) {
-        _paymentQueueUpdatedDownloadsBlock(queue, downloads);
     }
 }
 

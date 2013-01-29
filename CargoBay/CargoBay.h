@@ -79,6 +79,11 @@
 ///--------------------------------------------------
 
 /**
+
+ */
+- (void)setPaymentQueueUpdatedDownloadsBlock:(void (^)(SKPaymentQueue *queue, NSArray *downloads))block;
+
+/**
  
  */
 - (void)setPaymentQueueUpdatedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block;
@@ -102,11 +107,6 @@
  
  */
 - (void)setTransactionIDUniquenessVerificationWithBlock:(BOOL (^)(NSString *transactionID))block;
-
-/**
-
- */
-- (void)setPaymentQueueUpdatedDownloadsBlock:(void (^)(SKPaymentQueue *queue, NSArray *downloads))block;
 
 @end
 
