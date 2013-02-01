@@ -33,18 +33,6 @@ success:^(NSArray *products, NSArray *invalidIdentifiers) {
 }];
 ```
 
-### Getting Product Identifiers From Server
-
-```objective-c
-NSURL *URL = [NSURL URLWithString:@"http://example.com/products"];
-[[CargoBay sharedManager] productsWithURLRequest:[NSURLRequest requestWithURL:URL]
-success:^(NSArray *products, NSArray *invalidIdentifiers) {
-  // ...
-} failure:^(NSError *error) {
-  // ...
-}];
-```
-
 ### Payment Queue Observation
 
 **AppDelegate.m**
