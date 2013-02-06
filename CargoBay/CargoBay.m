@@ -42,7 +42,15 @@ typedef void (^CargoBayPaymentQueueRestoreFailureBlock)(SKPaymentQueue *queue, N
 typedef void (^CargoBayPaymentQueueUpdatedDownloadsBlock)(SKPaymentQueue *queue, NSArray *downloads);
 typedef BOOL (^CargoBayTransactionIDUniquenessVerificationBlock)(NSString *transactionID);
 
-static NSDate * CBDateFromDateString(NSString *string) {
+extern NSString * CBBase64EncodedStringFromData(NSData *);
+extern NSData * CBDataFromBase64EncodedString(NSString *);
+extern BOOL CBValidateTrust(SecTrustRef, NSError * __autoreleasing *);
+extern BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *, NSDictionary *, NSError * __autoreleasing *);
+extern BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *, NSDictionary *, NSError * __autoreleasing *);
+extern BOOL CBCheckReceiptSecurity(NSString *, NSString *, NSDate *);
+extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * __autoreleasing *);
+
+NSDate * CBDateFromDateString(NSString *string) {
     if (!string) {
         return nil;
     }
@@ -60,7 +68,7 @@ static NSDate * CBDateFromDateString(NSString *string) {
     return [_dateFormatter dateFromString:dateString];
 }
 
-static NSString * CBBase64EncodedStringFromData(NSData *data) {
+NSString * CBBase64EncodedStringFromData(NSData *data) {
     NSUInteger length = [data length];
     NSMutableData *mutableData = [NSMutableData dataWithLength:((length + 2) / 3) * 4];
 
@@ -89,7 +97,7 @@ static NSString * CBBase64EncodedStringFromData(NSData *data) {
 }
 
 // Reference http://cocoawithlove.com/2009/06/base64-encoding-options-on-mac-and.html
-static NSData * CBDataFromBase64EncodedString(NSString *base64EncodedString) {
+NSData * CBDataFromBase64EncodedString(NSString *base64EncodedString) {
     NSData *base64EncodedStringASCIIData = [base64EncodedString dataUsingEncoding:NSASCIIStringEncoding];
     uint8_t *input = (uint8_t *)base64EncodedStringASCIIData.bytes;
     NSUInteger length = base64EncodedStringASCIIData.length;
@@ -143,7 +151,7 @@ static NSData * CBDataFromBase64EncodedString(NSString *base64EncodedString) {
     return [NSData dataWithData:data];
 }
 
-static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error) {
+BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error) {
 #ifdef _SECURITY_SECBASE_H_
     extern CFStringRef kSecTrustInfoExtendedValidationKey;
     extern CFDictionaryRef SecTrustCopyInfo(SecTrustRef trust);
@@ -171,7 +179,7 @@ static BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error)
 #endif
 }
 
-static BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSDictionary *receipt, NSError * __autoreleasing *error) {
+BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSDictionary *receipt, NSError * __autoreleasing *error) {
     if (![[receipt objectForKey:@"bid"] isEqual:[purchaseInfo objectForKey:@"bid"]]) {
         if (error != NULL) {
             NSDictionary *userInfo = [NSMutableDictionary dictionary];
@@ -380,7 +388,7 @@ BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *transaction,
     #import <AssertMacros.h>
 #endif
 
-static BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureString, NSDate *purchaseDate) {
+BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureString, NSDate *purchaseDate) {
 #ifdef _SECURITY_SECBASE_H_
     BOOL isValid = NO;
     SecCertificateRef leaf = NULL;
@@ -596,7 +604,7 @@ _out:
 
 #pragma mark - Parsers
 
-static NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptData, NSError * __autoreleasing *error) {
+NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptData, NSError * __autoreleasing *error) {
     NSDictionary *transactionReceiptDictionary = [NSPropertyListSerialization propertyListWithData:transactionReceiptData options:NSPropertyListImmutable format:nil error:error];
     if (!transactionReceiptDictionary) {
         return nil;
