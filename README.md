@@ -38,7 +38,7 @@ success:^(NSArray *products, NSArray *invalidIdentifiers) {
 **AppDelegate.m**
 
 ```objective-c
-- (void)application:(UIApplication *)application didFinishLoadingWithOptions:(NSDictionary *)options {
+- (void)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)options {
   [[CargoBay sharedManager] setPaymentQueueUpdatedTransactionsBlock:^(SKPaymentQueue *queue, NSArray *transactions) {
     NSLog(@"Updated Transactions: %@", transactions);
   }];
