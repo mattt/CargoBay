@@ -218,6 +218,10 @@ BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSDictiona
         return NO;
     }
 
+    return YES;
+}
+
+BOOL CBValidatePurchaseInfoMatchesReceiptForDevice(NSDictionary *purchaseInfo, NSDictionary *receipt, NSError * __autoreleasing *error) {
     if ([[UIDevice currentDevice] respondsToSelector:NSSelectorFromString(@"identifierForVendor")]) {
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_5_1)
         NSString *deviceIdentifier = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
@@ -761,6 +765,20 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
                 }
 
                 BOOL isValid = CBValidatePurchaseInfoMatchesReceipt(purchaseInfo, receipt, &error);
+                if (!isValid) {
+                    if (failure) {
+                        failure(error);
+                    }
+                    
+                    return;
+                }
+                
+                // Every (re-)installation generates a new unique identifier for vendor.
+                // Every purchase and restoration receipt will be tag with this new unique identifier.
+                // But the latest receipt info might have a unique identifier for vendor from another device, from a previous installation, etc.
+                // So we should only check if the purchase info matches receipt for device for receipt we restored with this device.
+                // Previously this has caused a critical bug where restoration will always fails.
+                isValid = CBValidatePurchaseInfoMatchesReceiptForDevice(purchaseInfo, receipt, &error);
                 if (!isValid) {
                     if (failure) {
                         failure(error);
