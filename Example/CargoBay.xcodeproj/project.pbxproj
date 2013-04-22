@@ -14,6 +14,9 @@
 		AB0E5836167B159500B52560 /* CargoBayTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AB0E5835167B159500B52560 /* CargoBayTests.m */; };
 		AB1B6B0A167F705200210289 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8AA37EE15FD747D00C21309 /* StoreKit.framework */; };
 		AB28E09C167F1E200052CCFF /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F87666F416595C72007CD103 /* Security.framework */; };
+		AB9763D0171473F800932DA2 /* AFJSONRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380015FD7A5300C21309 /* AFJSONRequestOperation.m */; };
+		AB9763D21714742500932DA2 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB9763D11714742500932DA2 /* SystemConfiguration.framework */; };
+		AB9763D41714743000932DA2 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB9763D31714743000932DA2 /* MobileCoreServices.framework */; };
 		F84068541693676700B4966B /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F84068531693676700B4966B /* Default-568h@2x.png */; };
 		F853B17815FD71A100D5AC59 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17715FD71A100D5AC59 /* UIKit.framework */; };
 		F853B17A15FD71A100D5AC59 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17915FD71A100D5AC59 /* Foundation.framework */; };
@@ -25,16 +28,14 @@
 		F8AA37E615FD71F800C21309 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA37E015FD71F800C21309 /* ViewController.m */; };
 		F8AA37EC15FD724E00C21309 /* CargoBay.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA37EB15FD724E00C21309 /* CargoBay.m */; };
 		F8AA37EF15FD747D00C21309 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8AA37EE15FD747D00C21309 /* StoreKit.framework */; };
-		F8AA380E15FD7A5300C21309 /* AFHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA37FA15FD7A5300C21309 /* AFHTTPClient.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		F8AA380F15FD7A5300C21309 /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA37FC15FD7A5300C21309 /* AFHTTPRequestOperation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		F8AA381015FD7A5300C21309 /* AFImageRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA37FE15FD7A5300C21309 /* AFImageRequestOperation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		F8AA381115FD7A5300C21309 /* AFJSONRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380015FD7A5300C21309 /* AFJSONRequestOperation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		F8AA381215FD7A5300C21309 /* AFJSONUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380215FD7A5300C21309 /* AFJSONUtilities.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		F8AA381315FD7A5300C21309 /* AFNetworkActivityIndicatorManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380415FD7A5300C21309 /* AFNetworkActivityIndicatorManager.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		F8AA381415FD7A5300C21309 /* AFPropertyListRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380715FD7A5300C21309 /* AFPropertyListRequestOperation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		F8AA381515FD7A5300C21309 /* AFURLConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380915FD7A5300C21309 /* AFURLConnectionOperation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		F8AA381615FD7A5300C21309 /* AFXMLRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380B15FD7A5300C21309 /* AFXMLRequestOperation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		F8AA381715FD7A5300C21309 /* UIImageView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380D15FD7A5300C21309 /* UIImageView+AFNetworking.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		F8AA380E15FD7A5300C21309 /* AFHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA37FA15FD7A5300C21309 /* AFHTTPClient.m */; };
+		F8AA380F15FD7A5300C21309 /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA37FC15FD7A5300C21309 /* AFHTTPRequestOperation.m */; };
+		F8AA381015FD7A5300C21309 /* AFImageRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA37FE15FD7A5300C21309 /* AFImageRequestOperation.m */; };
+		F8AA381315FD7A5300C21309 /* AFNetworkActivityIndicatorManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380415FD7A5300C21309 /* AFNetworkActivityIndicatorManager.m */; };
+		F8AA381415FD7A5300C21309 /* AFPropertyListRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380715FD7A5300C21309 /* AFPropertyListRequestOperation.m */; };
+		F8AA381515FD7A5300C21309 /* AFURLConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380915FD7A5300C21309 /* AFURLConnectionOperation.m */; };
+		F8AA381615FD7A5300C21309 /* AFXMLRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380B15FD7A5300C21309 /* AFXMLRequestOperation.m */; };
+		F8AA381715FD7A5300C21309 /* UIImageView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AA380D15FD7A5300C21309 /* UIImageView+AFNetworking.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,7 +56,8 @@
 		AB0E5834167B159500B52560 /* CargoBayTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CargoBayTests.h; sourceTree = "<group>"; };
 		AB0E5835167B159500B52560 /* CargoBayTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CargoBayTests.m; sourceTree = "<group>"; };
 		AB0E5837167B159500B52560 /* CargoBayTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CargoBayTests-Prefix.pch"; sourceTree = "<group>"; };
-		AB2973761680B4F20053E9DC /* CargoBay+PrivateMethods.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CargoBay+PrivateMethods.h"; sourceTree = "<group>"; };
+		AB9763D11714742500932DA2 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		AB9763D31714743000932DA2 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		F84068531693676700B4966B /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		F853B17315FD71A100D5AC59 /* CargoBay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CargoBay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F853B17715FD71A100D5AC59 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -82,8 +84,6 @@
 		F8AA37FE15FD7A5300C21309 /* AFImageRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFImageRequestOperation.m; sourceTree = "<group>"; };
 		F8AA37FF15FD7A5300C21309 /* AFJSONRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFJSONRequestOperation.h; sourceTree = "<group>"; };
 		F8AA380015FD7A5300C21309 /* AFJSONRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFJSONRequestOperation.m; sourceTree = "<group>"; };
-		F8AA380115FD7A5300C21309 /* AFJSONUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFJSONUtilities.h; sourceTree = "<group>"; };
-		F8AA380215FD7A5300C21309 /* AFJSONUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFJSONUtilities.m; sourceTree = "<group>"; };
 		F8AA380315FD7A5300C21309 /* AFNetworkActivityIndicatorManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFNetworkActivityIndicatorManager.h; sourceTree = "<group>"; };
 		F8AA380415FD7A5300C21309 /* AFNetworkActivityIndicatorManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFNetworkActivityIndicatorManager.m; sourceTree = "<group>"; };
 		F8AA380515FD7A5300C21309 /* AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFNetworking.h; sourceTree = "<group>"; };
@@ -114,6 +114,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB9763D41714743000932DA2 /* MobileCoreServices.framework in Frameworks */,
+				AB9763D21714742500932DA2 /* SystemConfiguration.framework in Frameworks */,
 				F87666F516595C72007CD103 /* Security.framework in Frameworks */,
 				F8AA37EF15FD747D00C21309 /* StoreKit.framework in Frameworks */,
 				F853B17815FD71A100D5AC59 /* UIKit.framework in Frameworks */,
@@ -170,6 +172,8 @@
 		F853B17615FD71A100D5AC59 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AB9763D31714743000932DA2 /* MobileCoreServices.framework */,
+				AB9763D11714742500932DA2 /* SystemConfiguration.framework */,
 				F87666F416595C72007CD103 /* Security.framework */,
 				F8AA37EE15FD747D00C21309 /* StoreKit.framework */,
 				F853B17715FD71A100D5AC59 /* UIKit.framework */,
@@ -218,7 +222,6 @@
 			children = (
 				F8AA37EA15FD724E00C21309 /* CargoBay.h */,
 				F8AA37EB15FD724E00C21309 /* CargoBay.m */,
-				AB2973761680B4F20053E9DC /* CargoBay+PrivateMethods.h */,
 			);
 			name = CargoBay;
 			path = ../CargoBay;
@@ -244,8 +247,6 @@
 				F8AA37FE15FD7A5300C21309 /* AFImageRequestOperation.m */,
 				F8AA37FF15FD7A5300C21309 /* AFJSONRequestOperation.h */,
 				F8AA380015FD7A5300C21309 /* AFJSONRequestOperation.m */,
-				F8AA380115FD7A5300C21309 /* AFJSONUtilities.h */,
-				F8AA380215FD7A5300C21309 /* AFJSONUtilities.m */,
 				F8AA380315FD7A5300C21309 /* AFNetworkActivityIndicatorManager.h */,
 				F8AA380415FD7A5300C21309 /* AFNetworkActivityIndicatorManager.m */,
 				F8AA380515FD7A5300C21309 /* AFNetworking.h */,
@@ -360,7 +361,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+			shellScript = "if [ \"$RUN_UNIT_TEST_WITH_IOS_SIM\" = \"YES\" ]; then\ntest_bundle_path=\"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.$WRAPPER_EXTENSION\"\nios-sim launch \"$(dirname \"$TEST_HOST\")\" --setenv DYLD_INSERT_LIBRARIES=/../../Library/PrivateFrameworks/IDEBundleInjection.framework/IDEBundleInjection --setenv XCInjectBundle=\"$test_bundle_path\" --setenv XCInjectBundleInto=\"$TEST_HOST\" --args -SenTest All \"$test_bundle_path\" 2> log.txt\necho \"Finished running tests with ios-sim\"\nfailure=$(grep -q \"with 0 failures\" log.txt; echo $?)\nif [ $failure != 0 ]; then\nprintf \"\\n\"\ngrep --color=always \"error:\" log.txt\nfi\nrm log.txt\nexit $failure\nelse\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -384,8 +385,7 @@
 				F8AA380E15FD7A5300C21309 /* AFHTTPClient.m in Sources */,
 				F8AA380F15FD7A5300C21309 /* AFHTTPRequestOperation.m in Sources */,
 				F8AA381015FD7A5300C21309 /* AFImageRequestOperation.m in Sources */,
-				F8AA381115FD7A5300C21309 /* AFJSONRequestOperation.m in Sources */,
-				F8AA381215FD7A5300C21309 /* AFJSONUtilities.m in Sources */,
+				AB9763D0171473F800932DA2 /* AFJSONRequestOperation.m in Sources */,
 				F8AA381315FD7A5300C21309 /* AFNetworkActivityIndicatorManager.m in Sources */,
 				F8AA381415FD7A5300C21309 /* AFPropertyListRequestOperation.m in Sources */,
 				F8AA381515FD7A5300C21309 /* AFURLConnectionOperation.m in Sources */,
@@ -445,7 +445,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CargoBayTests/CargoBayTests-Prefix.pch";
 				INFOPLIST_FILE = "CargoBayTests/CargoBayTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
@@ -466,7 +466,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CargoBayTests/CargoBayTests-Prefix.pch";
 				INFOPLIST_FILE = "CargoBayTests/CargoBayTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
