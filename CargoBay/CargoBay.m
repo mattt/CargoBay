@@ -42,6 +42,7 @@ typedef void (^CargoBayPaymentQueueRestoreFailureBlock)(SKPaymentQueue *queue, N
 typedef void (^CargoBayPaymentQueueUpdatedDownloadsBlock)(SKPaymentQueue *queue, NSArray *downloads);
 typedef BOOL (^CargoBayTransactionIDUniquenessVerificationBlock)(NSString *transactionID);
 
+extern NSDate * CBDateFromDateString(NSString *string);
 extern NSString * CBBase64EncodedStringFromData(NSData *);
 extern NSData * CBDataFromBase64EncodedString(NSString *);
 extern BOOL CBValidateTrust(SecTrustRef, NSError * __autoreleasing *);
