@@ -136,6 +136,9 @@ typedef NS_ENUM(NSInteger, CargoBayStatusCode) {
     CargoBayStatusProductionReceiptSentToSandbox = 21008
 };
 
+/**
+ 
+ */
 typedef NS_ENUM(NSInteger, CargoBayErrorCode) {
     CargoBayErrorUnknown = -1,
 
