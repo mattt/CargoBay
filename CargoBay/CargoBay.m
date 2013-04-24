@@ -701,13 +701,45 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     [request start];
 }
 
+- (void)verifyTransaction:(SKPaymentTransaction *)transaction
+                 password:(NSString *)passwordOrNil
+                  success:(void (^)(NSDictionary *responseObject))success
+                  failure:(void (^)(NSError *error))failure
+{
+    if ((transaction.transactionState != SKPaymentTransactionStatePurchased) && (transaction.transactionState != SKPaymentTransactionStateRestored)) {
+        if (failure) {
+            NSDictionary *userInfo = [NSMutableDictionary dictionary];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Cannot verify transaction because transaction (%@) not in purchased or restored state.", @"CargoBay", nil), transaction.transactionIdentifier] forKey:NSLocalizedDescriptionKey];
+            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction (%@) not in purchased or restored state.", @"CargoBay", nil), transaction.transactionIdentifier] forKey:NSLocalizedFailureReasonErrorKey];
+            NSError *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionNotInPurchasedOrRestoredState userInfo:userInfo];
+
+            failure(error);
+        }
+        return;
+    }
+
+    NSError *error = nil;
+    if (![self isValidTransaction:transaction error:&error]) {
+        if (failure) {
+            failure(error);
+        }
+
+        return;
+    }
+
+    [self verifyTransactionReceipt:transaction.transactionReceipt password:passwordOrNil success:success failure:failure];
+}
+
+- (void)setTransactionIDUniquenessVerificationWithBlock:(BOOL (^)(NSString *transactionID))block {
+    _transactionIDUniquenessVerificationBlock = [block copy];
+}
+
 - (void)verifyTransactionReceipt:(NSData *)transactionReceipt
                         password:(NSString *)passwordOrNil
                          success:(void (^)(NSDictionary *responseObject))success
                          failure:(void (^)(NSError *error))failure
 {
     NSError *error = nil;
-
     NSDictionary *receiptDictionary = [NSPropertyListSerialization propertyListWithData:transactionReceipt options:NSPropertyListImmutable format:nil error:&error];
     if (!receiptDictionary) {
         failure(error);
@@ -860,35 +892,6 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     [client enqueueHTTPRequestOperation:requestOperation];
 }
 
-- (void)verifyTransaction:(SKPaymentTransaction *)transaction
-                 password:(NSString *)passwordOrNil
-                  success:(void (^)(NSDictionary *responseObject))success
-                  failure:(void (^)(NSError *error))failure
-{
-    if ((transaction.transactionState != SKPaymentTransactionStatePurchased) && (transaction.transactionState != SKPaymentTransactionStateRestored)) {
-        if (failure) {
-            NSDictionary *userInfo = [NSMutableDictionary dictionary];
-            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Cannot verify transaction because transaction (%@) not in purchased or restored state.", @"CargoBay", nil), transaction.transactionIdentifier] forKey:NSLocalizedDescriptionKey];
-            [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction (%@) not in purchased or restored state.", @"CargoBay", nil), transaction.transactionIdentifier] forKey:NSLocalizedFailureReasonErrorKey];
-            NSError *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionNotInPurchasedOrRestoredState userInfo:userInfo];
-
-            failure(error);
-        }
-        return;
-    }
-    
-    NSError *error = nil;
-    if (![self isValidTransaction:transaction error:&error]) {
-        if (failure) {
-            failure(error);
-        }
-        
-        return;
-    }
-
-    [self verifyTransactionReceipt:transaction.transactionReceipt password:passwordOrNil success:success failure:failure];
-}
-
 - (void)setPaymentQueueUpdatedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block {
     _paymentQueueTransactionsUpdated = [block copy];
 }
@@ -904,17 +907,12 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     _paymentQueueRestoreFailureBlock = [failure copy];
 }
 
-- (void)setTransactionIDUniquenessVerificationWithBlock:(BOOL (^)(NSString *transactionID))block {
-    _transactionIDUniquenessVerificationBlock = [block copy];
-}
-
 - (void)setPaymentQueueUpdatedDownloadsBlock:(void (^)(SKPaymentQueue *queue, NSArray *downloads))block {
     _paymentQueueUpdatedDownloadsBlock = [block copy];
 }
 
 #pragma mark - Receipt Verification
 
-// This method should be called once a transaction gets to the SKPaymentTransactionStatePurchased or SKPaymentTransactionStateRestored state
 - (BOOL)isValidTransaction:(SKPaymentTransaction *)transaction
                      error:(NSError * __autoreleasing *)error
 {
@@ -1094,7 +1092,7 @@ didFailWithError:(NSError *)error
 {
     if (_success) {
         _success(response.products, response.invalidProductIdentifiers);
-    }    
+    }
 }
 
 @end
