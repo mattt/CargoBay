@@ -68,6 +68,19 @@
                         success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
                         failure:(void (^)(NSError *error))failure;
 
+/**
+ Fetches product identifiers from an external webservice and performs an `SKProductsRequest`.
+
+ @param request The request object to be loaded asynchronously to retrieve an array of identifiers.
+ @param success A block object to be executed when the request finishes successfully. This block has no return value and takes two arguments: a list of products, one product for each valid product identifier provided and an array of product identifier strings that were not recognized by the Apple App Store.
+ @param failure A block object to be executed when the request finishes unsuccessfully. This block has no return value and takes a single arguments: the error that caused the request to fail.
+ 
+ @discussion Product identifiers are expected to be returned as a JSON array from the webservice.
+ */
+- (void)productsWithRequest:(NSURLRequest *)request
+                    success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
+                    failure:(void (^)(NSError *error))failure;
+
 ///-----------------------------------------
 /// @name Transaction & Receipt Verification
 ///-----------------------------------------

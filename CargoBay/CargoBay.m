@@ -701,6 +701,29 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     [request start];
 }
 
+- (void)productsWithRequest:(NSURLRequest *)request
+                    success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
+                    failure:(void (^)(NSError *error))failure
+{
+    [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        if (JSON && [JSON isKindOfClass:[NSArray class]]) {
+            [self productsWithIdentifiers:[NSSet setWithArray:JSON] success:success failure:failure];
+        } else {
+            if (failure) {
+                NSDictionary *userInfo = [NSMutableDictionary dictionary];
+                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Expected array of product identifiers, got %@.", @"CargoBay", nil), JSON] forKey:NSLocalizedDescriptionKey];
+                NSError *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionNotInPurchasedOrRestoredState userInfo:userInfo];
+
+                failure(error);
+            }
+        }
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        if (failure) {
+            failure(error);
+        }
+    }];
+}
+
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
                  password:(NSString *)passwordOrNil
                   success:(void (^)(NSDictionary *responseObject))success
