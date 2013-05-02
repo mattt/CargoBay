@@ -29,8 +29,8 @@
 
 NSString * const CargoBayErrorDomain = @"com.mattt.CargoBay.ErrorDomain";
 
-static NSString * const kCargoBaySandboxReceiptVerificationBaseURLString = @"https://sandbox.itunes.apple.com/";
-static NSString * const kCargoBayProductionReceiptVerificationBaseURLString = @"https://buy.itunes.apple.com/";
+static NSString * const kCargoBaySandboxReceiptVerificationURLString = @"https://sandbox.itunes.apple.com/verifyReceipt";
+static NSString * const kCargoBayProductionReceiptVerificationURLString = @"https://buy.itunes.apple.com/verifyReceipt";
 
 static NSString * const kCargoBayKnownIAPTransactionsKey = @"com.mattt.CargoBay.knownIAPTransactions";
 
@@ -650,11 +650,12 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     CargoBayTransactionIDUniquenessVerificationBlock _transactionIDUniquenessVerificationBlock;
 }
 
-@property (readwrite, nonatomic, strong) AFHTTPClient *sandboxReceiptVerificationClient;
-@property (readwrite, nonatomic, strong) AFHTTPClient *productionReceiptVerificationClient;
+@property (readwrite, nonatomic, strong) NSOperationQueue *requestOperationQueue;
+
 @end
 
 @implementation CargoBay
+@synthesize requestOperationQueue = _requestOperationQueue;
 
 + (instancetype)sharedManager {
     static id _sharedManager = nil;
@@ -682,8 +683,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
         return nil;
     }
 
-    self.sandboxReceiptVerificationClient = [[self class] receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationBaseURLString]];
-    self.productionReceiptVerificationClient = [[self class] receiptVerificationClientWithBaseURL:[NSURL URLWithString:kCargoBayProductionReceiptVerificationBaseURLString]];
+    self.requestOperationQueue = [[NSOperationQueue alloc] init];
 
     return self;
 }
@@ -770,23 +770,27 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     }
 
     NSString *environment = [receiptDictionary objectForKey:@"environment"];
-    AFHTTPClient *client = [environment isEqual:@"Sandbox"] ? [self sandboxReceiptVerificationClient] : [self productionReceiptVerificationClient];
+    NSURL *endpoint = [environment isEqual:@"Sandbox"] ? [NSURL URLWithString:kCargoBaySandboxReceiptVerificationURLString] : [NSURL URLWithString:kCargoBayProductionReceiptVerificationURLString];
 
-    [self verifyTransactionReceipt:transactionReceipt client:client password:passwordOrNil success:success failure:failure];
+    [self verifyTransactionWithMethod:@"POST" endpoint:endpoint receipt:transactionReceipt password:passwordOrNil success:success failure:failure];
 }
 
-- (void)verifyTransactionReceipt:(NSData *)transactionReceipt
-                          client:(AFHTTPClient *)client
-                        password:(NSString *)password
-                         success:(void (^)(NSDictionary *responseObject))success
-                         failure:(void (^)(NSError *error))failure
+- (void)verifyTransactionWithMethod:(NSString *)method
+                           endpoint:(NSURL *)url
+                            receipt:(NSData *)transactionReceipt
+                           password:(NSString *)password
+                            success:(void (^)(NSDictionary *responseObject))success
+                            failure:(void (^)(NSError *error))failure
 {
+    NSURL *baseURL = [NSURL URLWithString:[[url absoluteString] substringToIndex:[[url absoluteString] rangeOfString:[url path] options:NSBackwardsSearch].location]];
+    AFHTTPClient *client = [[self class] receiptVerificationClientWithBaseURL:baseURL];
+
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transactionReceipt) forKey:@"receipt-data"];
     if (password) {
         [parameters setObject:password forKey:@"password"];
     }
 
-    NSURLRequest *request = [client requestWithMethod:@"POST" path:@"verifyReceipt" parameters:parameters];
+    NSURLRequest *request = [client requestWithMethod:method path:[url path] parameters:parameters];
     AFHTTPRequestOperation *requestOperation = [client HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
 
@@ -864,10 +868,10 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
                 break;
             }
             case CargoBayStatusSandboxReceiptSentToProduction:
-                [self verifyTransactionReceipt:transactionReceipt client:[self sandboxReceiptVerificationClient] password:password success:success failure:failure];
+                [self verifyTransactionWithMethod:@"POST" endpoint:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationURLString] receipt:transactionReceipt password:password success:success failure:failure];
                 break;
             case CargoBayStatusProductionReceiptSentToSandbox:
-                [self verifyTransactionReceipt:transactionReceipt client:[self productionReceiptVerificationClient] password:password success:success failure:failure];
+                [self verifyTransactionWithMethod:@"POST" endpoint:[NSURL URLWithString:kCargoBayProductionReceiptVerificationURLString] receipt:transactionReceipt password:password success:success failure:failure];
                 break;
             default:
                 if (failure) {
@@ -912,7 +916,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
         }
     }];
 
-    [client enqueueHTTPRequestOperation:requestOperation];
+    [self.requestOperationQueue addOperation:requestOperation];
 }
 
 - (void)setPaymentQueueUpdatedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block {

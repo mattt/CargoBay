@@ -112,7 +112,7 @@
 /**
  Verifies a transaction receipt with the App Store.
 
- @param transaction The transaction to be verified.
+ @param receipt The receipt to be verified.
  @param passwordOrNil The password associated with the transaction if the transaction was for an auto-renewable subscription, or `nil`.
  @param success A block object to be executed when the verification finishes successfully. This block has no return value and takes a single argument: the receipt details of the transaction.
  @param error A block object to be executed when the verification fails or finishes unsuccessfully. This block has no return value and takes a single argument: the error that caused the request to fail.
@@ -121,6 +121,23 @@
                         password:(NSString *)passwordOrNil
                          success:(void (^)(NSDictionary *responseObject))success
                          failure:(void (^)(NSError *error))failure;
+
+/**
+ Verifies a transaction receipt with a custom webservice endpoint.
+
+ @param receipt The receipt to be verified.
+ @param method The HTTP method of the URL request.
+ @param endpoint The URL endpoint of the webservice
+ @param passwordOrNil The password associated with the transaction if the transaction was for an auto-renewable subscription, or `nil`.
+ @param success A block object to be executed when the verification finishes successfully. This block has no return value and takes a single argument: the receipt details of the transaction.
+ @param error A block object to be executed when the verification fails or finishes unsuccessfully. This block has no return value and takes a single argument: the error that caused the request to fail.
+ */
+- (void)verifyTransactionWithMethod:(NSString *)method
+                           endpoint:(NSURL *)url
+                            receipt:(NSData *)transactionReceipt
+                           password:(NSString *)password
+                            success:(void (^)(NSDictionary *responseObject))success
+                            failure:(void (^)(NSError *error))failure;
 
 ///--------------------------------------------------
 /// @name Transaction Queue Observer Delegate Methods
