@@ -29,8 +29,8 @@
 
 NSString * const CargoBayErrorDomain = @"com.mattt.CargoBay.ErrorDomain";
 
-static NSString * const kCargoBaySandboxReceiptVerificationURLString = @"https://sandbox.itunes.apple.com/verifyReceipt";
-static NSString * const kCargoBayProductionReceiptVerificationURLString = @"https://buy.itunes.apple.com/verifyReceipt";
+NSString * const kCargoBaySandboxReceiptVerificationURLString = @"https://sandbox.itunes.apple.com/verifyReceipt";
+NSString * const kCargoBayProductionReceiptVerificationURLString = @"https://buy.itunes.apple.com/verifyReceipt";
 
 static NSString * const kCargoBayKnownIAPTransactionsKey = @"com.mattt.CargoBay.knownIAPTransactions";
 

@@ -181,6 +181,11 @@
 ///----------------
 
 /**
+ ## Receipt Verification Endpoints
+ 
+ `kCargoBaySandboxReceiptVerificationURLString`: https://sandbox.itunes.apple.com/verifyReceipt
+ `kCargoBayProductionReceiptVerificationURLString`: https://buy.itunes.apple.com/verifyReceipt
+
  ## Error Domains
 
  The following error domain is predefined.
@@ -209,6 +214,9 @@
  CargoBayErrorReceiptServerUnavailable,
  }
  */
+extern NSString * const kCargoBaySandboxReceiptVerificationURLString;
+extern NSString * const kCargoBayProductionReceiptVerificationURLString;
+
 extern NSString * const CargoBayErrorDomain;
 
 NS_ENUM(NSInteger, CargoBayStatusCode) {
