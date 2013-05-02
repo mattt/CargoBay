@@ -1078,8 +1078,6 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
 
 #if __has_feature(objc_arc_weak)
     __weak __typeof(&*self)weakSelf = self;
-#else
-    __unsafe_unretained __typeof(&*self)weakSelf = self;
 #endif
 
     _success = [^(NSArray *products, NSArray *invalidIdentifiers) {
@@ -1087,7 +1085,9 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
             success(products, invalidIdentifiers);
         }
 
+#if __has_feature(objc_arc_weak)
         [[weakSelf class] unregisterDelegate:weakSelf];
+#endif
     } copy];
     
     _failure = [^(NSError *error) {
@@ -1095,7 +1095,9 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
             failure(error);
         }
         
+#if __has_feature(objc_arc_weak)
         [[weakSelf class] unregisterDelegate:weakSelf];
+#endif
     } copy];
     
     
@@ -1107,9 +1109,19 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
 - (void)request:(SKRequest *)request
 didFailWithError:(NSError *)error
 {
+#if !__has_feature(objc_arc_weak)
+    [[self class] unregisterDelegate:self];
+#endif
     if (_failure) {
         _failure(error);
     }    
+}
+
+- (void)requestDidFinish:(SKRequest *)request
+{
+#if !__has_feature(objc_arc_weak)
+    [[self class] unregisterDelegate:self];
+#endif
 }
 
 #pragma mark - SKProductsRequestDelegate
