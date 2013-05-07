@@ -244,23 +244,6 @@ BOOL CBValidatePurchaseInfoMatchesReceiptForDevice(NSDictionary *purchaseInfo, N
             }
         }
 #endif
-    } else if ([[UIDevice currentDevice] respondsToSelector:NSSelectorFromString(@"uniqueIdentifier")]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        NSString *deviceIdentifier = [[UIDevice currentDevice] uniqueIdentifier];
-#pragma clang diagnostic pop
-        NSString *transactionUniqueIdentifier = [purchaseInfo objectForKey:@"unique-identifier"];
-        NSString *receiptUniqueIdentifier = [receipt objectForKey:@"unique_identifier"];
-        if (![transactionUniqueIdentifier isEqual:receiptUniqueIdentifier] || ![transactionUniqueIdentifier isEqual:deviceIdentifier]) {
-            if (error != NULL) {
-                NSDictionary *userInfo = [NSMutableDictionary dictionary];
-                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Purchase info does not match receipt because device's unique identifier (%@) does not match purchase info's (%@) and receipt's unique identifier (%@).", @"CargoBay", nil), deviceIdentifier, transactionUniqueIdentifier, receiptUniqueIdentifier] forKey:NSLocalizedDescriptionKey];
-                [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Device's unique identifier (%@) does not match purchase info's (%@) and receipt's unique identifier (%@).", @"CargoBay", nil), deviceIdentifier, transactionUniqueIdentifier, receiptUniqueIdentifier] forKey:NSLocalizedFailureReasonErrorKey];
-                *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorPurchaseInfoDoesNotMatchReceipt userInfo:userInfo];
-            }
-            
-            return NO;
-        }
     }
 
     return YES;
