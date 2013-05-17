@@ -579,14 +579,7 @@ _out:
 
 NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptData, NSError * __autoreleasing *error) {
     NSDictionary *transactionReceiptDictionary = [NSPropertyListSerialization propertyListWithData:transactionReceiptData options:NSPropertyListImmutable format:nil error:error];
-    if (!transactionReceiptDictionary) {
-        return nil;
-    }
-
-    // Fixes crash in iOS 5.1.1 (not sure if crash provoked by people trying to crack IAP
-    // or it is a legitimate iOS 5.1.1 crash). In any case CargoBay should just fail
-    // verification and not crash.
-    if ( ![transactionReceiptDictionary respondsToSelector:@selector(objectForKey:)] ) {
+    if (!transactionReceiptDictionary || ![transactionReceiptDictionary respondsToSelector:@selector(objectForKey:)]) {
         return nil;
     }
 
