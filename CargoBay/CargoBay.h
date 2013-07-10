@@ -219,7 +219,7 @@ extern NSString * const kCargoBayProductionReceiptVerificationURLString;
 
 extern NSString * const CargoBayErrorDomain;
 
-NS_ENUM(NSInteger, CargoBayStatusCode) {
+typedef NS_ENUM(NSInteger, CargoBayStatusCode) {
     CargoBayStatusOK = 0,
 
     CargoBayStatusCannotParseJSON = 21000,
