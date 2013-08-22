@@ -871,15 +871,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
         }
     }];
 
-#ifndef _AFNETWORKING_PIN_SSL_CERTIFICATES_
-    [requestOperation setAuthenticationAgainstProtectionSpaceBlock:^BOOL(NSURLConnection *connection, NSURLProtectionSpace *protectionSpace) {
-        return [[protectionSpace authenticationMethod] isEqual:NSURLAuthenticationMethodServerTrust];
-    }];
-
-    [requestOperation setAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
-#else
-    [requestOperation setWillSendRequestForAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge){
-#endif
+    [requestOperation setWillSendRequestForAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
         if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust]) {
             SecTrustRef trust = [[challenge protectionSpace] serverTrust];
             NSError *error = nil;
