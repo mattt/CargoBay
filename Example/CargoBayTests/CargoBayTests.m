@@ -143,19 +143,10 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
 
 @implementation CargoBayTests
 
-#pragma mark - Helper methods
-
-// https://gist.github.com/2586763
 - (void)dispatchSemaphoreInBlock:(void (^)(void (^resume)(void)))block {
-    if ([[[UIDevice currentDevice] systemVersion] compare:@"5.1" options:NSNumericSearch] == NSOrderedDescending) {
-        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-        block(^{ dispatch_semaphore_signal(semaphore); });
-        while (dispatch_semaphore_wait(semaphore, DISPATCH_TIME_NOW)) {
-            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-        }
-    } else { // iOS 5.1 and below seems to have problem with dispatch semaphore in unit tests using Xcode 4.5.2. You will need to test this portion with iOS 6 or greater.
-        NSLog(@"WARNING: iOS 5.1 and below seems to have problem with dispatch semaphore in unit tests using Xcode 4.5.2. You will need to test this portion with iOS 6 or greater.");
-    }
+    __block BOOL keepRunning = YES;
+    block(^{ keepRunning = NO; });
+    while (keepRunning && [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.03]]) {}
 }
 
 #pragma mark -
@@ -240,15 +231,11 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             resume();
         }];
         
-        [operation setAuthenticationAgainstProtectionSpaceBlock:^BOOL(NSURLConnection *connection, NSURLProtectionSpace *protectionSpace) {
-            return [[protectionSpace authenticationMethod] isEqual:NSURLAuthenticationMethodServerTrust];
-        }];
-        
-        [operation setAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
+        [operation setWillSendRequestForAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
             if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust]) {
                 SecTrustRef trust = [[challenge protectionSpace] serverTrust];
                 NSError *error = nil;
-                
+
                 BOOL didUseCredential = NO;
                 BOOL isTrusted = [CargoBay _validateTrust:trust error:&error];
                 STAssertTrue(isTrusted, @"The result should be true.");
@@ -259,7 +246,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
                         didUseCredential = YES;
                     }
                 }
-                
+
                 if (!didUseCredential) {
                     [[challenge sender] cancelAuthenticationChallenge:challenge];
                 }
@@ -283,11 +270,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             resume();
         }];
         
-        [operation setAuthenticationAgainstProtectionSpaceBlock:^BOOL(NSURLConnection *connection, NSURLProtectionSpace *protectionSpace) {
-            return [[protectionSpace authenticationMethod] isEqual:NSURLAuthenticationMethodServerTrust];
-        }];
-        
-        [operation setAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
+        [operation setWillSendRequestForAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
             if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust]) {
                 SecTrustRef trust = [[challenge protectionSpace] serverTrust];
                 NSError *error = nil;
