@@ -615,7 +615,6 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 }
 
 + (void)registerDelegate:(CargoBayProductRequestDelegate *)delegate;
-+ (void)unregisterDelegate:(CargoBayProductRequestDelegate *)delegate;
 
 - (id)initWithSuccess:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
               failure:(void (^)(NSError *error))failure;
@@ -1032,16 +1031,16 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
 #pragma mark -
 
 @interface CargoBayProductRequestDelegate ()
-+ (NSMutableSet *)registeredDelegates;
++ (NSHashTable *)registeredDelegates;
 @end
 
 @implementation CargoBayProductRequestDelegate
 
-+ (NSMutableSet *)registeredDelegates {
-    static NSMutableSet *_mutableRegisteredDelegates = nil;
++ (NSHashTable *)registeredDelegates {
+    static NSHashTable *_mutableRegisteredDelegates = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _mutableRegisteredDelegates = [[NSMutableSet alloc] init];
+        _mutableRegisteredDelegates = [NSHashTable weakObjectsHashTable];
     });
 
     return _mutableRegisteredDelegates;
@@ -1049,10 +1048,6 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
 
 + (void)registerDelegate:(CargoBayProductRequestDelegate *)delegate {
     [[self registeredDelegates] addObject:delegate];
-}
-
-+ (void)unregisterDelegate:(CargoBayProductRequestDelegate *)delegate {
-    [[self registeredDelegates] removeObject:delegate];
 }
 
 - (id)initWithSuccess:(void (^)(NSArray *, NSArray *))success
@@ -1063,28 +1058,16 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
         return nil;
     }
 
-#if __has_feature(objc_arc_weak)
-    __weak __typeof(&*self)weakSelf = self;
-#endif
-
     _success = [^(NSArray *products, NSArray *invalidIdentifiers) {
         if (success) {
             success(products, invalidIdentifiers);
         }
-
-#if __has_feature(objc_arc_weak)
-        [[weakSelf class] unregisterDelegate:weakSelf];
-#endif
     } copy];
     
     _failure = [^(NSError *error) {
         if (failure) {
             failure(error);
         }
-        
-#if __has_feature(objc_arc_weak)
-        [[weakSelf class] unregisterDelegate:weakSelf];
-#endif
     } copy];
     
     
@@ -1096,19 +1079,9 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
 - (void)request:(SKRequest *)request
 didFailWithError:(NSError *)error
 {
-#if !__has_feature(objc_arc_weak)
-    [[self class] unregisterDelegate:self];
-#endif
     if (_failure) {
         _failure(error);
     }    
-}
-
-- (void)requestDidFinish:(SKRequest *)request
-{
-#if !__has_feature(objc_arc_weak)
-    [[self class] unregisterDelegate:self];
-#endif
 }
 
 #pragma mark - SKProductsRequestDelegate
