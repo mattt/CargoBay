@@ -833,31 +833,24 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
     }
 }
 
-- (void) testProductInvalidIdentifier;
-{
-    
-    
+- (void)testProductInvalidIdentifier {
     [self dispatchSemaphoreInBlock:^(void (^resume)(void)) {
-
-        NSString *productid = @"invalid";
-        NSSet *itemSet = [NSSet setWithObject:productid];
+        NSString *productID = @"invalid";
+        NSSet *itemSet = [NSSet setWithObject:productID];
 
         [[CargoBay sharedManager] productsWithIdentifiers:itemSet success:^(NSArray *products, NSArray *invalidIdentifiers) {
-            
             STAssertNotNil(invalidIdentifiers, @"Expected set of invalid ids.");
             STAssertTrue([invalidIdentifiers count] == 1, @"Expected one invalid id.");
 
             NSString *invalidid = [invalidIdentifiers lastObject];
             STAssertNotNil(invalidid, @"Expected invalid id to be defined.");
-            STAssertTrue([invalidid isEqualToString:productid], @"Expected invalid id to be the same as the product id");
+            STAssertTrue([invalidid isEqualToString:productID], @"Expected invalid id to be the same as the product id");
             resume();
         } failure:^(NSError *error) {
             STFail(@"The request should not fail.");
             resume();
         }];
     }];
-    
-
 }
 
 @end
