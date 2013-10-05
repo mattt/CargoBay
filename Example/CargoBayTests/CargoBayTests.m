@@ -222,10 +222,10 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
     // https://buy.itunes.apple.com/ have extended validation (EV) certificate.
     [self dispatchSemaphoreInBlock:^(void (^resume)(void)) {
         AFHTTPRequestOperationManager *manager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:[NSURL URLWithString:@"https://buy.itunes.apple.com/"]];
-		manager.requestSerializer  = [AFHTTPRequestSerializer  serializer];
-		manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+        manager.requestSerializer  = [AFHTTPRequestSerializer  serializer];
+        manager.responseSerializer = [AFHTTPResponseSerializer serializer];
         
-		NSURL *url = [NSURL URLWithString:@"" relativeToURL:manager.baseURL];
+        NSURL *url = [NSURL URLWithString:@"" relativeToURL:manager.baseURL];
         NSURLRequest *request = [manager.requestSerializer requestWithMethod:@"GET" URLString:url.absoluteString parameters:nil];
         AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
             resume();
@@ -265,7 +265,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
     [self dispatchSemaphoreInBlock:^(void (^resume)(void)) {
         AFHTTPRequestOperationManager *manager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:[NSURL URLWithString:@"https://www.apple.com/"]];
         
-		NSURL *url = [NSURL URLWithString:@"" relativeToURL:manager.baseURL];
+        NSURL *url = [NSURL URLWithString:@"" relativeToURL:manager.baseURL];
         NSURLRequest *request = [manager.requestSerializer requestWithMethod:@"GET" URLString:url.absoluteString parameters:nil];
         AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
             STFail(@"The network operation should not be able to succeed.");
