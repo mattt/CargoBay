@@ -22,12 +22,7 @@
 
 #import <Foundation/Foundation.h>
 #import <StoreKit/StoreKit.h>
-
-#import <Availability.h>
-
-#ifndef _SECURITY_SECBASE_H_
-#warning Security framework not found in project, or not included in precompiled header. Server trust validation on receipt verifications will not be available.
-#endif
+#import <Security/Security.h>
 
 /**
  `CargoBay` provides a convenient block-based API to StoreKit functionality, as well as advanced functionality like receipt and transaction verification and external product information querying.

@@ -363,6 +363,9 @@ BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *transaction,
 
 BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureString, NSDate *purchaseDate) {
 #ifdef _SECURITY_SECBASE_H_
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     BOOL isValid = NO;
     SecCertificateRef leaf = NULL;
     SecCertificateRef intermediate = NULL;
@@ -538,7 +541,7 @@ BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureStr
 
         CC_SHA1_Init(&SHA1Context);
         CC_SHA1_Update(&SHA1Context, &signatureBlob->_receiptVersion, sizeof(signatureBlob->_receiptVersion));
-        CC_SHA1_Update(&SHA1Context, purchaseInfoBytes, purchaseInfoLength);
+        CC_SHA1_Update(&SHA1Context, purchaseInfoBytes, (CC_LONG)purchaseInfoLength);
         CC_SHA1_Final(dataToBeVerified, &SHA1Context);
 
         SecKeyRef receiptSigningKey = SecTrustCopyPublicKey(trust);
@@ -570,6 +573,7 @@ _out:
     }
 
     return isValid;
+#pragma clang diagnostic pop
 #else
     return YES;
 #endif
