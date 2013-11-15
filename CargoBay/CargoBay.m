@@ -46,6 +46,7 @@ extern NSDate * CBDateFromDateString(NSString *string);
 extern NSString * CBBase64EncodedStringFromData(NSData *);
 extern NSData * CBDataFromBase64EncodedString(NSString *);
 extern BOOL CBValidateTrust(SecTrustRef, NSError * __autoreleasing *);
+extern BOOL CBValidatePurchaseInfoMatchesReceiptForDevice(NSDictionary *purchaseInfo, NSDictionary *receipt, __unused NSError * __autoreleasing *error);
 extern BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *, NSDictionary *, NSError * __autoreleasing *);
 extern BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *, NSDictionary *, NSError * __autoreleasing *);
 extern BOOL CBCheckReceiptSecurity(NSString *, NSString *, NSDate *);
@@ -56,7 +57,7 @@ NSDate * CBDateFromDateString(NSString *string) {
         return nil;
     }
 
-    NSString* dateString = [string stringByReplacingOccurrencesOfString:@"Etc/" withString:@""];
+    NSString *dateString = [string stringByReplacingOccurrencesOfString:@"Etc/" withString:@""];
 
     static NSDateFormatter *_dateFormatter = nil;
     static dispatch_once_t onceToken;
@@ -222,7 +223,7 @@ BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSDictiona
     return YES;
 }
 
-BOOL CBValidatePurchaseInfoMatchesReceiptForDevice(NSDictionary *purchaseInfo, NSDictionary *receipt, NSError * __autoreleasing *error) {
+BOOL CBValidatePurchaseInfoMatchesReceiptForDevice(NSDictionary *purchaseInfo, NSDictionary *receipt, __unused NSError * __autoreleasing *error) {
     if ([[UIDevice currentDevice] respondsToSelector:NSSelectorFromString(@"identifierForVendor")]) {
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_5_1)
         NSString *deviceIdentifier = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
@@ -684,11 +685,11 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     [request start];
 }
 
-- (void)productsWithRequest:(NSURLRequest *)request
+- (void)productsWithRequest:(NSURLRequest *)urlRequest
                     success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
                     failure:(void (^)(NSError *error))failure
 {
-    [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+    [AFJSONRequestOperation JSONRequestOperationWithRequest:urlRequest success:^(__unused NSURLRequest *request, __unused NSHTTPURLResponse *response, id JSON) {
         if (JSON && [JSON isKindOfClass:[NSArray class]]) {
             [self productsWithIdentifiers:[NSSet setWithArray:JSON] success:success failure:failure];
         } else {
@@ -700,7 +701,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
                 failure(error);
             }
         }
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+    } failure:^(__unused NSURLRequest *request, __unused NSHTTPURLResponse *response, NSError *error, __unused id JSON) {
         if (failure) {
             failure(error);
         }
@@ -774,7 +775,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     }
 
     NSURLRequest *request = [client requestWithMethod:method path:[url path] parameters:parameters];
-    AFHTTPRequestOperation *requestOperation = [client HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    AFHTTPRequestOperation *requestOperation = [client HTTPRequestOperationWithRequest:request success:^(__unused AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
 
         switch (status) {
@@ -866,13 +867,13 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
                 }
                 break;
         }
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    } failure:^(__unused AFHTTPRequestOperation *operation, NSError *error) {
         if (failure) {
             failure(error);
         }
     }];
 
-    [requestOperation setWillSendRequestForAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
+    [requestOperation setWillSendRequestForAuthenticationChallengeBlock:^(__unused NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
         if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust]) {
             SecTrustRef trust = [[challenge protectionSpace] serverTrust];
             NSError *error = nil;
@@ -1065,7 +1066,8 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
         }
 
 #if __has_feature(objc_arc_weak)
-        [[weakSelf class] unregisterDelegate:weakSelf];
+        __strong __typeof(&*weakSelf)strongSelf = weakSelf;
+        [[strongSelf class] unregisterDelegate:strongSelf];
 #endif
     } copy];
     
@@ -1075,7 +1077,8 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
         }
         
 #if __has_feature(objc_arc_weak)
-        [[weakSelf class] unregisterDelegate:weakSelf];
+        __strong __typeof(&*weakSelf)strongSelf = weakSelf;
+        [[strongSelf class] unregisterDelegate:strongSelf];
 #endif
     } copy];
     
@@ -1085,7 +1088,7 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
 
 #pragma mark - SKRequestDelegate
 
-- (void)request:(SKRequest *)request
+- (void)request:(__unused SKRequest *)request
 didFailWithError:(NSError *)error
 {
 #if !__has_feature(objc_arc_weak)
@@ -1096,8 +1099,7 @@ didFailWithError:(NSError *)error
     }    
 }
 
-- (void)requestDidFinish:(SKRequest *)request
-{
+- (void)requestDidFinish:(__unused SKRequest *)request {
 #if !__has_feature(objc_arc_weak)
     [[self class] unregisterDelegate:self];
 #endif
@@ -1105,7 +1107,7 @@ didFailWithError:(NSError *)error
 
 #pragma mark - SKProductsRequestDelegate
 
-- (void)productsRequest:(SKProductsRequest *)request
+- (void)productsRequest:(__unused SKProductsRequest *)request
      didReceiveResponse:(SKProductsResponse *)response
 {
     if (_success) {
