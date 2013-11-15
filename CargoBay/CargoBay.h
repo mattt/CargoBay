@@ -91,7 +91,7 @@
  @param transaction The transaction to be verified.
  @param passwordOrNil The password associated with the transaction if the transaction was for an auto-renewable subscription, or `nil`.
  @param success A block object to be executed when the verification finishes successfully. This block has no return value and takes a single argument: the receipt details of the transaction.
- @param error A block object to be executed when the verification fails or finishes unsuccessfully. This block has no return value and takes a single argument: the error that caused the request to fail.
+ @param failure A block object to be executed when the verification fails or finishes unsuccessfully. This block has no return value and takes a single argument: the error that caused the request to fail.
  
  @see -verifyTransactionReceipt:password:success:failure:
  */
@@ -112,10 +112,10 @@
 /**
  Verifies a transaction receipt with the App Store.
 
- @param receipt The receipt to be verified.
+ @param transactionReceipt The receipt to be verified.
  @param passwordOrNil The password associated with the transaction if the transaction was for an auto-renewable subscription, or `nil`.
  @param success A block object to be executed when the verification finishes successfully. This block has no return value and takes a single argument: the receipt details of the transaction.
- @param error A block object to be executed when the verification fails or finishes unsuccessfully. This block has no return value and takes a single argument: the error that caused the request to fail.
+ @param failure A block object to be executed when the verification fails or finishes unsuccessfully. This block has no return value and takes a single argument: the error that caused the request to fail.
  */
 - (void)verifyTransactionReceipt:(NSData *)transactionReceipt
                         password:(NSString *)passwordOrNil
@@ -125,15 +125,15 @@
 /**
  Verifies a transaction receipt with a custom webservice endpoint.
 
- @param receipt The receipt to be verified.
+ @param transactionReceipt The receipt to be verified.
  @param method The HTTP method of the URL request.
  @param endpoint The URL endpoint of the webservice
- @param passwordOrNil The password associated with the transaction if the transaction was for an auto-renewable subscription, or `nil`.
+ @param password The password associated with the transaction if the transaction was for an auto-renewable subscription, or `nil`.
  @param success A block object to be executed when the verification finishes successfully. This block has no return value and takes a single argument: the receipt details of the transaction.
- @param error A block object to be executed when the verification fails or finishes unsuccessfully. This block has no return value and takes a single argument: the error that caused the request to fail.
+ @param failure A block object to be executed when the verification fails or finishes unsuccessfully. This block has no return value and takes a single argument: the error that caused the request to fail.
  */
 - (void)verifyTransactionWithMethod:(NSString *)method
-                           endpoint:(NSURL *)url
+                           endpoint:(NSURL *)endpoint
                             receipt:(NSData *)transactionReceipt
                            password:(NSString *)password
                             success:(void (^)(NSDictionary *responseObject))success
@@ -161,7 +161,7 @@
  Sets a block to be called when the payment queue has finished sending restored transactions
  
  @param success A block object to be executed when the payment queue has finished sending restored transactions. The block has no return value and takes a single argument: the notifying payment queue.
- @param success A block object to be executed when an error occurred while restoring transactions. The block has no return value and takes two arguments: the notifying payment queue and the error that occurred.
+ @param failure A block object to be executed when an error occurred while restoring transactions. The block has no return value and takes two arguments: the notifying payment queue and the error that occurred.
  */
 - (void)setPaymentQueueRestoreCompletedTransactionsWithSuccess:(void (^)(SKPaymentQueue *queue))success
                                                        failure:(void (^)(SKPaymentQueue *queue, NSError *error))failure;
