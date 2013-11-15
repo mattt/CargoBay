@@ -48,13 +48,13 @@
 @end
 
 @interface CargoBay (Private) <_CargoBay>
-@property (readwrite, nonatomic, strong) AFHTTPClient *sandboxReceiptVerificationClient;
-@property (readwrite, nonatomic, strong) AFHTTPClient *productionReceiptVerificationClient;
+@property (readwrite, nonatomic, strong) AFHTTPRequestOperationManager *sandboxReceiptVerificationOperationManager;
+@property (readwrite, nonatomic, strong) AFHTTPRequestOperationManager *productionReceiptVerificationOperationManager;
 @end
 
 @implementation CargoBay (Private)
-@dynamic sandboxReceiptVerificationClient;
-@dynamic productionReceiptVerificationClient;
+@dynamic sandboxReceiptVerificationOperationManager;
+@dynamic productionReceiptVerificationOperationManager;
 
 extern NSString * CBBase64EncodedStringFromData(NSData *);
 extern NSData * CBDataFromBase64EncodedString(NSString *);
@@ -221,10 +221,13 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
 - (void)testValidateTrust {
     // https://buy.itunes.apple.com/ have extended validation (EV) certificate.
     [self dispatchSemaphoreInBlock:^(void (^resume)(void)) {
-        AFHTTPClient *client = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:@"https://buy.itunes.apple.com/"]];
+        AFHTTPRequestOperationManager *manager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:[NSURL URLWithString:@"https://buy.itunes.apple.com/"]];
+        manager.requestSerializer  = [AFHTTPRequestSerializer  serializer];
+        manager.responseSerializer = [AFHTTPResponseSerializer serializer];
         
-        NSURLRequest *request = [client requestWithMethod:@"GET" path:@"" parameters:nil];
-        AFHTTPRequestOperation *operation = [client HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSURL *url = [NSURL URLWithString:@"" relativeToURL:manager.baseURL];
+        NSURLRequest *request = [manager.requestSerializer requestWithMethod:@"GET" URLString:url.absoluteString parameters:nil];
+        AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
             resume();
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             STFail(@"The network operation should not fail.");
@@ -255,15 +258,16 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             }
         }];
         
-        [client enqueueHTTPRequestOperation:operation];
+        [manager.operationQueue addOperation:operation];
     }];
     
     // https://www.apple.com/ does not have extended validation (EV) certificate.
     [self dispatchSemaphoreInBlock:^(void (^resume)(void)) {
-        AFHTTPClient *client = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:@"https://www.apple.com/"]];
+        AFHTTPRequestOperationManager *manager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:[NSURL URLWithString:@"https://www.apple.com/"]];
         
-        NSURLRequest *request = [client requestWithMethod:@"GET" path:@"" parameters:nil];
-        AFHTTPRequestOperation *operation = [client HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSURL *url = [NSURL URLWithString:@"" relativeToURL:manager.baseURL];
+        NSURLRequest *request = [manager.requestSerializer requestWithMethod:@"GET" URLString:url.absoluteString parameters:nil];
+        AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
             STFail(@"The network operation should not be able to succeed.");
             resume();
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -294,7 +298,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             }
         }];
         
-        [client enqueueHTTPRequestOperation:operation];
+        [manager.operationQueue addOperation:operation];
     }];
 }
 
