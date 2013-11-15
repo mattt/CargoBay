@@ -12,6 +12,9 @@
       </FileRef>
    </Group>
    <FileRef
-      location = "group:Example/CargoBay.xcodeproj">
+      location = "group:Example/CargoBay (iOS).xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Example/CargoBay (OS X).xcodeproj">
    </FileRef>
 </Workspace>

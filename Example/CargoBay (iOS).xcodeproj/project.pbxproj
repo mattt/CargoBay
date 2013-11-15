@@ -152,7 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				F84068531693676700B4966B /* Default-568h@2x.png */,
-				F853B17D15FD71A100D5AC59 /* CargoBay Example */,
+				F853B17D15FD71A100D5AC59 /* Example */,
 				AB0E582E167B159500B52560 /* CargoBay Tests */,
 				F853B17615FD71A100D5AC59 /* Frameworks */,
 				F853B17415FD71A100D5AC59 /* Products */,
@@ -184,7 +184,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		F853B17D15FD71A100D5AC59 /* CargoBay Example */ = {
+		F853B17D15FD71A100D5AC59 /* Example */ = {
 			isa = PBXGroup;
 			children = (
 				F8AA37D615FD71F800C21309 /* AppDelegate.h */,
@@ -193,7 +193,7 @@
 				F8AA37E015FD71F800C21309 /* ViewController.m */,
 				F8AA37E815FD720300C21309 /* Supporting Files */,
 			);
-			name = "CargoBay Example";
+			name = Example;
 			path = CargoBay;
 			sourceTree = "<group>";
 		};
@@ -311,7 +311,7 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Mattt Thompson";
 			};
-			buildConfigurationList = F853B16D15FD71A100D5AC59 /* Build configuration list for PBXProject "CargoBay" */;
+			buildConfigurationList = F853B16D15FD71A100D5AC59 /* Build configuration list for PBXProject "CargoBay (iOS)" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -625,7 +625,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F853B16D15FD71A100D5AC59 /* Build configuration list for PBXProject "CargoBay" */ = {
+		F853B16D15FD71A100D5AC59 /* Build configuration list for PBXProject "CargoBay (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F853B18F15FD71A200D5AC59 /* Debug */,

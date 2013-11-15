@@ -1,0 +1,365 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F85305AA1836D53500A77485 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F85305A91836D53500A77485 /* Foundation.framework */; };
+		F85305AD1836D53500A77485 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F85305AC1836D53500A77485 /* main.m */; };
+		F85305BB1836D55600A77485 /* CargoBay.m in Sources */ = {isa = PBXBuildFile; fileRef = F85305BA1836D55600A77485 /* CargoBay.m */; };
+		F85305D01836D56F00A77485 /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F85305BE1836D56F00A77485 /* AFHTTPRequestOperation.m */; };
+		F85305D11836D56F00A77485 /* AFHTTPRequestOperationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F85305C01836D56F00A77485 /* AFHTTPRequestOperationManager.m */; };
+		F85305D21836D56F00A77485 /* AFHTTPSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F85305C21836D56F00A77485 /* AFHTTPSessionManager.m */; };
+		F85305D31836D56F00A77485 /* AFNetworkReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F85305C51836D56F00A77485 /* AFNetworkReachabilityManager.m */; };
+		F85305D41836D56F00A77485 /* AFSecurityPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = F85305C71836D56F00A77485 /* AFSecurityPolicy.m */; };
+		F85305D51836D56F00A77485 /* AFURLConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = F85305C91836D56F00A77485 /* AFURLConnectionOperation.m */; };
+		F85305D61836D56F00A77485 /* AFURLRequestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = F85305CB1836D56F00A77485 /* AFURLRequestSerialization.m */; };
+		F85305D71836D56F00A77485 /* AFURLResponseSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = F85305CD1836D56F00A77485 /* AFURLResponseSerialization.m */; };
+		F85305D81836D56F00A77485 /* AFURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F85305CF1836D56F00A77485 /* AFURLSessionManager.m */; };
+		F85305DA1836D60B00A77485 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F85305D91836D60B00A77485 /* Security.framework */; };
+		F85305DC1836D61900A77485 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F85305DB1836D61900A77485 /* SystemConfiguration.framework */; };
+		F85305E01836D63A00A77485 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F85305DF1836D63A00A77485 /* CoreServices.framework */; };
+		F85305E31836D65B00A77485 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F85305E11836D64400A77485 /* Cocoa.framework */; };
+		F85305E51836D66B00A77485 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F85305E41836D66B00A77485 /* StoreKit.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F85305A41836D53500A77485 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		F85305A61836D53500A77485 /* CargoBay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CargoBay; sourceTree = BUILT_PRODUCTS_DIR; };
+		F85305A91836D53500A77485 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		F85305AC1836D53500A77485 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ../main.m; sourceTree = "<group>"; };
+		F85305AF1836D53500A77485 /* Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Prefix.pch; path = ../Prefix.pch; sourceTree = "<group>"; };
+		F85305B91836D55600A77485 /* CargoBay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CargoBay.h; path = CargoBay/CargoBay.h; sourceTree = "<group>"; };
+		F85305BA1836D55600A77485 /* CargoBay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CargoBay.m; path = CargoBay/CargoBay.m; sourceTree = "<group>"; };
+		F85305BD1836D56F00A77485 /* AFHTTPRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperation.h; sourceTree = "<group>"; };
+		F85305BE1836D56F00A77485 /* AFHTTPRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFHTTPRequestOperation.m; sourceTree = "<group>"; };
+		F85305BF1836D56F00A77485 /* AFHTTPRequestOperationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperationManager.h; sourceTree = "<group>"; };
+		F85305C01836D56F00A77485 /* AFHTTPRequestOperationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFHTTPRequestOperationManager.m; sourceTree = "<group>"; };
+		F85305C11836D56F00A77485 /* AFHTTPSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPSessionManager.h; sourceTree = "<group>"; };
+		F85305C21836D56F00A77485 /* AFHTTPSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFHTTPSessionManager.m; sourceTree = "<group>"; };
+		F85305C31836D56F00A77485 /* AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFNetworking.h; sourceTree = "<group>"; };
+		F85305C41836D56F00A77485 /* AFNetworkReachabilityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFNetworkReachabilityManager.h; sourceTree = "<group>"; };
+		F85305C51836D56F00A77485 /* AFNetworkReachabilityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFNetworkReachabilityManager.m; sourceTree = "<group>"; };
+		F85305C61836D56F00A77485 /* AFSecurityPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFSecurityPolicy.h; sourceTree = "<group>"; };
+		F85305C71836D56F00A77485 /* AFSecurityPolicy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFSecurityPolicy.m; sourceTree = "<group>"; };
+		F85305C81836D56F00A77485 /* AFURLConnectionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFURLConnectionOperation.h; sourceTree = "<group>"; };
+		F85305C91836D56F00A77485 /* AFURLConnectionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLConnectionOperation.m; sourceTree = "<group>"; };
+		F85305CA1836D56F00A77485 /* AFURLRequestSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFURLRequestSerialization.h; sourceTree = "<group>"; };
+		F85305CB1836D56F00A77485 /* AFURLRequestSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLRequestSerialization.m; sourceTree = "<group>"; };
+		F85305CC1836D56F00A77485 /* AFURLResponseSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFURLResponseSerialization.h; sourceTree = "<group>"; };
+		F85305CD1836D56F00A77485 /* AFURLResponseSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLResponseSerialization.m; sourceTree = "<group>"; };
+		F85305CE1836D56F00A77485 /* AFURLSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFURLSessionManager.h; sourceTree = "<group>"; };
+		F85305CF1836D56F00A77485 /* AFURLSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLSessionManager.m; sourceTree = "<group>"; };
+		F85305D91836D60B00A77485 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		F85305DB1836D61900A77485 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		F85305DD1836D62E00A77485 /* SecurityFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityFoundation.framework; path = System/Library/Frameworks/SecurityFoundation.framework; sourceTree = SDKROOT; };
+		F85305DF1836D63A00A77485 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
+		F85305E11836D64400A77485 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		F85305E41836D66B00A77485 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F85305A31836D53500A77485 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F85305E51836D66B00A77485 /* StoreKit.framework in Frameworks */,
+				F85305E31836D65B00A77485 /* Cocoa.framework in Frameworks */,
+				F85305E01836D63A00A77485 /* CoreServices.framework in Frameworks */,
+				F85305DC1836D61900A77485 /* SystemConfiguration.framework in Frameworks */,
+				F85305DA1836D60B00A77485 /* Security.framework in Frameworks */,
+				F85305AA1836D53500A77485 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F853059D1836D53500A77485 = {
+			isa = PBXGroup;
+			children = (
+				F85305AB1836D53500A77485 /* CargoBay */,
+				F85305A81836D53500A77485 /* Frameworks */,
+				F85305A71836D53500A77485 /* Products */,
+				F85305B71836D54700A77485 /* Vendor */,
+			);
+			sourceTree = "<group>";
+		};
+		F85305A71836D53500A77485 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F85305A61836D53500A77485 /* CargoBay */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F85305A81836D53500A77485 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F85305E41836D66B00A77485 /* StoreKit.framework */,
+				F85305E11836D64400A77485 /* Cocoa.framework */,
+				F85305DF1836D63A00A77485 /* CoreServices.framework */,
+				F85305DD1836D62E00A77485 /* SecurityFoundation.framework */,
+				F85305DB1836D61900A77485 /* SystemConfiguration.framework */,
+				F85305D91836D60B00A77485 /* Security.framework */,
+				F85305A91836D53500A77485 /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F85305AB1836D53500A77485 /* CargoBay */ = {
+			isa = PBXGroup;
+			children = (
+				F85305AC1836D53500A77485 /* main.m */,
+				F85305AE1836D53500A77485 /* Supporting Files */,
+			);
+			path = CargoBay;
+			sourceTree = "<group>";
+		};
+		F85305AE1836D53500A77485 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F85305AF1836D53500A77485 /* Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F85305B71836D54700A77485 /* Vendor */ = {
+			isa = PBXGroup;
+			children = (
+				F85305BC1836D56F00A77485 /* AFNetworking */,
+				F85305B81836D55600A77485 /* CargoBay */,
+			);
+			name = Vendor;
+			sourceTree = "<group>";
+		};
+		F85305B81836D55600A77485 /* CargoBay */ = {
+			isa = PBXGroup;
+			children = (
+				F85305B91836D55600A77485 /* CargoBay.h */,
+				F85305BA1836D55600A77485 /* CargoBay.m */,
+			);
+			name = CargoBay;
+			path = ../../CargoBay;
+			sourceTree = "<group>";
+		};
+		F85305BC1836D56F00A77485 /* AFNetworking */ = {
+			isa = PBXGroup;
+			children = (
+				F85305BD1836D56F00A77485 /* AFHTTPRequestOperation.h */,
+				F85305BE1836D56F00A77485 /* AFHTTPRequestOperation.m */,
+				F85305BF1836D56F00A77485 /* AFHTTPRequestOperationManager.h */,
+				F85305C01836D56F00A77485 /* AFHTTPRequestOperationManager.m */,
+				F85305C11836D56F00A77485 /* AFHTTPSessionManager.h */,
+				F85305C21836D56F00A77485 /* AFHTTPSessionManager.m */,
+				F85305C31836D56F00A77485 /* AFNetworking.h */,
+				F85305C41836D56F00A77485 /* AFNetworkReachabilityManager.h */,
+				F85305C51836D56F00A77485 /* AFNetworkReachabilityManager.m */,
+				F85305C61836D56F00A77485 /* AFSecurityPolicy.h */,
+				F85305C71836D56F00A77485 /* AFSecurityPolicy.m */,
+				F85305C81836D56F00A77485 /* AFURLConnectionOperation.h */,
+				F85305C91836D56F00A77485 /* AFURLConnectionOperation.m */,
+				F85305CA1836D56F00A77485 /* AFURLRequestSerialization.h */,
+				F85305CB1836D56F00A77485 /* AFURLRequestSerialization.m */,
+				F85305CC1836D56F00A77485 /* AFURLResponseSerialization.h */,
+				F85305CD1836D56F00A77485 /* AFURLResponseSerialization.m */,
+				F85305CE1836D56F00A77485 /* AFURLSessionManager.h */,
+				F85305CF1836D56F00A77485 /* AFURLSessionManager.m */,
+			);
+			name = AFNetworking;
+			path = ../../AFNetworking/AFNetworking;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F85305A51836D53500A77485 /* CargoBay */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F85305B41836D53500A77485 /* Build configuration list for PBXNativeTarget "CargoBay" */;
+			buildPhases = (
+				F85305A21836D53500A77485 /* Sources */,
+				F85305A31836D53500A77485 /* Frameworks */,
+				F85305A41836D53500A77485 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CargoBay;
+			productName = CargoBay;
+			productReference = F85305A61836D53500A77485 /* CargoBay */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F853059E1836D53500A77485 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = "Mattt Thompson";
+			};
+			buildConfigurationList = F85305A11836D53500A77485 /* Build configuration list for PBXProject "CargoBay (OS X)" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F853059D1836D53500A77485;
+			productRefGroup = F85305A71836D53500A77485 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F85305A51836D53500A77485 /* CargoBay */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F85305A21836D53500A77485 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F85305D61836D56F00A77485 /* AFURLRequestSerialization.m in Sources */,
+				F85305D51836D56F00A77485 /* AFURLConnectionOperation.m in Sources */,
+				F85305D41836D56F00A77485 /* AFSecurityPolicy.m in Sources */,
+				F85305D01836D56F00A77485 /* AFHTTPRequestOperation.m in Sources */,
+				F85305D81836D56F00A77485 /* AFURLSessionManager.m in Sources */,
+				F85305D71836D56F00A77485 /* AFURLResponseSerialization.m in Sources */,
+				F85305AD1836D53500A77485 /* main.m in Sources */,
+				F85305D21836D56F00A77485 /* AFHTTPSessionManager.m in Sources */,
+				F85305D11836D56F00A77485 /* AFHTTPRequestOperationManager.m in Sources */,
+				F85305D31836D56F00A77485 /* AFNetworkReachabilityManager.m in Sources */,
+				F85305BB1836D55600A77485 /* CargoBay.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F85305B21836D53500A77485 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		F85305B31836D53500A77485 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		F85305B51836D53500A77485 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Prefix.pch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		F85305B61836D53500A77485 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Prefix.pch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F85305A11836D53500A77485 /* Build configuration list for PBXProject "CargoBay (OS X)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F85305B21836D53500A77485 /* Debug */,
+				F85305B31836D53500A77485 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F85305B41836D53500A77485 /* Build configuration list for PBXNativeTarget "CargoBay" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F85305B51836D53500A77485 /* Debug */,
+				F85305B61836D53500A77485 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F853059E1836D53500A77485 /* Project object */;
+}

@@ -25,8 +25,6 @@
 #import "AFHTTPRequestOperationManager.h"
 #import "AFHTTPRequestOperation.h"
 
-#import <Availability.h>
-
 NSString * const CargoBayErrorDomain = @"com.mattt.CargoBay.ErrorDomain";
 
 NSString * const kCargoBaySandboxReceiptVerificationURLString = @"https://sandbox.itunes.apple.com/verifyReceipt";
@@ -154,7 +152,7 @@ NSData * CBDataFromBase64EncodedString(NSString *base64EncodedString) {
 }
 
 BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error) {
-#ifdef _SECURITY_SECBASE_H_
+#if defined(_SECURITY_SECBASE_H_) && !defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
     extern CFStringRef kSecTrustInfoExtendedValidationKey;
     extern CFDictionaryRef SecTrustCopyInfo(SecTrustRef trust);
 
@@ -172,13 +170,12 @@ BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:@"kSecTrustError" code:(NSInteger)result userInfo:nil];
         }
+        
         return NO;
     }
-
-    return YES;
-#else
-    return YES;
 #endif
+    
+    return YES;
 }
 
 BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSDictionary *receipt, NSError * __autoreleasing *error) {
@@ -224,6 +221,7 @@ BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *purchaseInfo, NSDictiona
 }
 
 BOOL CBValidatePurchaseInfoMatchesReceiptForDevice(NSDictionary *purchaseInfo, NSDictionary *receipt, __unused NSError * __autoreleasing *error) {
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
     if ([[UIDevice currentDevice] respondsToSelector:NSSelectorFromString(@"identifierForVendor")]) {
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_5_1)
         NSString *deviceIdentifier = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
@@ -246,6 +244,7 @@ BOOL CBValidatePurchaseInfoMatchesReceiptForDevice(NSDictionary *purchaseInfo, N
         }
 #endif
     }
+#endif
 
     return YES;
 }
@@ -732,7 +731,9 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
         return;
     }
 
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
     [self verifyTransactionReceipt:transaction.transactionReceipt password:passwordOrNil success:success failure:failure];
+#endif
 }
 
 - (void)setTransactionIDUniquenessVerificationWithBlock:(BOOL (^)(NSString *transactionID))block {
@@ -921,6 +922,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 - (BOOL)isValidTransaction:(SKPaymentTransaction *)transaction
                      error:(NSError * __autoreleasing *)error
 {
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
     if (!((transaction) && (transaction.transactionReceipt) && (transaction.transactionReceipt.length > 0))) {
         if (error != NULL) {
             NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
@@ -974,6 +976,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
             return NO;
         }        
     }
+#endif
 
     return YES;
 }
