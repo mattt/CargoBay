@@ -22,8 +22,8 @@
 
 #import "CargoBay.h"
 
-#import "AFHTTPClient.h"
-#import "AFJSONRequestOperation.h"
+#import "AFHTTPRequestOperationManager.h"
+#import "AFHTTPRequestOperation.h"
 
 #import <Availability.h>
 
@@ -650,14 +650,15 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     return _sharedManager;
 }
 
-+ (AFHTTPClient *)receiptVerificationClientWithBaseURL:(NSURL *)baseURL {
-    AFHTTPClient *HTTPClient = [[AFHTTPClient alloc] initWithBaseURL:baseURL];
-    [HTTPClient setDefaultHeader:@"Accept" value:@"application/json"];
-    [HTTPClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
-    [HTTPClient setParameterEncoding:AFJSONParameterEncoding];
-    [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObject:@"text/plain"]];
++ (AFHTTPRequestOperationManager *)receiptVerificationOperationManagerWithBaseURL:(NSURL *)baseURL {
+    AFHTTPRequestOperationManager *manager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:baseURL];
     
-    return HTTPClient;
+    manager.requestSerializer  = [AFJSONRequestSerializer serializer];
+    [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer.acceptableContentTypes setByAddingObject:@"text/plain"];
+    
+    return manager;
 }
 
 - (id)init {
@@ -688,7 +689,9 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
                     success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
                     failure:(void (^)(NSError *error))failure
 {
-    [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    operation.responseSerializer = [AFJSONResponseSerializer serializer];
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id JSON) {
         if (JSON && [JSON isKindOfClass:[NSArray class]]) {
             [self productsWithIdentifiers:[NSSet setWithArray:JSON] success:success failure:failure];
         } else {
@@ -696,15 +699,16 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
                 NSDictionary *userInfo = [NSMutableDictionary dictionary];
                 [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Expected array of product identifiers, got %@.", @"CargoBay", nil), JSON] forKey:NSLocalizedDescriptionKey];
                 NSError *error = [NSError errorWithDomain:CargoBayErrorDomain code:CargoBayErrorTransactionNotInPurchasedOrRestoredState userInfo:userInfo];
-
+                
                 failure(error);
             }
         }
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if (failure) {
             failure(error);
         }
     }];
+    [self.requestOperationQueue addOperation:operation];
 }
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
@@ -766,15 +770,15 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
                             failure:(void (^)(NSError *error))failure
 {
     NSURL *baseURL = [NSURL URLWithString:[[url absoluteString] substringToIndex:[[url absoluteString] rangeOfString:[url path] options:NSBackwardsSearch].location]];
-    AFHTTPClient *client = [[self class] receiptVerificationClientWithBaseURL:baseURL];
+    AFHTTPRequestOperationManager *manager = [[self class] receiptVerificationOperationManagerWithBaseURL:baseURL];
 
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObject:CBBase64EncodedStringFromData(transactionReceipt) forKey:@"receipt-data"];
     if (password) {
         [parameters setObject:password forKey:@"password"];
     }
 
-    NSURLRequest *request = [client requestWithMethod:method path:[url path] parameters:parameters];
-    AFHTTPRequestOperation *requestOperation = [client HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    NSURLRequest *request = [manager.requestSerializer requestWithMethod:method URLString:url.absoluteString parameters:parameters];
+    AFHTTPRequestOperation *requestOperation = [manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
 
         switch (status) {
