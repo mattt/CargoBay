@@ -683,9 +683,9 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
                     success:(void (^)(NSArray *products, NSArray *invalidIdentifiers))success
                     failure:(void (^)(NSError *error))failure
 {
-    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
-    operation.responseSerializer = [AFJSONResponseSerializer serializer];
-    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id JSON) {
+    AFHTTPRequestOperation *requestOperation = [[AFHTTPRequestOperation alloc] initWithRequest:urlRequest];
+    requestOperation.responseSerializer = [AFJSONResponseSerializer serializer];
+    [requestOperation setCompletionBlockWithSuccess:^(__unused AFHTTPRequestOperation *operation, id JSON) {
         if (JSON && [JSON isKindOfClass:[NSArray class]]) {
             [self productsWithIdentifiers:[NSSet setWithArray:JSON] success:success failure:failure];
         } else {
@@ -697,13 +697,13 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
                 failure(error);
             }
         }
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    } failure:^(__unused AFHTTPRequestOperation *operation, NSError *error) {
         if (failure) {
             failure(error);
         }
     }];
     
-    [self.requestOperationQueue addOperation:operation];
+    [self.requestOperationQueue addOperation:requestOperation];
 }
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
@@ -773,7 +773,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     }
 
     NSURLRequest *request = [manager.requestSerializer requestWithMethod:method URLString:url.absoluteString parameters:parameters];
-    AFHTTPRequestOperation *requestOperation = [manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    AFHTTPRequestOperation *requestOperation = [manager HTTPRequestOperationWithRequest:request success:^(__unused AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
 
         switch (status) {
