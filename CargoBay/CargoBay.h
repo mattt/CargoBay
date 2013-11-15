@@ -27,8 +27,6 @@
 #warning Security framework not found in project, or not included in precompiled header. Server trust validation on receipt verifications will not be available.
 #endif
 
-@class AFHTTPClient;
-
 /**
  `CargoBay` provides a convenient block-based API to StoreKit functionality, as well as advanced functionality like receipt and transaction verification and external product information querying.
  
