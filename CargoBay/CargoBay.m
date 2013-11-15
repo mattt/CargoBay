@@ -609,11 +609,9 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 
 #pragma mark
 
-@interface CargoBayProductRequestDelegate : NSObject <SKRequestDelegate, SKProductsRequestDelegate> {
-@private
-    CargoBayPaymentQueueProductSuccessBlock _success;
-    CargoBayPaymentQueueProductFailureBlock _failure;
-}
+@interface CargoBayProductRequestDelegate : NSObject <SKRequestDelegate, SKProductsRequestDelegate>
+@property (readwrite, nonatomic, copy) CargoBayPaymentQueueProductSuccessBlock success;
+@property (readwrite, nonatomic, copy) CargoBayPaymentQueueProductFailureBlock failure;
 
 + (void)registerDelegate:(CargoBayProductRequestDelegate *)delegate;
 + (void)unregisterDelegate:(CargoBayProductRequestDelegate *)delegate;
@@ -624,22 +622,17 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 
 #pragma mark -
 
-@interface CargoBay () {
-@private
-    CargoBayPaymentQueueTransactionsBlock _paymentQueueTransactionsUpdated;
-    CargoBayPaymentQueueTransactionsBlock _paymentQueueTransactionsRemoved;
-    CargoBayPaymentQueueRestoreSuccessBlock _paymentQueueRestoreSuccessBlock;
-    CargoBayPaymentQueueRestoreFailureBlock _paymentQueueRestoreFailureBlock;
-    CargoBayPaymentQueueUpdatedDownloadsBlock _paymentQueueUpdatedDownloadsBlock;
-    CargoBayTransactionIDUniquenessVerificationBlock _transactionIDUniquenessVerificationBlock;
-}
-
+@interface CargoBay ()
 @property (readwrite, nonatomic, strong) NSOperationQueue *requestOperationQueue;
-
+@property (readwrite, nonatomic, copy) CargoBayPaymentQueueTransactionsBlock paymentQueueTransactionsUpdated;
+@property (readwrite, nonatomic, copy) CargoBayPaymentQueueTransactionsBlock paymentQueueTransactionsRemoved;
+@property (readwrite, nonatomic, copy) CargoBayPaymentQueueRestoreSuccessBlock paymentQueueRestoreSuccessBlock;
+@property (readwrite, nonatomic, copy) CargoBayPaymentQueueRestoreFailureBlock paymentQueueRestoreFailureBlock;
+@property (readwrite, nonatomic, copy) CargoBayPaymentQueueUpdatedDownloadsBlock paymentQueueUpdatedDownloadsBlock;
+@property (readwrite, nonatomic, copy) CargoBayTransactionIDUniquenessVerificationBlock transactionIDUniquenessVerificationBlock;
 @end
 
 @implementation CargoBay
-@synthesize requestOperationQueue = _requestOperationQueue;
 
 + (instancetype)sharedManager {
     static id _sharedManager = nil;
@@ -900,22 +893,22 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 }
 
 - (void)setPaymentQueueUpdatedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block {
-    _paymentQueueTransactionsUpdated = [block copy];
+    self.paymentQueueTransactionsUpdated = block;
 }
 
 - (void)setPaymentQueueRemovedTransactionsBlock:(void (^)(SKPaymentQueue *queue, NSArray *transactions))block {
-    _paymentQueueTransactionsRemoved = [block copy];
+    self.paymentQueueTransactionsRemoved = block;
 }
 
 - (void)setPaymentQueueRestoreCompletedTransactionsWithSuccess:(void (^)(SKPaymentQueue *queue))success
                                                        failure:(void (^)(SKPaymentQueue *queue, NSError *error))failure
 {
-    _paymentQueueRestoreSuccessBlock = [success copy];
-    _paymentQueueRestoreFailureBlock = [failure copy];
+    self.paymentQueueRestoreSuccessBlock = success;
+    self.paymentQueueRestoreFailureBlock = failure;
 }
 
 - (void)setPaymentQueueUpdatedDownloadsBlock:(void (^)(SKPaymentQueue *queue, NSArray *downloads))block {
-    _paymentQueueUpdatedDownloadsBlock = [block copy];
+    self.paymentQueueUpdatedDownloadsBlock = block;
 }
 
 #pragma mark - Receipt Verification
@@ -943,8 +936,8 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     }
 
     NSString *transactionID = [purchaseInfoDictionary objectForKey:@"transaction-id"];
-    if (_transactionIDUniquenessVerificationBlock) {
-        if (!_transactionIDUniquenessVerificationBlock(transactionID)) {
+    if (self.transactionIDUniquenessVerificationBlock) {
+        if (!self.transactionIDUniquenessVerificationBlock(transactionID)) {
             if (error != NULL) {
                 NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
                 [userInfo setValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Transaction ID (%@) is not unique.", @"CargoBay", nil), transactionID] forKey:NSLocalizedDescriptionKey];
@@ -985,38 +978,38 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 - (void)paymentQueue:(SKPaymentQueue *)queue
     updatedDownloads:(NSArray *)downloads
 {
-    if (_paymentQueueUpdatedDownloadsBlock) {
-        _paymentQueueUpdatedDownloadsBlock(queue, downloads);
+    if (self.paymentQueueUpdatedDownloadsBlock) {
+        self.paymentQueueUpdatedDownloadsBlock(queue, downloads);
     }
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue
  updatedTransactions:(NSArray *)transactions
 {
-    if (_paymentQueueTransactionsUpdated) {
-        _paymentQueueTransactionsUpdated(queue, transactions);
+    if (self.paymentQueueTransactionsUpdated) {
+        self.paymentQueueTransactionsUpdated(queue, transactions);
     }
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue
  removedTransactions:(NSArray *)transactions
 {
-    if (_paymentQueueTransactionsRemoved) {
-        _paymentQueueTransactionsRemoved(queue, transactions);
+    if (self.paymentQueueTransactionsRemoved) {
+        self.paymentQueueTransactionsRemoved(queue, transactions);
     }
 }
 
 - (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue {
-    if (_paymentQueueRestoreSuccessBlock) {
-        _paymentQueueRestoreSuccessBlock(queue);
+    if (self.paymentQueueRestoreSuccessBlock) {
+        self.paymentQueueRestoreSuccessBlock(queue);
     }
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue
 restoreCompletedTransactionsFailedWithError:(NSError *)error
 {
-    if (_paymentQueueRestoreFailureBlock) {
-        _paymentQueueRestoreFailureBlock(queue, error);
+    if (self.paymentQueueRestoreFailureBlock) {
+        self.paymentQueueRestoreFailureBlock(queue, error);
     }
 }
 
@@ -1060,7 +1053,7 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
     __weak __typeof(&*self)weakSelf = self;
 #endif
 
-    _success = [^(NSArray *products, NSArray *invalidIdentifiers) {
+    self.success = ^(NSArray *products, NSArray *invalidIdentifiers) {
         if (success) {
             success(products, invalidIdentifiers);
         }
@@ -1069,9 +1062,9 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
         __strong __typeof(&*weakSelf)strongSelf = weakSelf;
         [[strongSelf class] unregisterDelegate:strongSelf];
 #endif
-    } copy];
+    };
     
-    _failure = [^(NSError *error) {
+    self.failure = ^(NSError *error) {
         if (failure) {
             failure(error);
         }
@@ -1080,7 +1073,7 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
         __strong __typeof(&*weakSelf)strongSelf = weakSelf;
         [[strongSelf class] unregisterDelegate:strongSelf];
 #endif
-    } copy];
+    };
     
     
     return self;
@@ -1094,8 +1087,8 @@ didFailWithError:(NSError *)error
 #if !__has_feature(objc_arc_weak)
     [[self class] unregisterDelegate:self];
 #endif
-    if (_failure) {
-        _failure(error);
+    if (self.failure) {
+        self.failure(error);
     }    
 }
 
@@ -1110,8 +1103,8 @@ didFailWithError:(NSError *)error
 - (void)productsRequest:(__unused SKProductsRequest *)request
      didReceiveResponse:(SKProductsResponse *)response
 {
-    if (_success) {
-        _success(response.products, response.invalidProductIdentifiers);
+    if (self.success) {
+        self.success(response.products, response.invalidProductIdentifiers);
     }
 }
 
