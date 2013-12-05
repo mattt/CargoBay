@@ -25,6 +25,9 @@
 #import "AFHTTPRequestOperationManager.h"
 #import "AFHTTPRequestOperation.h"
 
+#include <stddef.h>
+
+
 NSString * const CargoBayErrorDomain = @"com.mattt.CargoBay.ErrorDomain";
 
 NSString * const kCargoBaySandboxReceiptVerificationURLString = @"https://sandbox.itunes.apple.com/verifyReceipt";
