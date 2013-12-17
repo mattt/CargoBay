@@ -43,11 +43,11 @@ typedef void (^CargoBayPaymentQueueRestoreFailureBlock)(SKPaymentQueue *queue, N
 typedef void (^CargoBayPaymentQueueUpdatedDownloadsBlock)(SKPaymentQueue *queue, NSArray *downloads);
 typedef BOOL (^CargoBayTransactionIDUniquenessVerificationBlock)(NSString *transactionID);
 
-extern NSDate * CBDateFromDateString(NSString *string);
+extern NSDate * CBDateFromDateString(NSString *);
 extern NSString * CBBase64EncodedStringFromData(NSData *);
 extern NSData * CBDataFromBase64EncodedString(NSString *);
 extern BOOL CBValidateTrust(SecTrustRef, NSError * __autoreleasing *);
-extern BOOL CBValidatePurchaseInfoMatchesReceiptForDevice(NSDictionary *purchaseInfo, NSDictionary *receipt, __unused NSError * __autoreleasing *error);
+extern BOOL CBValidatePurchaseInfoMatchesReceiptForDevice(NSDictionary *, NSDictionary *, __unused NSError * __autoreleasing *);
 extern BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *, NSDictionary *, NSError * __autoreleasing *);
 extern BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *, NSDictionary *, NSError * __autoreleasing *);
 extern BOOL CBCheckReceiptSecurity(NSString *, NSString *, NSDate *);
@@ -100,7 +100,6 @@ NSString * CBBase64EncodedStringFromData(NSData *data) {
     return [[NSString alloc] initWithData:mutableData encoding:NSASCIIStringEncoding];
 }
 
-// Reference http://cocoawithlove.com/2009/06/base64-encoding-options-on-mac-and.html
 NSData * CBDataFromBase64EncodedString(NSString *base64EncodedString) {
     NSData *base64EncodedStringASCIIData = [base64EncodedString dataUsingEncoding:NSASCIIStringEncoding];
     uint8_t *input = (uint8_t *)base64EncodedStringASCIIData.bytes;
@@ -334,7 +333,6 @@ BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *transaction,
     }
 #endif
 
-
     // Optionally check the requestData.
     /*
         `transaction.payment.requestData` is reserved for future use as stated in the document (iOS 6). 
@@ -367,7 +365,6 @@ BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *transaction,
 
 BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureString, NSDate *purchaseDate) {
 #ifdef _SECURITY_SECBASE_H_
-    
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     BOOL isValid = NO;
@@ -498,7 +495,7 @@ BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureStr
              2. Check receipt version == 2.
              3. Sanity check that signature is 128 bytes.
              4. Sanity check certification size <= remaining payload data.
-           */
+        */
 
 #pragma pack(push, 1)
         struct CBSignatureBlob {
