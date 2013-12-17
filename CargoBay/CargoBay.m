@@ -51,6 +51,7 @@ extern BOOL CBValidatePurchaseInfoMatchesReceiptForDevice(NSDictionary *purchase
 extern BOOL CBValidatePurchaseInfoMatchesReceipt(NSDictionary *, NSDictionary *, NSError * __autoreleasing *);
 extern BOOL CBValidateTransactionMatchesPurchaseInfo(SKPaymentTransaction *, NSDictionary *, NSError * __autoreleasing *);
 extern BOOL CBCheckReceiptSecurity(NSString *, NSString *, NSDate *);
+extern NSData * CBTransactionReceiptFromPaymentTransaction(SKPaymentTransaction *);
 extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * __autoreleasing *);
 
 NSDate * CBDateFromDateString(NSString *string) {
@@ -582,7 +583,22 @@ _out:
 #endif
 }
 
-#pragma mark - Parsers
+#pragma mark -
+
+NSData * CBTransactionReceiptFromPaymentTransaction(SKPaymentTransaction *transaction) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    if ([NSBundle instancesRespondToSelector:@selector(appStoreReceiptURL)]) {
+        NSError *error = nil;
+        NSData *data = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL] options:0 error:&error];
+        if (data && !error) {
+            return data;
+        }
+    }
+
+    return transaction.transactionReceipt;
+#pragma clang diagnostic pop
+}
 
 NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptData, NSError * __autoreleasing *error) {
     NSDictionary *transactionReceiptDictionary = [NSPropertyListSerialization propertyListWithData:transactionReceiptData options:NSPropertyListImmutable format:nil error:error];
@@ -739,7 +755,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     }
 
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-    [self verifyTransactionReceipt:transaction.transactionReceipt password:passwordOrNil success:success failure:failure];
+    [self verifyTransactionReceipt:CBTransactionReceiptFromPaymentTransaction(transaction) password:passwordOrNil success:success failure:failure];
 #endif
 }
 
@@ -930,7 +946,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
                      error:(NSError * __autoreleasing *)error
 {
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-    if (!((transaction) && (transaction.transactionReceipt) && (transaction.transactionReceipt.length > 0))) {
+    if (!(transaction && CBTransactionReceiptFromPaymentTransaction(transaction))) {
         if (error != NULL) {
             NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
             [userInfo setValue:NSLocalizedStringFromTable(@"Transaction object is not valid.", @"CargoBay", nil) forKey:NSLocalizedDescriptionKey];
@@ -940,7 +956,8 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
         return NO;
     }
 
-    NSDictionary *purchaseInfoDictionary = CBPurchaseInfoFromTransactionReceipt(transaction.transactionReceipt, error);
+    NSData *transactionReceipt = CBTransactionReceiptFromPaymentTransaction(transaction);
+    NSDictionary *purchaseInfoDictionary = CBPurchaseInfoFromTransactionReceipt(transactionReceipt, error);
     if (!purchaseInfoDictionary) {
         return NO;
     }
