@@ -585,6 +585,7 @@ _out:
 NSData * CBTransactionReceiptFromPaymentTransaction(SKPaymentTransaction *transaction) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#ifdef __IPHONE_7_0
     if ([NSBundle instancesRespondToSelector:@selector(appStoreReceiptURL)]) {
         NSError *error = nil;
         NSData *data = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL] options:0 error:&error];
@@ -592,7 +593,7 @@ NSData * CBTransactionReceiptFromPaymentTransaction(SKPaymentTransaction *transa
             return data;
         }
     }
-
+#endif
     return transaction.transactionReceipt;
 #pragma clang diagnostic pop
 }
