@@ -768,7 +768,9 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     NSError *error = nil;
     NSDictionary *receiptDictionary = [NSPropertyListSerialization propertyListWithData:transactionReceipt options:NSPropertyListImmutable format:nil error:&error];
     if (!receiptDictionary) {
-        failure(error);
+        if (failure) {
+            failure(error);
+        }
         return;
     }
 
