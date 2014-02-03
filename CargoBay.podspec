@@ -4,6 +4,7 @@ Pod::Spec.new do |s|
   s.license  = 'MIT'
   s.summary  = 'The Essential StoreKit Companion.'
   s.homepage = 'https://github.com/mattt/CargoBay'
+  s.social_media_url = 'https://twitter.com/mattt'
   s.authors  = { 'Mattt Thompson' => 'm@mattt.me' }
   s.source   = { :git => 'https://github.com/mattt/CargoBay.git', :tag => '2.0.2' }
   s.source_files = 'CargoBay'
