@@ -508,10 +508,10 @@ BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureStr
         uint32_t certificateLength;
 
         // Make sure the signature blob is long enough to safely extract the _receiptVersion and _certificateLength fields, then perform a sanity check on the fields.
-        __Require(signatureLength > offsetof(struct CBSignatureBlob, _certificate), _out);
+        __Require(signatureLength > __offsetof(struct CBSignatureBlob, _certificate), _out);
         __Require(signatureBlob->_receiptVersion == 2, _out);
         certificateLength = ntohl(signatureBlob->_certificateLength);
-        __Require(signatureLength - offsetof(struct CBSignatureBlob, _certificate) >= certificateLength, _out);
+        __Require(signatureLength - __offsetof(struct CBSignatureBlob, _certificate) >= certificateLength, _out);
 
         // Validate certificate chains back to valid receipt signer; policy approximation for now set intermediate as a trust anchor; current intermediate lapses in 2016.
         NSData *certificateData = [NSData dataWithBytes:signatureBlob->_certificate length:certificateLength];
