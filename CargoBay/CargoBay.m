@@ -25,7 +25,7 @@
 #import "AFHTTPRequestOperationManager.h"
 #import "AFHTTPRequestOperation.h"
 
-#include <stddef.h>
+#import <AssertMacros.h>
 
 
 NSString * const CargoBayErrorDomain = @"com.mattt.CargoBay.ErrorDomain";
@@ -468,17 +468,17 @@ BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureStr
             0x54, 0x6b, 0x01, 0x0d, 0xc7, 0xdd, 0x1a
         };
 
-        require([purchaseInfoString canBeConvertedToEncoding:NSASCIIStringEncoding], _out);
+        __Require([purchaseInfoString canBeConvertedToEncoding:NSASCIIStringEncoding], _out);
         NSData *purchaseInfoData = CBDataFromBase64EncodedString(purchaseInfoString);
         size_t purchaseInfoLength = purchaseInfoData.length;
         uint8_t *purchaseInfoBytes = (uint8_t *)purchaseInfoData.bytes;
 
-        require([signatureString canBeConvertedToEncoding:NSASCIIStringEncoding], _out);
+        __Require([signatureString canBeConvertedToEncoding:NSASCIIStringEncoding], _out);
         NSData *signatureData = CBDataFromBase64EncodedString(signatureString);
         size_t signatureLength = signatureData.length;
         uint8_t *signatureBytes = (uint8_t *)signatureData.bytes;
 
-        require(purchaseInfoBytes && signatureBytes, _out);
+        __Require(purchaseInfoBytes && signatureBytes, _out);
 
         /*
              Binary format looks as follows:
@@ -508,33 +508,33 @@ BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureStr
         uint32_t certificateLength;
 
         // Make sure the signature blob is long enough to safely extract the _receiptVersion and _certificateLength fields, then perform a sanity check on the fields.
-        require(signatureLength > offsetof(struct CBSignatureBlob, _certificate), _out);
-        require(signatureBlob->_receiptVersion == 2, _out);
+        __Require(signatureLength > offsetof(struct CBSignatureBlob, _certificate), _out);
+        __Require(signatureBlob->_receiptVersion == 2, _out);
         certificateLength = ntohl(signatureBlob->_certificateLength);
-        require(signatureLength - offsetof(struct CBSignatureBlob, _certificate) >= certificateLength, _out);
+        __Require(signatureLength - offsetof(struct CBSignatureBlob, _certificate) >= certificateLength, _out);
 
         // Validate certificate chains back to valid receipt signer; policy approximation for now set intermediate as a trust anchor; current intermediate lapses in 2016.
         NSData *certificateData = [NSData dataWithBytes:signatureBlob->_certificate length:certificateLength];
-        require(leaf = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificateData), _out);
+        __Require(leaf = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificateData), _out);
 
         certificateData = [NSData dataWithBytes:iTS_intermediate_der length:iTS_intermediate_der_len];
-        require(intermediate = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificateData), _out);
+        __Require(intermediate = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificateData), _out);
 
         NSArray *anchors = [NSArray arrayWithObject:(__bridge id)intermediate];
-        require(anchors, _out);
+        __Require(anchors, _out);
 
-        require_noerr(SecTrustCreateWithCertificates(leaf, policy, &trust), _out);
-        require_noerr(SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef)anchors), _out);
+        __Require_noErr(SecTrustCreateWithCertificates(leaf, policy, &trust), _out);
+        __Require_noErr(SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef)anchors), _out);
 
         if (purchaseDate) {
-            require_noerr(SecTrustSetVerifyDate(trust, (__bridge CFDateRef)purchaseDate), _out);
+            __Require_noErr(SecTrustSetVerifyDate(trust, (__bridge CFDateRef)purchaseDate), _out);
         }
 
         SecTrustResultType trustResult;
-        require_noerr(SecTrustEvaluate(trust, &trustResult), _out);
-        require(trustResult == kSecTrustResultUnspecified, _out);
+        __Require_noErr(SecTrustEvaluate(trust, &trustResult), _out);
+        __Require(trustResult == kSecTrustResultUnspecified, _out);
 
-        require(SecTrustGetCertificateCount(trust) == 2, _out);
+        __Require(SecTrustGetCertificateCount(trust) == 2, _out);
 
         // Chain is valid, use leaf key to verify signature on receipt by calculating SHA1(version|purchaseinfo)
         CC_SHA1_CTX SHA1Context;
@@ -546,8 +546,8 @@ BOOL CBCheckReceiptSecurity(NSString *purchaseInfoString, NSString *signatureStr
         CC_SHA1_Final(dataToBeVerified, &SHA1Context);
 
         SecKeyRef receiptSigningKey = SecTrustCopyPublicKey(trust);
-        require(receiptSigningKey, _out);
-        require_noerr(SecKeyRawVerify(receiptSigningKey, kSecPaddingPKCS1SHA1, dataToBeVerified, sizeof(dataToBeVerified), signatureBlob->_signature, sizeof(signatureBlob->_signature)), _out);
+        __Require(receiptSigningKey, _out);
+        __Require_noErr(SecKeyRawVerify(receiptSigningKey, kSecPaddingPKCS1SHA1, dataToBeVerified, sizeof(dataToBeVerified), signatureBlob->_signature, sizeof(signatureBlob->_signature)), _out);
 
         // TODO: Implements optional verification step.
         // Optional: Verify that the receipt certificate has the 1.2.840.113635.100.6.5.1 Null OID.
