@@ -645,9 +645,9 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 @property (readwrite, nonatomic, strong) NSOperationQueue *requestOperationQueue;
 @property (readwrite, nonatomic, copy) CargoBayPaymentQueueTransactionsBlock paymentQueueTransactionsUpdated;
 @property (readwrite, nonatomic, copy) CargoBayPaymentQueueTransactionsBlock paymentQueueTransactionsRemoved;
-@property (readwrite, nonatomic, copy) CargoBayPaymentQueueRestoreSuccessBlock paymentQueueRestoreSuccessBlock;
-@property (readwrite, nonatomic, copy) CargoBayPaymentQueueRestoreFailureBlock paymentQueueRestoreFailureBlock;
-@property (readwrite, nonatomic, copy) CargoBayPaymentQueueUpdatedDownloadsBlock paymentQueueUpdatedDownloadsBlock;
+@property (readwrite, nonatomic, copy) CargoBayPaymentQueueRestoreSuccessBlock paymentQueueRestoreSuccess;
+@property (readwrite, nonatomic, copy) CargoBayPaymentQueueRestoreFailureBlock paymentQueueRestoreFailure;
+@property (readwrite, nonatomic, copy) CargoBayPaymentQueueUpdatedDownloadsBlock paymentQueueUpdatedDownloads;
 @property (readwrite, nonatomic, copy) CargoBayTransactionIDUniquenessVerificationBlock transactionIDUniquenessVerificationBlock;
 @end
 
@@ -931,12 +931,12 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 - (void)setPaymentQueueRestoreCompletedTransactionsWithSuccess:(void (^)(SKPaymentQueue *queue))success
                                                        failure:(void (^)(SKPaymentQueue *queue, NSError *error))failure
 {
-    self.paymentQueueRestoreSuccessBlock = success;
-    self.paymentQueueRestoreFailureBlock = failure;
+    self.paymentQueueRestoreSuccess = success;
+    self.paymentQueueRestoreFailure = failure;
 }
 
 - (void)setPaymentQueueUpdatedDownloadsBlock:(void (^)(SKPaymentQueue *queue, NSArray *downloads))block {
-    self.paymentQueueUpdatedDownloadsBlock = block;
+    self.paymentQueueUpdatedDownloads = block;
 }
 
 #pragma mark - Receipt Verification
@@ -1009,8 +1009,8 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 - (void)paymentQueue:(SKPaymentQueue *)queue
     updatedDownloads:(NSArray *)downloads
 {
-    if (self.paymentQueueUpdatedDownloadsBlock) {
-        self.paymentQueueUpdatedDownloadsBlock(queue, downloads);
+    if (self.paymentQueueUpdatedDownloads) {
+        self.paymentQueueUpdatedDownloads(queue, downloads);
     }
 }
 
@@ -1031,16 +1031,16 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 }
 
 - (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue {
-    if (self.paymentQueueRestoreSuccessBlock) {
-        self.paymentQueueRestoreSuccessBlock(queue);
+    if (self.paymentQueueRestoreSuccess) {
+        self.paymentQueueRestoreSuccess(queue);
     }
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue
 restoreCompletedTransactionsFailedWithError:(NSError *)error
 {
-    if (self.paymentQueueRestoreFailureBlock) {
-        self.paymentQueueRestoreFailureBlock(queue, error);
+    if (self.paymentQueueRestoreFailure) {
+        self.paymentQueueRestoreFailure(queue, error);
     }
 }
 
