@@ -795,7 +795,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
         [parameters setObject:password forKey:@"password"];
     }
 
-    NSURLRequest *request = [manager.requestSerializer requestWithMethod:method URLString:url.absoluteString parameters:parameters];
+    NSURLRequest *request = [manager.requestSerializer requestWithMethod:method URLString:url.absoluteString parameters:parameters error:nil];
     AFHTTPRequestOperation *requestOperation = [manager HTTPRequestOperationWithRequest:request success:^(__unused AFHTTPRequestOperation *operation, id responseObject) {
         NSInteger status = [responseObject valueForKey:@"status"] ? [[responseObject valueForKey:@"status"] integerValue] : NSNotFound;
 
@@ -1092,7 +1092,6 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
         }
     };
     
-    
     return self;
 }
 
@@ -1103,7 +1102,8 @@ didFailWithError:(NSError *)error
 {
     if (self.failure) {
         self.failure(error);
-    }    
+    }
+    
     [[self class] unregisterDelegate:self];
 }
 
