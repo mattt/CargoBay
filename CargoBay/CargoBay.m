@@ -1080,18 +1080,9 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
         return nil;
     }
 
-    self.success = ^(NSArray *products, NSArray *invalidIdentifiers) {
-        if (success) {
-            success(products, invalidIdentifiers);
-        }
-    };
-    
-    self.failure = ^(NSError *error) {
-        if (failure) {
-            failure(error);
-        }
-    };
-    
+    self.success = success;
+    self.failure = failure;
+
     return self;
 }
 
