@@ -696,6 +696,11 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 
     [CargoBayProductRequestDelegate registerDelegate:delegate];
     [request start];
+    
+    // Fix request oject too fast relase
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [request description];
+    });
 }
 
 - (void)productsWithRequest:(NSURLRequest *)urlRequest
