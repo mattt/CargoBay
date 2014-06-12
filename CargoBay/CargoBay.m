@@ -1096,17 +1096,19 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
 
 #pragma mark - SKRequestDelegate
 
-- (void)request:(__unused SKRequest *)request
+- (void)request:(SKRequest *)request
 didFailWithError:(NSError *)error
 {
     if (self.failure) {
         self.failure(error);
     }
-    
+
+    request.delegate = nil;
     [[self class] unregisterDelegate:self];
 }
 
-- (void)requestDidFinish:(__unused SKRequest *)request {
+- (void)requestDidFinish:(SKRequest *)request {
+    request.delegate = nil;
     [[self class] unregisterDelegate:self];
 }
 
