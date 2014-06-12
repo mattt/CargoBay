@@ -27,7 +27,6 @@
 
 #import <AssertMacros.h>
 
-
 NSString * const CargoBayErrorDomain = @"com.mattt.CargoBay.ErrorDomain";
 
 NSString * const kCargoBaySandboxReceiptVerificationURLString = @"https://sandbox.itunes.apple.com/verifyReceipt";

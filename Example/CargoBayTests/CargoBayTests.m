@@ -226,7 +226,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         manager.responseSerializer = [AFHTTPResponseSerializer serializer];
         
         NSURL *url = [NSURL URLWithString:@"" relativeToURL:manager.baseURL];
-        NSURLRequest *request = [manager.requestSerializer requestWithMethod:@"GET" URLString:url.absoluteString parameters:nil];
+        NSURLRequest *request = [manager.requestSerializer requestWithMethod:@"GET" URLString:url.absoluteString parameters:nil error:nil];
         AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
             resume();
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {

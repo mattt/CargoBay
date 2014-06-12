@@ -1,12 +1,12 @@
 Pod::Spec.new do |s|
   s.name     = 'CargoBay'
-  s.version  = '2.0.3'
+  s.version  = '2.1.0'
   s.license  = 'MIT'
   s.summary  = 'The Essential StoreKit Companion.'
   s.homepage = 'https://github.com/mattt/CargoBay'
   s.social_media_url = 'https://twitter.com/mattt'
   s.authors  = { 'Mattt Thompson' => 'm@mattt.me' }
-  s.source   = { :git => 'https://github.com/mattt/CargoBay.git', :tag => '2.0.3' }
+  s.source   = { :git => 'https://github.com/mattt/CargoBay.git', :tag => '2.1.0' }
   s.source_files = 'CargoBay'
   s.requires_arc = true
 
@@ -14,5 +14,5 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.8'
   s.frameworks = 'StoreKit', 'Security'
 
-  s.dependency 'AFNetworking', '~> 2.1'
+  s.dependency 'AFNetworking', '~> 2.2'
 end
