@@ -828,7 +828,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
                 }
                 
                 // Every (re-)installation generates a new unique identifier for vendor.
-                // Every purchase and restoration receipt will be tag with this new unique identifier.
+                // Every purchase and restoration receipt will be tagged with this new unique identifier.
                 // However, the latest receipt info might have a unique identifier for vendor from another device, from a previous installation, etc.
                 // Therefore, we should only check if the purchase info matches receipt for device for receipt we restored with this device.
                 isValid = CBValidatePurchaseInfoMatchesReceiptForDevice(purchaseInfo, receipt, &error);
