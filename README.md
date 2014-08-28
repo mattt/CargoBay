@@ -59,10 +59,12 @@ success:^(NSArray *products, NSArray *invalidIdentifiers) {
 }];
 ```
 
-### Contact
+## Contact
 
-[Mattt Thompson](http://github.com/mattt)  
-[@mattt](https://twitter.com/mattt)
+Mattt Thompson
+
+- http://github.com/mattt
+- http://twitter.com/mattt
 
 ## License
 
