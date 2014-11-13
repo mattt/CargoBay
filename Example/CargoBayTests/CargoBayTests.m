@@ -158,63 +158,30 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         NSString *encoded = @"TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
         
-        // Encodes
-        {
-            NSString *output = [CargoBay _base64EncodedStringFromData:decoded];
-            
-            STAssertEqualObjects(encoded, output, @"The result should be equal.");
-        }
-        
-        // Decodes
-        {
-            NSData *output = [CargoBay _dataFromBase64EncodedString:encoded];
-            
-            STAssertEqualObjects(decoded, output, @"The result should be equal.");
-        }
+        XCTAssertEqualObjects(encoded, [CargoBay _base64EncodedStringFromData:decoded], @"The result should be equal.");
+        XCTAssertEqualObjects(decoded, [CargoBay _dataFromBase64EncodedString:encoded], @"The result should be equal.");
     }
-    
-    
+
     // [From Wikipedia: Lorem ipsum](http://en.wikipedia.org/wiki/Lorem_ipsum)
     {
         NSData *decoded = [@"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." dataUsingEncoding:NSUTF8StringEncoding];
         
         NSString *encoded = @"TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2ljaW5nIGVsaXQsIHNlZCBkbyBlaXVzbW9kIHRlbXBvciBpbmNpZGlkdW50IHV0IGxhYm9yZSBldCBkb2xvcmUgbWFnbmEgYWxpcXVhLiBVdCBlbmltIGFkIG1pbmltIHZlbmlhbSwgcXVpcyBub3N0cnVkIGV4ZXJjaXRhdGlvbiB1bGxhbWNvIGxhYm9yaXMgbmlzaSB1dCBhbGlxdWlwIGV4IGVhIGNvbW1vZG8gY29uc2VxdWF0LiBEdWlzIGF1dGUgaXJ1cmUgZG9sb3IgaW4gcmVwcmVoZW5kZXJpdCBpbiB2b2x1cHRhdGUgdmVsaXQgZXNzZSBjaWxsdW0gZG9sb3JlIGV1IGZ1Z2lhdCBudWxsYSBwYXJpYXR1ci4gRXhjZXB0ZXVyIHNpbnQgb2NjYWVjYXQgY3VwaWRhdGF0IG5vbiBwcm9pZGVudCwgc3VudCBpbiBjdWxwYSBxdWkgb2ZmaWNpYSBkZXNlcnVudCBtb2xsaXQgYW5pbSBpZCBlc3QgbGFib3J1bS4=";
-        
-        // Encodes
-        {
-            NSString *output = [CargoBay _base64EncodedStringFromData:decoded];
-            
-            STAssertEqualObjects(encoded, output, @"The result should be equal.");
-        }
-        
-        // Decodes
-        {
-            NSData *output = [CargoBay _dataFromBase64EncodedString:encoded];
-            
-            STAssertEqualObjects(decoded, output, @"The result should be equal.");
-        }
+
+        XCTAssertEqualObjects(encoded, [CargoBay _base64EncodedStringFromData:decoded], @"The result should be equal.");
+        XCTAssertEqualObjects(decoded, [CargoBay _dataFromBase64EncodedString:encoded], @"The result should be equal.");
     }
     
     
     // [Sample receipt from Sandbox Server](https://gist.github.com/4187607)
-    // Plist is generated using OpenStep format which is not available for writing.
+    // Property List is generated using OpenStep format which is not available for writing.
     {
         NSData *decoded = [@"{\n	\"signature\" = \"AkYuPMDg5n9y40Q/jWOO/UNJyFAo3cO+oRjIZIKYt7/M05EyXqJNHJGPQnmda4Zy0BqGsz1m2fpSJQatT03V/b0TfAr4+p8bofURjCLY9NX36LCgWDjwS1SxRao+4ek72q53MeGVSkGoy5E27jSz5P2fQds8PvwPid3Dx3O594/wAAADVzCCA1MwggI7oAMCAQICCGUUkU3ZWAS1MA0GCSqGSIb3DQEBBQUAMH8xCzAJBgNVBAYTAlVTMRMwEQYDVQQKDApBcHBsZSBJbmMuMSYwJAYDVQQLDB1BcHBsZSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTEzMDEGA1UEAwwqQXBwbGUgaVR1bmVzIFN0b3JlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MB4XDTA5MDYxNTIyMDU1NloXDTE0MDYxNDIyMDU1NlowZDEjMCEGA1UEAwwaUHVyY2hhc2VSZWNlaXB0Q2VydGlmaWNhdGUxGzAZBgNVBAsMEkFwcGxlIGlUdW5lcyBTdG9yZTETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMrRjF2ct4IrSdiTChaI0g8pwv/cmHs8p/RwV/rt/91XKVhNl4XIBimKjQQNfgHsDs6yju++DrKJE7uKsphMddKYfFE5rGXsAdBEjBwRIxexTevx3HLEFGAt1moKx509dhxtiIdDgJv2YaVs49B0uJvNdy6SMqNNLHsDLzDS9oZHAgMBAAGjcjBwMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUNh3o4p2C0gEYtTJrDtdDC5FYQzowDgYDVR0PAQH/BAQDAgeAMB0GA1UdDgQWBBSpg4PyGUjFPhJXCBTMzaN+mV8k9TAQBgoqhkiG92NkBgUBBAIFADANBgkqhkiG9w0BAQUFAAOCAQEAEaSbPjtmN4C/IB3QEpK32RxacCDXdVXAeVReS5FaZxc+t88pQP93BiAxvdW/3eTSMGY5FbeAYL3etqP5gm8wrFojX0ikyVRStQ+/AQ0KEjtqB07kLs9QUe8czR8UGfdM1EumV/UgvDd4NwNYxLQMg4WTQfgkQQVy8GXZwVHgbE/UC6Y7053pGXBk51NPM3woxhd3gSRLvXj+loHsStcTEqe9pBDpmG5+sk4tw+GK3GMeEN5/+e1QT9np/Kl1nj+aBw7C0xsy0bFnaAd1cSS6xdory/CUvM6gtKsmnOOdqTesbp0bs8sn6Wqs0C9dgcxRHuOMZ2tm8npLUm7argOSzQ==\";\n	\"purchase-info\" = \"ewoJIm9yaWdpbmFsLXB1cmNoYXNlLWRhdGUtcHN0IiA9ICIyMDEyLTEyLTAxIDIzOjE1OjU0IEFtZXJpY2EvTG9zX0FuZ2VsZXMiOwoJInB1cmNoYXNlLWRhdGUtbXMiID0gIjEzNTQ0MzI1NTQwMDAiOwoJInVuaXF1ZS1pZGVudGlmaWVyIiA9ICIwMDAwYjAwOTI4MTgiOwoJIm9yaWdpbmFsLXRyYW5zYWN0aW9uLWlkIiA9ICIxMDAwMDAwMDU5NjMyMzg1IjsKCSJleHBpcmVzLWRhdGUiID0gIjEzNTQ0MzYxNTQwMDAiOwoJInRyYW5zYWN0aW9uLWlkIiA9ICIxMDAwMDAwMDU5NjMyMzg1IjsKCSJvcmlnaW5hbC1wdXJjaGFzZS1kYXRlLW1zIiA9ICIxMzU0NDMyNTU0MDAwIjsKCSJ3ZWItb3JkZXItbGluZS1pdGVtLWlkIiA9ICIxMDAwMDAwMDI2NDM2MjkwIjsKCSJidnJzIiA9ICI3IjsKCSJleHBpcmVzLWRhdGUtZm9ybWF0dGVkLXBzdCIgPSAiMjAxMi0xMi0wMiAwMDoxNTo1NCBBbWVyaWNhL0xvc19BbmdlbGVzIjsKCSJpdGVtLWlkIiA9ICI1ODAxOTM5MzciOwoJImV4cGlyZXMtZGF0ZS1mb3JtYXR0ZWQiID0gIjIwMTItMTItMDIgMDg6MTU6NTQgRXRjL0dNVCI7CgkicHJvZHVjdC1pZCIgPSAiY29tLmRfX2J1enouZ2FnX3BsdXMuaW9zLjAwMS5hcnMucHJlbWl1bS4xeSI7CgkicHVyY2hhc2UtZGF0ZSIgPSAiMjAxMi0xMi0wMiAwNzoxNTo1NCBFdGMvR01UIjsKCSJvcmlnaW5hbC1wdXJjaGFzZS1kYXRlIiA9ICIyMDEyLTEyLTAyIDA3OjE1OjU0IEV0Yy9HTVQiOwoJImJpZCIgPSAiY29tLmQtLWJ1enouZ2FnLXBsdXMuaW9zLjAwMSI7CgkicHVyY2hhc2UtZGF0ZS1wc3QiID0gIjIwMTItMTItMDEgMjM6MTU6NTQgQW1lcmljYS9Mb3NfQW5nZWxlcyI7CgkicXVhbnRpdHkiID0gIjEiOwp9\";\n	\"environment\" = \"Sandbox\";\n	\"pod\" = \"100\";\n	\"signing-status\" = \"0\";\n}" dataUsingEncoding:NSUTF8StringEncoding];
         
         NSString *encoded = @"ewoJInNpZ25hdHVyZSIgPSAiQWtZdVBNRGc1bjl5NDBRL2pXT08vVU5KeUZBbzNjTytvUmpJWklLWXQ3L00wNUV5WHFKTkhKR1BRbm1kYTRaeTBCcUdzejFtMmZwU0pRYXRUMDNWL2IwVGZBcjQrcDhib2ZVUmpDTFk5TlgzNkxDZ1dEandTMVN4UmFvKzRlazcycTUzTWVHVlNrR295NUUyN2pTejVQMmZRZHM4UHZ3UGlkM0R4M081OTQvd0FBQURWekNDQTFNd2dnSTdvQU1DQVFJQ0NHVVVrVTNaV0FTMU1BMEdDU3FHU0liM0RRRUJCUVVBTUg4eEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVNZd0pBWURWUVFMREIxQmNIQnNaU0JEWlhKMGFXWnBZMkYwYVc5dUlFRjFkR2h2Y21sMGVURXpNREVHQTFVRUF3d3FRWEJ3YkdVZ2FWUjFibVZ6SUZOMGIzSmxJRU5sY25ScFptbGpZWFJwYjI0Z1FYVjBhRzl5YVhSNU1CNFhEVEE1TURZeE5USXlNRFUxTmxvWERURTBNRFl4TkRJeU1EVTFObG93WkRFak1DRUdBMVVFQXd3YVVIVnlZMmhoYzJWU1pXTmxhWEIwUTJWeWRHbG1hV05oZEdVeEd6QVpCZ05WQkFzTUVrRndjR3hsSUdsVWRXNWxjeUJUZEc5eVpURVRNQkVHQTFVRUNnd0tRWEJ3YkdVZ1NXNWpMakVMTUFrR0ExVUVCaE1DVlZNd2daOHdEUVlKS29aSWh2Y05BUUVCQlFBRGdZMEFNSUdKQW9HQkFNclJqRjJjdDRJclNkaVRDaGFJMGc4cHd2L2NtSHM4cC9Sd1YvcnQvOTFYS1ZoTmw0WElCaW1LalFRTmZnSHNEczZ5anUrK0RyS0pFN3VLc3BoTWRkS1lmRkU1ckdYc0FkQkVqQndSSXhleFRldngzSExFRkdBdDFtb0t4NTA5ZGh4dGlJZERnSnYyWWFWczQ5QjB1SnZOZHk2U01xTk5MSHNETHpEUzlvWkhBZ01CQUFHamNqQndNQXdHQTFVZEV3RUIvd1FDTUFBd0h3WURWUjBqQkJnd0ZvQVVOaDNvNHAyQzBnRVl0VEpyRHRkREM1RllRem93RGdZRFZSMFBBUUgvQkFRREFnZUFNQjBHQTFVZERnUVdCQlNwZzRQeUdVakZQaEpYQ0JUTXphTittVjhrOVRBUUJnb3Foa2lHOTJOa0JnVUJCQUlGQURBTkJna3Foa2lHOXcwQkFRVUZBQU9DQVFFQUVhU2JQanRtTjRDL0lCM1FFcEszMlJ4YWNDRFhkVlhBZVZSZVM1RmFaeGMrdDg4cFFQOTNCaUF4dmRXLzNlVFNNR1k1RmJlQVlMM2V0cVA1Z204d3JGb2pYMGlreVZSU3RRKy9BUTBLRWp0cUIwN2tMczlRVWU4Y3pSOFVHZmRNMUV1bVYvVWd2RGQ0TndOWXhMUU1nNFdUUWZna1FRVnk4R1had1ZIZ2JFL1VDNlk3MDUzcEdYQms1MU5QTTN3b3hoZDNnU1JMdlhqK2xvSHNTdGNURXFlOXBCRHBtRzUrc2s0dHcrR0szR01lRU41LytlMVFUOW5wL0tsMW5qK2FCdzdDMHhzeTBiRm5hQWQxY1NTNnhkb3J5L0NVdk02Z3RLc21uT09kcVRlc2JwMGJzOHNuNldxczBDOWRnY3hSSHVPTVoydG04bnBMVW03YXJnT1N6UT09IjsKCSJwdXJjaGFzZS1pbmZvIiA9ICJld29KSW05eWFXZHBibUZzTFhCMWNtTm9ZWE5sTFdSaGRHVXRjSE4wSWlBOUlDSXlNREV5TFRFeUxUQXhJREl6T2pFMU9qVTBJRUZ0WlhKcFkyRXZURzl6WDBGdVoyVnNaWE1pT3dvSkluQjFjbU5vWVhObExXUmhkR1V0YlhNaUlEMGdJakV6TlRRME16STFOVFF3TURBaU93b0pJblZ1YVhGMVpTMXBaR1Z1ZEdsbWFXVnlJaUE5SUNJd01EQXdZakF3T1RJNE1UZ2lPd29KSW05eWFXZHBibUZzTFhSeVlXNXpZV04wYVc5dUxXbGtJaUE5SUNJeE1EQXdNREF3TURVNU5qTXlNemcxSWpzS0NTSmxlSEJwY21WekxXUmhkR1VpSUQwZ0lqRXpOVFEwTXpZeE5UUXdNREFpT3dvSkluUnlZVzV6WVdOMGFXOXVMV2xrSWlBOUlDSXhNREF3TURBd01EVTVOak15TXpnMUlqc0tDU0p2Y21sbmFXNWhiQzF3ZFhKamFHRnpaUzFrWVhSbExXMXpJaUE5SUNJeE16VTBORE15TlRVME1EQXdJanNLQ1NKM1pXSXRiM0prWlhJdGJHbHVaUzFwZEdWdExXbGtJaUE5SUNJeE1EQXdNREF3TURJMk5ETTJNamt3SWpzS0NTSmlkbkp6SWlBOUlDSTNJanNLQ1NKbGVIQnBjbVZ6TFdSaGRHVXRabTl5YldGMGRHVmtMWEJ6ZENJZ1BTQWlNakF4TWkweE1pMHdNaUF3TURveE5UbzFOQ0JCYldWeWFXTmhMMHh2YzE5QmJtZGxiR1Z6SWpzS0NTSnBkR1Z0TFdsa0lpQTlJQ0kxT0RBeE9UTTVNemNpT3dvSkltVjRjR2x5WlhNdFpHRjBaUzFtYjNKdFlYUjBaV1FpSUQwZ0lqSXdNVEl0TVRJdE1ESWdNRGc2TVRVNk5UUWdSWFJqTDBkTlZDSTdDZ2tpY0hKdlpIVmpkQzFwWkNJZ1BTQWlZMjl0TG1SZlgySjFlbm91WjJGblgzQnNkWE11YVc5ekxqQXdNUzVoY25NdWNISmxiV2wxYlM0eGVTSTdDZ2tpY0hWeVkyaGhjMlV0WkdGMFpTSWdQU0FpTWpBeE1pMHhNaTB3TWlBd056b3hOVG8xTkNCRmRHTXZSMDFVSWpzS0NTSnZjbWxuYVc1aGJDMXdkWEpqYUdGelpTMWtZWFJsSWlBOUlDSXlNREV5TFRFeUxUQXlJREEzT2pFMU9qVTBJRVYwWXk5SFRWUWlPd29KSW1KcFpDSWdQU0FpWTI5dExtUXRMV0oxZW5vdVoyRm5MWEJzZFhNdWFXOXpMakF3TVNJN0Nna2ljSFZ5WTJoaGMyVXRaR0YwWlMxd2MzUWlJRDBnSWpJd01USXRNVEl0TURFZ01qTTZNVFU2TlRRZ1FXMWxjbWxqWVM5TWIzTmZRVzVuWld4bGN5STdDZ2tpY1hWaGJuUnBkSGtpSUQwZ0lqRWlPd3A5IjsKCSJlbnZpcm9ubWVudCIgPSAiU2FuZGJveCI7CgkicG9kIiA9ICIxMDAiOwoJInNpZ25pbmctc3RhdHVzIiA9ICIwIjsKfQ==";
         
-        // Encodes
-        {
-            NSString *output = [CargoBay _base64EncodedStringFromData:decoded];
-            
-            STAssertEqualObjects(encoded, output, @"The result should be equal.");
-        }
-        
-        // Decodes
-        {
-            NSData *output = [CargoBay _dataFromBase64EncodedString:encoded];
-            STAssertEqualObjects(decoded, output, @"The result should be equal.");
-        }
+        XCTAssertEqualObjects(encoded, [CargoBay _base64EncodedStringFromData:decoded], @"The result should be equal.");
+        XCTAssertEqualObjects(decoded, [CargoBay _dataFromBase64EncodedString:encoded], @"The result should be equal.");
     }
 }
 
@@ -230,7 +197,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
             resume();
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-            STFail(@"The network operation should not fail.");
+            XCTFail(@"The network operation should not fail.");
             resume();
         }];
         
@@ -241,7 +208,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
 
                 BOOL didUseCredential = NO;
                 BOOL isTrusted = [CargoBay _validateTrust:trust error:&error];
-                STAssertTrue(isTrusted, @"The result should be true.");
+                XCTAssertTrue(isTrusted, @"The result should be true.");
                 if (isTrusted) {
                     NSURLCredential *credential = [NSURLCredential credentialForTrust:trust];
                     if (credential) {
@@ -268,7 +235,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         NSURL *url = [NSURL URLWithString:@"" relativeToURL:manager.baseURL];
         NSURLRequest *request = [manager.requestSerializer requestWithMethod:@"GET" URLString:url.absoluteString parameters:nil error:nil];
         AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
-            STFail(@"The network operation should not be able to succeed.");
+            XCTFail(@"The network operation should not be able to succeed.");
             resume();
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             resume();
@@ -281,7 +248,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
                 
                 BOOL didUseCredential = NO;
                 BOOL isTrusted = [CargoBay _validateTrust:trust error:&error];
-                STAssertTrue(isTrusted, @"The result should be true.");
+                XCTAssertTrue(isTrusted, @"The result should be true.");
                 if (isTrusted) {
                     NSURLCredential *credential = [NSURLCredential credentialForTrust:trust];
                     if (credential) {
@@ -374,29 +341,29 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
     
     {
         NSError *error = nil;
-        STAssertFalse([CargoBay _validatePurchaseInfo:nil matchesReceipt:nil error:&error], @"The result should be true.");
-        STAssertNotNil(error, @"The result should not be nil.");
-        STAssertEquals(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
+        XCTAssertFalse([CargoBay _validatePurchaseInfo:nil matchesReceipt:nil error:&error], @"The result should be true.");
+        XCTAssertNotNil(error, @"The result should not be nil.");
+        XCTAssertEqual(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
     }
     
     {
         NSError *error = nil;
-        STAssertFalse([CargoBay _validatePurchaseInfo:nil matchesReceipt:receipt error:&error], @"The result should be true.");
-        STAssertNotNil(error, @"The result should not be nil.");
-        STAssertEquals(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
+        XCTAssertFalse([CargoBay _validatePurchaseInfo:nil matchesReceipt:receipt error:&error], @"The result should be true.");
+        XCTAssertNotNil(error, @"The result should not be nil.");
+        XCTAssertEqual(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
     }
     
     {
         NSError *error = nil;
-        STAssertFalse([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:nil error:&error], @"The result should be true.");
-        STAssertNotNil(error, @"The result should not be nil.");
-        STAssertEquals(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
+        XCTAssertFalse([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:nil error:&error], @"The result should be true.");
+        XCTAssertNotNil(error, @"The result should not be nil.");
+        XCTAssertEqual(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
     }
     
     {
         NSError *error = nil;
-        STAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
-        STAssertNil(error, @"The result should be nil.");
+        XCTAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
+        XCTAssertNil(error, @"The result should be nil.");
     }
     
     {
@@ -404,9 +371,9 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         NSMutableDictionary *mutableReceipt = [receipt mutableCopy];
         mutableReceipt[@"bid"] = @"com.example.app";
-        STAssertFalse([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:mutableReceipt error:&error], @"The result should be true.");
-        STAssertNotNil(error, @"The result should not be nil.");
-        STAssertEquals(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
+        XCTAssertFalse([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:mutableReceipt error:&error], @"The result should be true.");
+        XCTAssertNotNil(error, @"The result should not be nil.");
+        XCTAssertEqual(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
     }
     
     {
@@ -414,9 +381,9 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         NSMutableDictionary *mutableReceipt = [receipt mutableCopy];
         mutableReceipt[@"product_id"] = @"com.example.app.ars.premium.1y";
-        STAssertFalse([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:mutableReceipt error:&error], @"The result should be true.");
-        STAssertNotNil(error, @"The result should not be nil.");
-        STAssertEquals(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
+        XCTAssertFalse([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:mutableReceipt error:&error], @"The result should be true.");
+        XCTAssertNotNil(error, @"The result should not be nil.");
+        XCTAssertEqual(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
     }
     
     {
@@ -424,9 +391,9 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         NSMutableDictionary *mutableReceipt = [receipt mutableCopy];
         mutableReceipt[@"quantity"] = @"2";
-        STAssertFalse([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:mutableReceipt error:&error], @"The result should be true.");
-        STAssertNotNil(error, @"The result should not be nil.");
-        STAssertEquals(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
+        XCTAssertFalse([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:mutableReceipt error:&error], @"The result should be true.");
+        XCTAssertNotNil(error, @"The result should not be nil.");
+        XCTAssertEqual(error.code, CargoBayErrorPurchaseInfoDoesNotMatchReceipt, @"The result should be equal.");
     }
     
 #if !TARGET_IPHONE_SIMULATOR
@@ -490,28 +457,28 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         {
             NSError *error = nil;
-            STAssertTrue([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be true.");
+            XCTAssertTrue([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be true.");
         }
         
         {
             NSError *error = nil;
-            STAssertFalse([CargoBay _validateTransaction:nil matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
-            STAssertNotNil(error, @"The result should not be nil.");
-            STAssertEquals(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
+            XCTAssertFalse([CargoBay _validateTransaction:nil matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
+            XCTAssertNotNil(error, @"The result should not be nil.");
+            XCTAssertEqual(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
         }
         
         {
             NSError *error = nil;
-            STAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:nil error:&error], @"The result should be false.");
-            STAssertNotNil(error, @"The result should not be nil.");
-            STAssertEquals(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
+            XCTAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:nil error:&error], @"The result should be false.");
+            XCTAssertNotNil(error, @"The result should not be nil.");
+            XCTAssertEqual(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
         }
         
         {
             NSError *error = nil;
-            STAssertFalse([CargoBay _validateTransaction:nil matchesPurchaseInfo:nil error:&error], @"The result should be false.");
-            STAssertNotNil(error, @"The result should not be nil.");
-            STAssertEquals(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
+            XCTAssertFalse([CargoBay _validateTransaction:nil matchesPurchaseInfo:nil error:&error], @"The result should be false.");
+            XCTAssertNotNil(error, @"The result should not be nil.");
+            XCTAssertEqual(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
         }
     }
     
@@ -525,9 +492,9 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         {
             NSError *error = nil;
-            STAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
-            STAssertNotNil(error, @"The result should not be nil.");
-            STAssertEquals(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
+            XCTAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
+            XCTAssertNotNil(error, @"The result should not be nil.");
+            XCTAssertEqual(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
         }
     }
     
@@ -541,9 +508,9 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         {
             NSError *error = nil;
-            STAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
-            STAssertNotNil(error, @"The result should not be nil.");
-            STAssertEquals(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
+            XCTAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
+            XCTAssertNotNil(error, @"The result should not be nil.");
+            XCTAssertEqual(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
         }
     }
     
@@ -557,9 +524,9 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         {
             NSError *error = nil;
-            STAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
-            STAssertNotNil(error, @"The result should not be nil.");
-            STAssertEquals(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
+            XCTAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
+            XCTAssertNotNil(error, @"The result should not be nil.");
+            XCTAssertEqual(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
         }
     }
     
@@ -573,9 +540,9 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         {
             NSError *error = nil;
-            STAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
-            STAssertNotNil(error, @"The result should not be nil.");
-            STAssertEquals(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
+            XCTAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
+            XCTAssertNotNil(error, @"The result should not be nil.");
+            XCTAssertEqual(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
         }
     }
     
@@ -589,9 +556,9 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         {
             NSError *error = nil;
-            STAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
-            STAssertNotNil(error, @"The result should not be nil.");
-            STAssertEquals(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
+            XCTAssertFalse([CargoBay _validateTransaction:paymentTransaction matchesPurchaseInfo:mutablePurchaseInfo error:&error], @"The result should be false.");
+            XCTAssertNotNil(error, @"The result should not be nil.");
+            XCTAssertEqual(error.code, CargoBayErrorTransactionDoesNotMatchesPurchaseInfo, @"The result should be equal.");
         }
     }
 }
@@ -671,26 +638,26 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
      -----END CERTIFICATE-----
      */
     
-    STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoString signature:signatureString purchaseDate:purchaseDate], @"The result should be true.");
+    XCTAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoString signature:signatureString purchaseDate:purchaseDate], @"The result should be true.");
     
     // If this fails, it is likely that the signature certificate have expired.
     // This means that Apple will have to sign it with a new certificate though.
     // Although the hardcoded intermediate certificate still have around 2 more
     // years of validity, care have to be taken to determine if Apple have
     // updated its intermediate certificate.
-    STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoString signature:signatureString purchaseDate:[NSDate date]], @"The result should be true.");
+    XCTAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoString signature:signatureString purchaseDate:[NSDate date]], @"The result should be true.");
 
-    STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoString signature:signatureString purchaseDate:[NSDate dateWithTimeIntervalSince1970:1402783556.0]], @"The result should be true.");
-    STAssertFalse([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoString signature:signatureString purchaseDate:[NSDate dateWithTimeIntervalSince1970:1402783557.0]], @"The result should be false.");
+    XCTAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoString signature:signatureString purchaseDate:[NSDate dateWithTimeIntervalSince1970:1402783556.0]], @"The result should be true.");
+    XCTAssertFalse([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoString signature:signatureString purchaseDate:[NSDate dateWithTimeIntervalSince1970:1402783557.0]], @"The result should be false.");
     
     {
         //NSString *purchaseInfoPlist = [[NSString alloc] initWithData:CBDataFromBase64EncodedString(purchaseInfoString) encoding:NSUTF8StringEncoding];
         NSString *purchaseInfoPlist = @"{\n	\"original-purchase-date-pst\" = \"2012-12-01 23:15:54 America/Los_Angeles\";\n	\"purchase-date-ms\" = \"1354432554000\";\n	\"unique-identifier\" = \"0000b0092818\";\n	\"original-transaction-id\" = \"1000000059632385\";\n	\"expires-date\" = \"1354436154000\";\n	\"transaction-id\" = \"1000000059632385\";\n	\"original-purchase-date-ms\" = \"1354432554000\";\n	\"web-order-line-item-id\" = \"1000000026436290\";\n	\"bvrs\" = \"7\";\n	\"expires-date-formatted-pst\" = \"2012-12-02 00:15:54 America/Los_Angeles\";\n	\"item-id\" = \"580193937\";\n	\"expires-date-formatted\" = \"2012-12-02 08:15:54 Etc/GMT\";\n	\"product-id\" = \"com.d__buzz.gag_plus.ios.001.ars.premium.1y\";\n	\"purchase-date\" = \"2012-12-02 07:15:54 Etc/GMT\";\n	\"original-purchase-date\" = \"2012-12-02 07:15:54 Etc/GMT\";\n	\"bid\" = \"com.d--buzz.gag-plus.ios.001\";\n	\"purchase-date-pst\" = \"2012-12-01 23:15:54 America/Los_Angeles\";\n	\"quantity\" = \"1\";\n}";
         NSString *purchaseInfoPlistBase64Encoded = [CargoBay _base64EncodedStringFromData:[purchaseInfoPlist dataUsingEncoding:NSUTF8StringEncoding]];
-        STAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoPlistBase64Encoded signature:signatureString purchaseDate:purchaseDate], @"The result should be true.");
+        XCTAssertTrue([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoPlistBase64Encoded signature:signatureString purchaseDate:purchaseDate], @"The result should be true.");
         purchaseInfoPlist = [purchaseInfoPlist stringByReplacingOccurrencesOfString:@"\"quantity\" = \"1\";" withString:@"\"quantity\" = \"9\";"];
         purchaseInfoPlistBase64Encoded = [CargoBay _base64EncodedStringFromData:[purchaseInfoPlist dataUsingEncoding:NSUTF8StringEncoding]];
-        STAssertFalse([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoPlistBase64Encoded signature:signatureString purchaseDate:purchaseDate], @"The result should be false.");
+        XCTAssertFalse([CargoBay _checkReceiptSecurityWithPurchaseInfo:purchaseInfoPlistBase64Encoded signature:signatureString purchaseDate:purchaseDate], @"The result should be false.");
     }
 }
 
@@ -700,8 +667,8 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         NSData *receiptData = [CargoBay _dataFromBase64EncodedString:receiptBase64EncodedString];
         NSError *error = nil;
         NSDictionary *purchaseInfo = [CargoBay _purchaseInfoFromTransactionReceipt:receiptData error:&error];
-        STAssertNotNil(purchaseInfo, @"The result should not be nil.");
-        STAssertNil(error, @"The result should be nil.");
+        XCTAssertNotNil(purchaseInfo, @"The result should not be nil.");
+        XCTAssertNil(error, @"The result should be nil.");
     }
     
     {
@@ -717,8 +684,8 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             
             NSError *error = nil;
             NSDictionary *purchaseInfo = [CargoBay _purchaseInfoFromTransactionReceipt:receiptData error:&error];
-            STAssertNotNil(purchaseInfo, @"The result should not be nil.");
-            STAssertNil(error, @"The result should be nil.");
+            XCTAssertNotNil(purchaseInfo, @"The result should not be nil.");
+            XCTAssertNil(error, @"The result should be nil.");
         }
         
         {
@@ -729,9 +696,9 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             
             NSError *error = nil;
             NSDictionary *purchaseInfo = [CargoBay _purchaseInfoFromTransactionReceipt:receiptData error:&error];
-            STAssertNil(purchaseInfo, @"The result should be nil.");
-            STAssertNotNil(error, @"The result should not be nil.");
-            STAssertEquals(error.code, CargoBayErrorCannotExtractPurchaseInfoFromTransactionReceipt, @"The result should be equal.");
+            XCTAssertNil(purchaseInfo, @"The result should be nil.");
+            XCTAssertNotNil(error, @"The result should not be nil.");
+            XCTAssertEqual(error.code, CargoBayErrorCannotExtractPurchaseInfoFromTransactionReceipt, @"The result should be equal.");
         }
     }
 }
@@ -743,11 +710,11 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         // Checks for malfunction receipt data
         [self dispatchSemaphoreInBlock:^(void (^resume)(void)) {
             [cargoBay verifyTransactionWithMethod:@"POST" endpoint:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationURLString] receipt:[NSData data] password:nil success:^(NSDictionary *responseObject) {
-                STFail(@"The result should fail.");
+                XCTFail(@"The result should fail.");
                 resume();
             } failure:^(NSError *error) {
-                STAssertNotNil(error, @"The result should not be nil.");
-                STAssertEquals(error.code, CargoBayErrorMalformedReceiptData, @"The result should be equal.");
+                XCTAssertNotNil(error, @"The result should not be nil.");
+                XCTAssertEqual(error.code, CargoBayErrorMalformedReceiptData, @"The result should be equal.");
                 resume();
             }];
         }];
@@ -758,11 +725,11 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             NSData *receiptData = [CargoBay _dataFromBase64EncodedString:receiptBase64EncodedString];
 
             [cargoBay verifyTransactionWithMethod:@"POST" endpoint:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationURLString] receipt:receiptData password:nil success:^(NSDictionary *responseObject) {
-                STFail(@"The result should fail.");
+                XCTFail(@"The result should fail.");
                 resume();
             } failure:^(NSError *error) {
-                STAssertNotNil(error, @"The result should not be nil.");
-                STAssertEquals(error.code, CargoBayStatusSharedSecretDoesNotMatch, @"The result should be equal.");
+                XCTAssertNotNil(error, @"The result should not be nil.");
+                XCTAssertEqual(error.code, CargoBayStatusSharedSecretDoesNotMatch, @"The result should be equal.");
                 resume();
             }];
         }];
@@ -773,18 +740,18 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             NSData *receiptData = [CargoBay _dataFromBase64EncodedString:receiptBase64EncodedString];
 
             [cargoBay verifyTransactionWithMethod:@"POST" endpoint:[NSURL URLWithString:kCargoBayProductionReceiptVerificationURLString] receipt:receiptData password:nil success:^(NSDictionary *responseObject) {
-                STAssertNotNil(responseObject, @"The result should not be nil.");
+                XCTAssertNotNil(responseObject, @"The result should not be nil.");
                 NSError *error = nil;
                 NSDictionary *purchaseInfo = [CargoBay _purchaseInfoFromTransactionReceipt:receiptData error:&error];
-                STAssertNil(error, @"The result should be nil.");
-                STAssertNotNil(purchaseInfo, @"The result should not be nil.");
+                XCTAssertNil(error, @"The result should be nil.");
+                XCTAssertNotNil(purchaseInfo, @"The result should not be nil.");
                 NSDictionary *receipt = responseObject[@"receipt"];
-                STAssertNotNil(receipt, @"The result should not be nil.");
-                STAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
-                STAssertNil(error, @"The result should be nil.");
+                XCTAssertNotNil(receipt, @"The result should not be nil.");
+                XCTAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
+                XCTAssertNil(error, @"The result should be nil.");
                 resume();
             } failure:^(NSError *error) {
-                STFail(@"The result should not fail.");
+                XCTFail(@"The result should not fail.");
                 resume();
             }];
         }];
@@ -795,18 +762,18 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             NSData *receiptData = [CargoBay _dataFromBase64EncodedString:receiptBase64EncodedString];
             
             [cargoBay verifyTransactionWithMethod:@"POST" endpoint:[NSURL URLWithString:kCargoBayProductionReceiptVerificationURLString] receipt:receiptData password:nil success:^(NSDictionary *responseObject) {
-                 STAssertNotNil(responseObject, @"The result should not be nil.");
+                 XCTAssertNotNil(responseObject, @"The result should not be nil.");
                  NSError *error = nil;
                  NSDictionary *purchaseInfo = [CargoBay _purchaseInfoFromTransactionReceipt:receiptData error:&error];
-                 STAssertNil(error, @"The result should be nil.");
-                 STAssertNotNil(purchaseInfo, @"The result should not be nil.");
+                 XCTAssertNil(error, @"The result should be nil.");
+                 XCTAssertNotNil(purchaseInfo, @"The result should not be nil.");
                  NSDictionary *receipt = responseObject[@"receipt"];
-                 STAssertNotNil(receipt, @"The result should not be nil.");
-                 STAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
-                 STAssertNil(error, @"The result should be nil.");
+                 XCTAssertNotNil(receipt, @"The result should not be nil.");
+                 XCTAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
+                 XCTAssertNil(error, @"The result should be nil.");
                  resume();
              } failure:^(NSError *error) {
-                 STFail(@"The result should not fail.");
+                 XCTFail(@"The result should not fail.");
                  resume();
              }];
         }];
@@ -817,18 +784,18 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             NSData *receiptData = [CargoBay _dataFromBase64EncodedString:receiptBase64EncodedString];
             
             [cargoBay verifyTransactionReceipt:receiptData password:nil success:^(NSDictionary *responseObject) {
-                 STAssertNotNil(responseObject, @"The result should not be nil.");
+                 XCTAssertNotNil(responseObject, @"The result should not be nil.");
                  NSError *error = nil;
                  NSDictionary *purchaseInfo = [CargoBay _purchaseInfoFromTransactionReceipt:receiptData error:&error];
-                 STAssertNil(error, @"The result should be nil.");
-                 STAssertNotNil(purchaseInfo, @"The result should not be nil.");
+                 XCTAssertNil(error, @"The result should be nil.");
+                 XCTAssertNotNil(purchaseInfo, @"The result should not be nil.");
                  NSDictionary *receipt = responseObject[@"receipt"];
-                 STAssertNotNil(receipt, @"The result should not be nil.");
-                 STAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
-                 STAssertNil(error, @"The result should be nil.");
+                 XCTAssertNotNil(receipt, @"The result should not be nil.");
+                 XCTAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
+                 XCTAssertNil(error, @"The result should be nil.");
                  resume();
              } failure:^(NSError *error) {
-                 STFail(@"The result should not fail.");
+                 XCTFail(@"The result should not fail.");
                  resume();
              }];
         }];
@@ -843,16 +810,15 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         NSSet *itemSet = [NSSet setWithObject:productID];
 
         [[CargoBay sharedManager] productsWithIdentifiers:itemSet success:^(NSArray *products, NSArray *invalidIdentifiers) {
-            STAssertNotNil(invalidIdentifiers, @"Expected set of invalid ids.");
-            STAssertTrue([invalidIdentifiers count] == 1, @"Expected one invalid id.");
+            XCTAssertNotNil(invalidIdentifiers, @"Expected set of invalid ids.");
+            XCTAssertTrue([invalidIdentifiers count] == 1, @"Expected one invalid id.");
 
             NSString *invalidid = [invalidIdentifiers lastObject];
-            STAssertNotNil(invalidid, @"Expected invalid id to be defined.");
-            STAssertTrue([invalidid isEqualToString:productID], @"Expected invalid id to be the same as the product id");
+            XCTAssertNotNil(invalidid, @"Expected invalid id to be defined.");
+            XCTAssertTrue([invalidid isEqualToString:productID], @"Expected invalid id to be the same as the product id");
             resume();
         } failure:^(NSError *error) {
             NSLog(@"%@, Check that the necessary entitlements are enabled for the project.", error.localizedDescription);
-//            STFail(@"The request should not fail.");
             resume();
         }];
     }];

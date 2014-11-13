@@ -16,7 +16,6 @@
 		1E974D941800A190000B825B /* AFURLRequestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E974D891800A190000B825B /* AFURLRequestSerialization.m */; };
 		1E974D951800A190000B825B /* AFURLResponseSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E974D8B1800A190000B825B /* AFURLResponseSerialization.m */; };
 		1E974D961800A190000B825B /* AFURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E974D8D1800A190000B825B /* AFURLSessionManager.m */; };
-		AB0E582B167B159500B52560 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB0E582A167B159500B52560 /* SenTestingKit.framework */; };
 		AB0E582C167B159500B52560 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17715FD71A100D5AC59 /* UIKit.framework */; };
 		AB0E582D167B159500B52560 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F853B17915FD71A100D5AC59 /* Foundation.framework */; };
 		AB0E5833167B159500B52560 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB0E5831167B159500B52560 /* InfoPlist.strings */; };
@@ -69,7 +68,6 @@
 		1E974D8C1800A190000B825B /* AFURLSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFURLSessionManager.h; sourceTree = "<group>"; };
 		1E974D8D1800A190000B825B /* AFURLSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLSessionManager.m; sourceTree = "<group>"; };
 		AB0E5829167B159500B52560 /* CargoBayTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CargoBayTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
-		AB0E582A167B159500B52560 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		AB0E5830167B159500B52560 /* CargoBayTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CargoBayTests-Info.plist"; sourceTree = "<group>"; };
 		AB0E5832167B159500B52560 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		AB0E5834167B159500B52560 /* CargoBayTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CargoBayTests.h; sourceTree = "<group>"; };
@@ -104,7 +102,6 @@
 			files = (
 				AB1B6B0A167F705200210289 /* StoreKit.framework in Frameworks */,
 				AB28E09C167F1E200052CCFF /* Security.framework in Frameworks */,
-				AB0E582B167B159500B52560 /* SenTestingKit.framework in Frameworks */,
 				AB0E582C167B159500B52560 /* UIKit.framework in Frameworks */,
 				AB0E582D167B159500B52560 /* Foundation.framework in Frameworks */,
 			);
@@ -179,7 +176,6 @@
 				F853B17715FD71A100D5AC59 /* UIKit.framework */,
 				F853B17915FD71A100D5AC59 /* Foundation.framework */,
 				F853B17B15FD71A100D5AC59 /* CoreGraphics.framework */,
-				AB0E582A167B159500B52560 /* SenTestingKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -283,7 +279,7 @@
 			name = CargoBayTests;
 			productName = CargoBayTests;
 			productReference = AB0E5829167B159500B52560 /* CargoBayTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		F853B17215FD71A100D5AC59 /* CargoBay */ = {
 			isa = PBXNativeTarget;
@@ -308,6 +304,7 @@
 		F853B16A15FD71A100D5AC59 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastTestingUpgradeCheck = 0610;
 				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = "Mattt Thompson";
 				TargetAttributes = {
@@ -446,6 +443,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CargoBayTests/CargoBayTests-Prefix.pch";
@@ -454,7 +452,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
 		};
@@ -467,6 +464,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CargoBayTests/CargoBayTests-Prefix.pch";
@@ -474,7 +472,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Release;
 		};
