@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 
 #import <StoreKit/StoreKit.h>
+#import <objc/runtime.h>
 
 #import "CargoBayTests.h"
 
@@ -108,14 +109,14 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
 #pragma mark -
 
 @interface MockSKPaymentTransaction : NSObject <NSCopying>
-@property NSError *error;
-@property SKPaymentTransaction *originalTransaction;
-@property SKPayment *payment;
-@property NSArray *downloads;
-@property NSDate *transactionDate;
-@property NSString *transactionIdentifier;
-@property NSData *transactionReceipt;
-@property SKPaymentTransactionState transactionState;
+@property (nonatomic, strong) NSError *error;
+@property (nonatomic, strong) SKPaymentTransaction *originalTransaction;
+@property (nonatomic, strong) SKPayment *payment;
+@property (nonatomic, strong) NSArray *downloads;
+@property (nonatomic, strong) NSDate *transactionDate;
+@property (nonatomic, strong) NSString *transactionIdentifier;
+@property (nonatomic, strong) NSData *transactionReceipt;
+@property (nonatomic, assign) SKPaymentTransactionState transactionState;
 @end
 
 @implementation MockSKPaymentTransaction
@@ -194,14 +195,14 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         NSURL *url = [NSURL URLWithString:@"" relativeToURL:manager.baseURL];
         NSURLRequest *request = [manager.requestSerializer requestWithMethod:@"GET" URLString:url.absoluteString parameters:nil error:nil];
-        AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        AFHTTPRequestOperation *requestOperation = [manager HTTPRequestOperationWithRequest:request success:^(__unused AFHTTPRequestOperation *operation, __unused id responseObject) {
             resume();
-        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        } failure:^(__unused AFHTTPRequestOperation *operation, __unused NSError *error) {
             XCTFail(@"The network operation should not fail.");
             resume();
         }];
         
-        [operation setWillSendRequestForAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
+        [requestOperation setWillSendRequestForAuthenticationChallengeBlock:^(__unused NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
             if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust]) {
                 SecTrustRef trust = [[challenge protectionSpace] serverTrust];
                 NSError *error = nil;
@@ -225,7 +226,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             }
         }];
         
-        [manager.operationQueue addOperation:operation];
+        [manager.operationQueue addOperation:requestOperation];
     }];
     
     // https://www.apple.com/ does not have extended validation (EV) certificate.
@@ -234,14 +235,14 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         
         NSURL *url = [NSURL URLWithString:@"" relativeToURL:manager.baseURL];
         NSURLRequest *request = [manager.requestSerializer requestWithMethod:@"GET" URLString:url.absoluteString parameters:nil error:nil];
-        AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:request success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        AFHTTPRequestOperation *requestOperation = [manager HTTPRequestOperationWithRequest:request success:^(__unused AFHTTPRequestOperation *operation, __unused id responseObject) {
             XCTFail(@"The network operation should not be able to succeed.");
             resume();
-        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        } failure:^(__unused AFHTTPRequestOperation *operation, __unused NSError *error) {
             resume();
         }];
         
-        [operation setWillSendRequestForAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
+        [requestOperation setWillSendRequestForAuthenticationChallengeBlock:^(__unused NSURLConnection *connection, __unused NSURLAuthenticationChallenge *challenge) {
             if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust]) {
                 SecTrustRef trust = [[challenge protectionSpace] serverTrust];
                 NSError *error = nil;
@@ -265,7 +266,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             }
         }];
         
-        [manager.operationQueue addOperation:operation];
+        [manager.operationQueue addOperation:requestOperation];
     }];
 }
 
@@ -706,10 +707,10 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
 - (void)testVerifyTransactionReceipt {
     {
         CargoBay *cargoBay = [[CargoBay alloc] init];
-        
+
         // Checks for malfunction receipt data
         [self dispatchSemaphoreInBlock:^(void (^resume)(void)) {
-            [cargoBay verifyTransactionWithMethod:@"POST" endpoint:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationURLString] receipt:[NSData data] password:nil success:^(NSDictionary *responseObject) {
+            [cargoBay verifyTransactionWithMethod:@"POST" endpoint:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationURLString] receipt:[NSData data] password:nil success:^(__unused id responseObject) {
                 XCTFail(@"The result should fail.");
                 resume();
             } failure:^(NSError *error) {
@@ -724,7 +725,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
             NSString *receiptBase64EncodedString = @"ewoJInNpZ25hdHVyZSIgPSAiQWtZdVBNRGc1bjl5NDBRL2pXT08vVU5KeUZBbzNjTytvUmpJWklLWXQ3L00wNUV5WHFKTkhKR1BRbm1kYTRaeTBCcUdzejFtMmZwU0pRYXRUMDNWL2IwVGZBcjQrcDhib2ZVUmpDTFk5TlgzNkxDZ1dEandTMVN4UmFvKzRlazcycTUzTWVHVlNrR295NUUyN2pTejVQMmZRZHM4UHZ3UGlkM0R4M081OTQvd0FBQURWekNDQTFNd2dnSTdvQU1DQVFJQ0NHVVVrVTNaV0FTMU1BMEdDU3FHU0liM0RRRUJCUVVBTUg4eEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVNZd0pBWURWUVFMREIxQmNIQnNaU0JEWlhKMGFXWnBZMkYwYVc5dUlFRjFkR2h2Y21sMGVURXpNREVHQTFVRUF3d3FRWEJ3YkdVZ2FWUjFibVZ6SUZOMGIzSmxJRU5sY25ScFptbGpZWFJwYjI0Z1FYVjBhRzl5YVhSNU1CNFhEVEE1TURZeE5USXlNRFUxTmxvWERURTBNRFl4TkRJeU1EVTFObG93WkRFak1DRUdBMVVFQXd3YVVIVnlZMmhoYzJWU1pXTmxhWEIwUTJWeWRHbG1hV05oZEdVeEd6QVpCZ05WQkFzTUVrRndjR3hsSUdsVWRXNWxjeUJUZEc5eVpURVRNQkVHQTFVRUNnd0tRWEJ3YkdVZ1NXNWpMakVMTUFrR0ExVUVCaE1DVlZNd2daOHdEUVlKS29aSWh2Y05BUUVCQlFBRGdZMEFNSUdKQW9HQkFNclJqRjJjdDRJclNkaVRDaGFJMGc4cHd2L2NtSHM4cC9Sd1YvcnQvOTFYS1ZoTmw0WElCaW1LalFRTmZnSHNEczZ5anUrK0RyS0pFN3VLc3BoTWRkS1lmRkU1ckdYc0FkQkVqQndSSXhleFRldngzSExFRkdBdDFtb0t4NTA5ZGh4dGlJZERnSnYyWWFWczQ5QjB1SnZOZHk2U01xTk5MSHNETHpEUzlvWkhBZ01CQUFHamNqQndNQXdHQTFVZEV3RUIvd1FDTUFBd0h3WURWUjBqQkJnd0ZvQVVOaDNvNHAyQzBnRVl0VEpyRHRkREM1RllRem93RGdZRFZSMFBBUUgvQkFRREFnZUFNQjBHQTFVZERnUVdCQlNwZzRQeUdVakZQaEpYQ0JUTXphTittVjhrOVRBUUJnb3Foa2lHOTJOa0JnVUJCQUlGQURBTkJna3Foa2lHOXcwQkFRVUZBQU9DQVFFQUVhU2JQanRtTjRDL0lCM1FFcEszMlJ4YWNDRFhkVlhBZVZSZVM1RmFaeGMrdDg4cFFQOTNCaUF4dmRXLzNlVFNNR1k1RmJlQVlMM2V0cVA1Z204d3JGb2pYMGlreVZSU3RRKy9BUTBLRWp0cUIwN2tMczlRVWU4Y3pSOFVHZmRNMUV1bVYvVWd2RGQ0TndOWXhMUU1nNFdUUWZna1FRVnk4R1had1ZIZ2JFL1VDNlk3MDUzcEdYQms1MU5QTTN3b3hoZDNnU1JMdlhqK2xvSHNTdGNURXFlOXBCRHBtRzUrc2s0dHcrR0szR01lRU41LytlMVFUOW5wL0tsMW5qK2FCdzdDMHhzeTBiRm5hQWQxY1NTNnhkb3J5L0NVdk02Z3RLc21uT09kcVRlc2JwMGJzOHNuNldxczBDOWRnY3hSSHVPTVoydG04bnBMVW03YXJnT1N6UT09IjsKCSJwdXJjaGFzZS1pbmZvIiA9ICJld29KSW05eWFXZHBibUZzTFhCMWNtTm9ZWE5sTFdSaGRHVXRjSE4wSWlBOUlDSXlNREV5TFRFeUxUQXhJREl6T2pFMU9qVTBJRUZ0WlhKcFkyRXZURzl6WDBGdVoyVnNaWE1pT3dvSkluQjFjbU5vWVhObExXUmhkR1V0YlhNaUlEMGdJakV6TlRRME16STFOVFF3TURBaU93b0pJblZ1YVhGMVpTMXBaR1Z1ZEdsbWFXVnlJaUE5SUNJd01EQXdZakF3T1RJNE1UZ2lPd29KSW05eWFXZHBibUZzTFhSeVlXNXpZV04wYVc5dUxXbGtJaUE5SUNJeE1EQXdNREF3TURVNU5qTXlNemcxSWpzS0NTSmxlSEJwY21WekxXUmhkR1VpSUQwZ0lqRXpOVFEwTXpZeE5UUXdNREFpT3dvSkluUnlZVzV6WVdOMGFXOXVMV2xrSWlBOUlDSXhNREF3TURBd01EVTVOak15TXpnMUlqc0tDU0p2Y21sbmFXNWhiQzF3ZFhKamFHRnpaUzFrWVhSbExXMXpJaUE5SUNJeE16VTBORE15TlRVME1EQXdJanNLQ1NKM1pXSXRiM0prWlhJdGJHbHVaUzFwZEdWdExXbGtJaUE5SUNJeE1EQXdNREF3TURJMk5ETTJNamt3SWpzS0NTSmlkbkp6SWlBOUlDSTNJanNLQ1NKbGVIQnBjbVZ6TFdSaGRHVXRabTl5YldGMGRHVmtMWEJ6ZENJZ1BTQWlNakF4TWkweE1pMHdNaUF3TURveE5UbzFOQ0JCYldWeWFXTmhMMHh2YzE5QmJtZGxiR1Z6SWpzS0NTSnBkR1Z0TFdsa0lpQTlJQ0kxT0RBeE9UTTVNemNpT3dvSkltVjRjR2x5WlhNdFpHRjBaUzFtYjNKdFlYUjBaV1FpSUQwZ0lqSXdNVEl0TVRJdE1ESWdNRGc2TVRVNk5UUWdSWFJqTDBkTlZDSTdDZ2tpY0hKdlpIVmpkQzFwWkNJZ1BTQWlZMjl0TG1SZlgySjFlbm91WjJGblgzQnNkWE11YVc5ekxqQXdNUzVoY25NdWNISmxiV2wxYlM0eGVTSTdDZ2tpY0hWeVkyaGhjMlV0WkdGMFpTSWdQU0FpTWpBeE1pMHhNaTB3TWlBd056b3hOVG8xTkNCRmRHTXZSMDFVSWpzS0NTSnZjbWxuYVc1aGJDMXdkWEpqYUdGelpTMWtZWFJsSWlBOUlDSXlNREV5TFRFeUxUQXlJREEzT2pFMU9qVTBJRVYwWXk5SFRWUWlPd29KSW1KcFpDSWdQU0FpWTI5dExtUXRMV0oxZW5vdVoyRm5MWEJzZFhNdWFXOXpMakF3TVNJN0Nna2ljSFZ5WTJoaGMyVXRaR0YwWlMxd2MzUWlJRDBnSWpJd01USXRNVEl0TURFZ01qTTZNVFU2TlRRZ1FXMWxjbWxqWVM5TWIzTmZRVzVuWld4bGN5STdDZ2tpY1hWaGJuUnBkSGtpSUQwZ0lqRWlPd3A5IjsKCSJlbnZpcm9ubWVudCIgPSAiU2FuZGJveCI7CgkicG9kIiA9ICIxMDAiOwoJInNpZ25pbmctc3RhdHVzIiA9ICIwIjsKfQ==";
             NSData *receiptData = [CargoBay _dataFromBase64EncodedString:receiptBase64EncodedString];
 
-            [cargoBay verifyTransactionWithMethod:@"POST" endpoint:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationURLString] receipt:receiptData password:nil success:^(NSDictionary *responseObject) {
+            [cargoBay verifyTransactionWithMethod:@"POST" endpoint:[NSURL URLWithString:kCargoBaySandboxReceiptVerificationURLString] receipt:receiptData password:nil success:^(__unused id responseObject) {
                 XCTFail(@"The result should fail.");
                 resume();
             } failure:^(NSError *error) {
@@ -750,7 +751,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
                 XCTAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
                 XCTAssertNil(error, @"The result should be nil.");
                 resume();
-            } failure:^(NSError *error) {
+            } failure:^(__unused NSError *error) {
                 XCTFail(@"The result should not fail.");
                 resume();
             }];
@@ -772,7 +773,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
                  XCTAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
                  XCTAssertNil(error, @"The result should be nil.");
                  resume();
-             } failure:^(NSError *error) {
+             } failure:^(__unused NSError *error) {
                  XCTFail(@"The result should not fail.");
                  resume();
              }];
@@ -794,7 +795,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
                  XCTAssertTrue([CargoBay _validatePurchaseInfo:purchaseInfo matchesReceipt:receipt error:&error], @"The result should be true.");
                  XCTAssertNil(error, @"The result should be nil.");
                  resume();
-             } failure:^(NSError *error) {
+             } failure:^(__unused NSError *error) {
                  XCTFail(@"The result should not fail.");
                  resume();
              }];
@@ -809,7 +810,7 @@ extern NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *,  NSError * 
         NSString *productID = @"invalid";
         NSSet *itemSet = [NSSet setWithObject:productID];
 
-        [[CargoBay sharedManager] productsWithIdentifiers:itemSet success:^(NSArray *products, NSArray *invalidIdentifiers) {
+        [[CargoBay sharedManager] productsWithIdentifiers:itemSet success:^(__unused NSArray *products, NSArray *invalidIdentifiers) {
             XCTAssertNotNil(invalidIdentifiers, @"Expected set of invalid ids.");
             XCTAssertTrue([invalidIdentifiers count] == 1, @"Expected one invalid id.");
 
