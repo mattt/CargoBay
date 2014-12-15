@@ -175,6 +175,8 @@ BOOL CBValidateTrust(SecTrustRef trust, NSError * __autoreleasing *error) {
         
         return NO;
     }
+#else
+#pragma unused (trust, error)
 #endif
     
     return YES;
@@ -246,6 +248,8 @@ BOOL CBValidatePurchaseInfoMatchesReceiptForDevice(NSDictionary *purchaseInfo, N
         }
 #endif
     }
+#else
+#pragma unused (purchaseInfo, receipt)
 #endif
 
     return YES;
@@ -757,6 +761,8 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
     [self verifyTransactionReceipt:CBTransactionReceiptFromPaymentTransaction(transaction) password:passwordOrNil success:success failure:failure];
+#else
+#pragma unused (passwordOrNil, success)
 #endif
 }
 
@@ -1003,6 +1009,8 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
             return NO;
         }        
     }
+#else
+#pragma unused (transaction, error)
 #endif
 
     return YES;
