@@ -28,10 +28,8 @@
 
 #if defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
 
-int main(int argc, const char * argv[]) {
-    @autoreleasepool {
-        
-    }
+int main(__unused int argc, __unused const char * argv[]) {
+    @autoreleasepool {}
     
     return 0;
 }
