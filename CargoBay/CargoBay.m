@@ -640,6 +640,9 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 @property (readwrite, nonatomic, copy) CargoBayPaymentQueueProductSuccessBlock success;
 @property (readwrite, nonatomic, copy) CargoBayPaymentQueueProductFailureBlock failure;
 
+// On tvOS we need to retain the request
+@property (readwrite, nonatomic, strong) SKProductsRequest *request;
+
 + (void)registerDelegate:(CargoBayProductRequestDelegate *)delegate;
 + (void)unregisterDelegate:(CargoBayProductRequestDelegate *)delegate;
 
@@ -699,8 +702,9 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 {
     SKProductsRequest *request = [[SKProductsRequest alloc] initWithProductIdentifiers:identifiers];
 
-    id <SKProductsRequestDelegate> delegate = [[CargoBayProductRequestDelegate alloc] initWithSuccess:success failure:failure];
+    CargoBayProductRequestDelegate *delegate = [[CargoBayProductRequestDelegate alloc] initWithSuccess:success failure:failure];
     request.delegate = delegate;
+    delegate.request = request; // We need to retain the request on tvOS
 
     [CargoBayProductRequestDelegate registerDelegate:delegate];
     [request start];
