@@ -12,7 +12,9 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '6.0'
   s.osx.deployment_target = '10.8'
+  s.tvos.deployment_target = '9.0'
   s.frameworks = 'StoreKit', 'Security'
 
-  s.dependency 'AFNetworking', '~> 2.2'
+  s.dependency 'AFNetworking/NSURLSession', '~> 2.2'
+  s.dependency 'AFNetworking/NSURLConnection', '~> 2.2'
 end
