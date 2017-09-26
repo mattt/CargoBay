@@ -41,6 +41,7 @@ typedef void (^CargoBayPaymentQueueRestoreSuccessBlock)(SKPaymentQueue *queue);
 typedef void (^CargoBayPaymentQueueRestoreFailureBlock)(SKPaymentQueue *queue, NSError *error);
 typedef void (^CargoBayPaymentQueueUpdatedDownloadsBlock)(SKPaymentQueue *queue, NSArray *downloads);
 typedef BOOL (^CargoBayTransactionIDUniquenessVerificationBlock)(NSString *transactionID);
+typedef BOOL (^CargoBayPaymentQueueShouldAddStorePaymentBlock)(SKPaymentQueue *queue, SKPayment *payment, SKProduct *product);
 
 extern NSDate * CBDateFromDateString(NSString *);
 extern NSString * CBBase64EncodedStringFromData(NSData *);
@@ -657,6 +658,7 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
 @property (readwrite, nonatomic, copy) CargoBayPaymentQueueRestoreFailureBlock paymentQueueRestoreFailure;
 @property (readwrite, nonatomic, copy) CargoBayPaymentQueueUpdatedDownloadsBlock paymentQueueUpdatedDownloads;
 @property (readwrite, nonatomic, copy) CargoBayTransactionIDUniquenessVerificationBlock transactionIDUniquenessVerificationBlock;
+@property (readwrite, nonatomic, copy) CargoBayPaymentQueueShouldAddStorePaymentBlock paymentQueueShouldAddStorePayment;
 @end
 
 @implementation CargoBay
@@ -949,6 +951,10 @@ NSDictionary * CBPurchaseInfoFromTransactionReceipt(NSData *transactionReceiptDa
     self.paymentQueueUpdatedDownloads = block;
 }
 
+- (void)setPaymentQueueShouldAddStorePayment:(BOOL (^)(SKPaymentQueue *queue, SKPayment *payment, SKProduct *product))block {
+    _paymentQueueShouldAddStorePayment = block;
+}
+
 #pragma mark - Receipt Verification
 
 - (BOOL)isValidTransaction:(SKPaymentTransaction *)transaction
@@ -1054,6 +1060,15 @@ restoreCompletedTransactionsFailedWithError:(NSError *)error
     if (self.paymentQueueRestoreFailure) {
         self.paymentQueueRestoreFailure(queue, error);
     }
+}
+
+- (BOOL)paymentQueue:(SKPaymentQueue *)queue shouldAddStorePayment:(SKPayment *)payment forProduct:(SKProduct *)product {
+    
+    if (self.paymentQueueShouldAddStorePayment) {
+        return self.paymentQueueShouldAddStorePayment(queue, payment, product);
+    }
+    
+    return NO;
 }
 
 @end
