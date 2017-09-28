@@ -169,6 +169,16 @@
  */
 - (void)setPaymentQueueUpdatedDownloadsBlock:(void (^)(SKPaymentQueue *queue, NSArray *downloads))block;
 
+
+/**
+ Sets a block to be called when the payment has requested directly via the App Store.
+
+ @param block A block object to be executed when the payment queue should decide to complete a transaction now, or defer it later.
+ 
+ @discussion Return NO to defer the payment to a later time, or YES to handle the payment now.  If deferred to a later time, you are responsible for keeping track of the payment object to handle it later.
+ */
+- (void)setPaymentQueueShouldAddStorePayment:(BOOL (^)(SKPaymentQueue *queue, SKPayment *payment, SKProduct *product))block;
+
 @end
 
 ///----------------
