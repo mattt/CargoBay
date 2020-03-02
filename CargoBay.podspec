@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name     = 'CargoBay'
-  s.version  = '2.1.1'
+  s.version  = '2.1.2'
   s.license  = 'MIT'
   s.summary  = 'The Essential StoreKit Companion.'
   s.homepage = 'https://github.com/mattt/CargoBay'
@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.source_files = 'CargoBay'
   s.requires_arc = true
 
-  s.ios.deployment_target = '6.0'
+  s.ios.deployment_target = '9.3'
   s.osx.deployment_target = '10.8'
   s.frameworks = 'StoreKit', 'Security'
 end
