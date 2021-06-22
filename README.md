@@ -1,5 +1,6 @@
 # CargoBay
-**The Essential StoreKit Companion**
+
+> **Note**: This project is no longer being maintained.
 
 [`StoreKit`](http://developer.apple.com/library/ios/#documentation/StoreKit/Reference/StoreKit_Collection/) is the Apple framework for [making In-App Purchases](https://developer.apple.com/library/IOS/documentation/NetworkingInternet/Conceptual/StoreKitGuide/Introduction.html). It's pretty good, but it has a few rough edges.
 
@@ -10,8 +11,6 @@
 - Ability to request product information for identifiers asynchronously from a remote web service
 - Block-based callbacks for payment queue observation delegate methods
 - Automatic check for transaction uniqueness
-
-> This project is part of a series of open source libraries covering the mission-critical aspects of an iOS app's infrastructure. Be sure to check out its sister projects: [GroundControl](https://github.com/mattt/GroundControl), [SkyLab](https://github.com/mattt/SkyLab), [houston](https://github.com/mattt/houston), and [Orbiter](https://github.com/mattt/Orbiter).
 
 ## Usage
 
@@ -58,13 +57,6 @@ success:^(NSArray *products, NSArray *invalidIdentifiers) {
     NSLog(@"Error %d (%@)", [error code], [error localizedDescription]);
 }];
 ```
-
-## Contact
-
-Mattt Thompson
-
-- http://github.com/mattt
-- http://twitter.com/mattt
 
 ## License
 
